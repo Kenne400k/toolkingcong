@@ -55,6 +55,29 @@
         .bg-secondary { background: var(--bg-secondary); }
         .border-custom { border-color: var(--border); }
         
+        /* =================== SIDEBAR & HEADER - MUST BE VISIBLE =================== */
+        #app-sidebar {
+            display: flex !important;
+            flex-direction: column;
+            width: 256px;
+            min-width: 256px;
+            border-right: 1px solid var(--border);
+            background: var(--bg-main);
+            flex-shrink: 0;
+        }
+        
+        #app-header {
+            display: flex !important;
+            height: 64px;
+            min-height: 64px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-main);
+            flex-shrink: 0;
+        }
+        
         /* Sidebar Styles */
         .avatar-wrapper {
             width: 40px; height: 40px;
@@ -106,6 +129,11 @@
         
         /* File Input Hidden */
         #fileInput { display: none; }
+        
+        /* Responsive - Hide sidebar on mobile */
+        @media (max-width: 768px) {
+            #app-sidebar { display: none !important; }
+        }
     </style>
 </head>
 <body class="bg-main">
@@ -118,7 +146,7 @@
     <div class="flex h-screen w-full overflow-hidden">
         
         <!-- =================== SIDEBAR =================== -->
-        <aside class="w-64 flex flex-col border-r border-custom bg-main hidden md:flex shrink-0" id="app-sidebar">
+        <aside class="w-64 flex flex-col border-r border-custom bg-main shrink-0" id="app-sidebar">
             <div class="flex flex-col h-full p-4">
                 
                 <!-- User Info -->
@@ -160,7 +188,7 @@
         </aside>
         
         <!-- =================== MAIN CONTENT =================== -->
-        <main class="flex-1 flex flex-col h-full overflow-hidden bg-main">
+        <main class="flex-1 flex flex-col overflow-hidden bg-main" style="height: 100vh;">
             
             <!-- Header -->
             <header class="h-16 flex items-center justify-between border-b border-custom px-6 bg-main shrink-0" id="app-header">
@@ -176,7 +204,7 @@
             </header>
 
             <!-- TTS Container -->
-            <div class="tts-container m-4" style="height: calc(100% - 96px);">
+            <div class="tts-container" style="margin: 16px; height: calc(100% - 32px);">
                 
                 <!-- =================== INPUT AREA (Left) =================== -->
                 <div class="input-area" id="dropZone">

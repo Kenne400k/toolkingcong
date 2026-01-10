@@ -43,13 +43,24 @@ body {
     display: grid;
     grid-template-columns: 1fr 420px;
     gap: 0;
-    height: calc(100vh - 64px);
+    height: 100%;
     border: 1px solid var(--el-border);
     border-radius: 16px;
     overflow: hidden;
     background: var(--el-bg);
     box-shadow: 0 4px 24px rgba(0,0,0,0.4);
     position: relative;
+}
+
+/* =========================================
+   ENSURE SIDEBAR AND HEADER ARE VISIBLE
+   ========================================= */
+#app-sidebar {
+    display: flex !important;
+}
+
+#app-header {
+    display: flex !important;
 }
 
 /* =========================================
