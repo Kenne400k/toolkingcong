@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>VoiceStudio - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class", 
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#a855f7", 
+                        "bg-main": "#0a0a0a",
+                        "bg-secondary": "#121212", 
+                        "bg-tertiary": "#1a1a1a",
+                        "border-dark": "#2a2a2a"
+                    }, 
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #a855f7;
+            --bg-main: #0a0a0a;
+            --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text-dim: #888;
+        }
+        
+        /* =================== SCROLLBAR =================== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a3a3a;
+        }
+        
+        /* =================== SMOOTH TRANSITIONS =================== */
+        * {
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body {
+            background: var(--bg-main);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        
+        /* =================== GRADIENT BORDER WRAPPER =================== */
+        .gradient-border {
+            position: relative;
+            border-radius: 12px;
+            padding: 1.5px;
+            background: var(--bg-main);
+            overflow: hidden;
+        }
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: -150%;
+            background: conic-gradient(
+                from 0deg,
+                #1a1a2e 0deg,
+                oklch(54.6% .245 262.881) 45deg,
+                oklch(62.3% .214 259.815) 90deg,
+                oklch(70.7% .165 254.624) 135deg,
+                oklch(29.1% .149 302.717) 180deg,
+                oklch(48.8% .243 264.376) 225deg,
+                oklch(54.6% .245 262.881) 270deg,
+                oklch(42.4% .199 265.638) 315deg,
+                #1a1a2e 360deg
+            );
+            animation: spin 8s linear infinite, colorChange 16s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes colorChange {
+            0% { filter: hue-rotate(0deg) saturate(1); }
+            50% { filter: hue-rotate(80deg) saturate(1.2); }
+            100% { filter: hue-rotate(0deg) saturate(1); }
+        }
+        
+        .gradient-border-inner {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-secondary);
+            border-radius: 11px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* =================== AVATAR =================== */
+        .avatar-wrapper {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0.1) 100%);
+            padding: 2px;
+            flex-shrink: 0;
+        }
+        
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .avatar-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* =================== STAT CARDS =================== */
+        .stat-card {
+            position: relative;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(168, 85, 247, 0.1),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-card:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* =================== NAV LINKS =================== */
+        .nav-link {
+            position: relative;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--primary);
+            transition: height 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(168, 85, 247, 0.08);
+        }
+        
+        .nav-link.active {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--primary);
+        }
+        
+        .nav-link.active::before {
+            height: 60%;
+        }
+        
+        /* =================== TABLE =================== */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .data-table thead tr {
+            background: var(--bg-main);
+        }
+        
+        .data-table tbody tr {
+            border-top: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+        
+        .data-table tbody tr:hover {
+            background: rgba(168, 85, 247, 0.05);
+        }
+        
+        /* =================== LOADING =================== */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* =================== ANIMATIONS =================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* =================== UTILITIES =================== */
+        .text-dim {
+            color: var(--text-dim);
+        }
+        
+        .bg-main {
+            background: var(--bg-main);
+        }
+        
+        .bg-secondary {
+            background: var(--bg-secondary);
+        }
+        
+        .bg-tertiary {
+            background: var(--bg-tertiary);
+        }
+        
+        .border-custom {
+            border-color: var(--border);
+        }
+        
+        /* =================== SMOOTH RESIZE =================== */
+        .resize-smooth {
+            will-change: transform;
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+    </style>
+</head>
+
+<body class="bg-main">
+    <div class="flex h-screen w-full overflow-hidden resize-smooth">
+        
+        <!-- =================== SIDEBAR =================== -->
+        <aside class="w-64 flex flex-col border-r border-custom bg-main hidden md:flex shrink-0">
+            <div class="flex flex-col h-full p-4">
+                
+                <!-- User Info -->
+                <div class="flex gap-3 items-center p-3 mb-6">
+                    <div class="avatar-wrapper">
+                        <div class="avatar-inner" id="user-avatar">
+                            <span class="text-sm font-bold text-white">K</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <h1 class="text-white text-sm font-semibold truncate" id="user-name">VoiceStudio</h1>
+                        <p class="text-dim text-xs">Pro Plan</p>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="flex flex-col gap-1 flex-1">
+                    <a class="nav-link active flex items-center gap-3 text-sm font-medium" data-page="dashboard">
+                        <span class="material-symbols-outlined text-xl">dashboard</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="nav-link flex items-center gap-3 text-sm font-medium text-dim" data-page="tts">
+                        <span class="material-symbols-outlined text-xl">mic</span>
+                        <span>TTS Tool</span>
+                    </a>
+                    <a class="nav-link flex items-center gap-3 text-sm font-medium text-dim" data-page="history">
+                        <span class="material-symbols-outlined text-xl">history</span>
+                        <span>History</span>
+                    </a>
+                    
+                    <div class="mt-auto pt-4 border-t border-custom">
+                        <a class="nav-link flex items-center gap-3 text-sm font-medium text-dim" id="logout-btn">
+                            <span class="material-symbols-outlined text-xl">logout</span>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </aside>
+        
+        <!-- =================== MAIN CONTENT =================== -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-main">
+            
+            <!-- Header -->
+            <header class="h-16 flex items-center justify-between border-b border-custom px-6 bg-main shrink-0">
+                <h2 class="text-white text-lg font-semibold">Overview</h2>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg border border-custom">
+                        <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
+                        <span class="text-sm font-semibold text-white" id="header-credits">0</span>
+                        <span class="text-xs text-dim">Credits</span>
+                    </div>
+                    <span class="text-sm text-dim hidden sm:block" id="header-email">Loading...</span>
+                </div>
+            </header>
+            
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-6" id="dashboard-content">
+                
+                <!-- Loading State -->
+                <div class="flex items-center justify-center h-full" id="loading-state">
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="loading-spinner"></div>
+                        <p class="text-dim text-sm">Loading dashboard...</p>
+                    </div>
+                </div>
+                
+                <!-- Main Dashboard -->
+                <div class="max-w-7xl mx-auto flex-col gap-8 hidden" id="main-dashboard">
+                    
+                    <!-- Welcome Section -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h1 class="text-2xl font-bold text-white mb-1">Welcome back, <span id="welcome-name">User</span></h1>
+                            <p class="text-dim text-sm">Here's what's happening with your voice projects today.</p>
+                        </div>
+                        <button class="bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all hover:scale-105" id="create-task-btn">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            New Task
+                        </button>
+                    </div>
+                    
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        
+                        <!-- Total Tasks -->
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-primary">task_alt</span>
+                                </div>
+                            </div>
+                            <h3 class="text-3xl font-bold text-white mb-1" id="stat-total-tasks">0</h3>
+                            <p class="text-dim text-xs font-medium">Total Tasks</p>
+                        </div>
+                        
+                        <!-- Credits -->
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-purple-400">token</span>
+                                </div>
+                            </div>
+                            <h3 class="text-3xl font-bold text-white mb-1" id="stat-credits">0</h3>
+                            <p class="text-dim text-xs font-medium">Credits Remaining</p>
+                        </div>
+                        
+                        <!-- Pending -->
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-orange-400">pending</span>
+                                </div>
+                            </div>
+                            <h3 class="text-3xl font-bold text-white mb-1" id="stat-pending">0</h3>
+                            <p class="text-dim text-xs font-medium">Pending Tasks</p>
+                        </div>
+                        
+                        <!-- Success Rate -->
+                        <div class="stat-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-green-400">check_circle</span>
+                                </div>
+                            </div>
+                            <h3 class="text-3xl font-bold text-white mb-1" id="stat-success-rate">0%</h3>
+                            <p class="text-dim text-xs font-medium">Success Rate</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Tasks Table -->
+                    <div class="gradient-border">
+                        <div class="gradient-border-inner">
+                            <div class="p-5 border-b border-custom flex items-center justify-between">
+                                <h3 class="text-base font-semibold text-white">Recent Tasks</h3>
+                                <button class="text-sm text-primary font-medium hover:text-primary/80 transition-colors" id="view-all-btn">View All</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr class="text-dim text-xs uppercase tracking-wider">
+                                            <th class="px-6 py-4 font-medium text-left">Task ID</th>
+                                            <th class="px-6 py-4 font-medium text-left">Text Preview</th>
+                                            <th class="px-6 py-4 font-medium text-left">Voice</th>
+                                            <th class="px-6 py-4 font-medium text-left">Status</th>
+                                            <th class="px-6 py-4 font-medium text-left">Cost</th>
+                                            <th class="px-6 py-4 font-medium text-right">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-sm" id="recent-tasks-body">
+                                        <tr>
+                                            <td colspan="6" class="px-6 py-8 text-center text-dim">
+                                                Loading tasks...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/api-handler.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

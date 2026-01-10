@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KingCong Studio - AI TTS</title>
+    <link rel="stylesheet" href="css/tts.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-left">
+            <img src="../image/Kingcong.jpg" alt="KingCong Studio" class="logo-img">
+        </div>
+        <div class="header-right">
+            <div class="credits-badge">
+                <i class="bi bi-coin"></i>
+                <span id="creditsValue">5000</span> Credits
+            </div>
+            <button class="btn-icon" title="Đăng xuất" onclick="handleLogout()">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <main class="editor-section">
+            <div class="quick-toolbar">
+                <div class="provider-badge">
+                    <img src="https://via.placeholder.com/20" class="provider-icon-mini">
+                    <span>ElevenLabs</span>
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </div>
+
+            <div class="gradient-border-box textarea-wrapper">
+                <div class="textarea-inner">
+                    <textarea 
+                        id="txtInput" 
+                        placeholder="Nhập văn bản vào đây để bắt đầu chuyển đổi..."
+                        spellcheck="false"
+                    ></textarea>
+                    
+                    <div class="empty-state" id="emptyState">
+                        <i class="bi bi-keyboard"></i>
+                        <p>Bắt đầu nhập liệu hoặc tải file lên...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-footer">
+                <button class="btn-upload" onclick="openFileUpload()">
+                    <i class="bi bi-cloud-upload"></i> Tải file (.txt, .srt)
+                </button>
+                <div class="stats">
+                    <span>0 ký tự</span>
+                    <span class="divider">|</span>
+                    <span>~0s thời lượng</span>
+                </div>
+            </div>
+        </main>
+
+        <aside class="sidebar-section">
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" onclick="switchTab('settings')">Cài đặt</button>
+                <button class="tab-btn" onclick="switchTab('history')">Lịch sử</button>
+            </div>
+
+            <div id="tabSettings" class="sidebar-content show">
+                
+                <div class="control-group">
+                    <label>Giọng đọc</label>
+                    <div class="gradient-border-box selector-box" onclick="openVoiceModal()">
+                        <div class="selector-inner">
+                            <span class="selected-value">Chọn giọng đọc...</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Mô hình (Model)</label>
+                    <div class="gradient-border-box selector-box">
+                        <div class="selector-inner">
+                            <select class="native-select">
+                                <option>Eleven Multilingual v2</option>
+                                <option>Eleven Turbo v2.5</option>
+                            </select>
+                            <i class="bi bi-chevron-down dropdown-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group toggle-group">
+                    <div class="toggle-row">
+                        <span>Tạo phụ đề (SRT)</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="action-area">
+                    <button class="btn-primary-gradient" onclick="startTTS()">
+                        <i class="bi bi-soundwave"></i>
+                        CHUYỂN ĐỔI NGAY
+                    </button>
+                </div>
+            </div>
+
+            <div id="tabHistory" class="sidebar-content">
+                <div class="history-card">
+                    <div class="hc-header">
+                        <span class="hc-time">10:45 AM</span>
+                        <span class="hc-badge done">Hoàn thành</span>
+                    </div>
+                    <p class="hc-preview">Xin chào, đây là đoạn văn bản mẫu...</p>
+                    <div class="hc-player">
+                        <button class="btn-mini-play"><i class="bi bi-play-fill"></i></button>
+                        <div class="progress-bar"><div class="fill" style="width: 40%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="js/tts.js"></script>
+</body>
+</html>

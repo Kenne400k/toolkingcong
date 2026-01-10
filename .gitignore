@@ -1,0 +1,65 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build output
+dist/
+build/
+out/
+*.asar
+*.app
+*.exe
+*.dmg
+*.deb
+*.rpm
+
+# 🔥 SESSION & CREDENTIALS - QUAN TRỌNG NHẤT
+sessions/
+*.session
+session.json
+config.json
+.env
+.env.local
+.env.production
+
+# API Keys & Secrets
+*apikey*
+*api-key*
+*api_key*
+*secret*
+*.pem
+*.key
+*.p12
+credentials/
+auth/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database
+*.db
+*.sqlite
+*.sqlite3

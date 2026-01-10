@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Minimax JS Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, textarea, button { width: 100%; margin-bottom: 10px; padding: 10px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        #status { color: gray; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🗣️ Minimax JS Demo</h2>
+        
+        <label>API Key:</label>
+        <input type="text" id="apiKey" placeholder="Dán key sk_... vào đây" value="sk_9geumg7l9v9x5gchkwb8y7igf7oe8bqagi25rjbryn75f6z7">
+        
+        <label>Voice ID:</label>
+        <input type="text" id="voiceId" value="speech-01-hd">
+
+        <label>Nội dung:</label>
+        <textarea id="textInput" rows="4">Xin chào, đây là bản thử nghiệm bằng JavaScript.</textarea>
+
+        <button id="speakBtn">🔊 Đọc Ngay</button>
+        
+        <div id="status">Sẵn sàng...</div>
+        
+        <audio id="audioPlayer" controls style="width: 100%; margin-top: 10px;"></audio>
+    </div>
+
+    <script src="./renderer.js"></script>
+</body>
+</html>
