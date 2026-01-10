@@ -9,8 +9,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getSession: () => ipcRenderer.invoke('get-session'),
   logout: () => ipcRenderer.invoke('logout'),
   
-  // 🔥 API CALLS (GIẤU ENDPOINT)
-  apiRequest: (action, data) => ipcRenderer.invoke('api-request', { action, data }),
+  // 🔥 API CALLS - Support both formats:
+  // 1. apiRequest(url, data) - New format for TTS JS
+  // 2. apiRequest({action, data}) - Old format for backwards compatibility
+  apiRequest: (urlOrAction, data) => {
+    if (typeof urlOrAction === 'string' && urlOrAction.startsWith('http')) {
+      // New format: apiRequest(url, data)
+      return ipcRenderer.invoke('api-request', urlOrAction, data);
+    } else if (typeof urlOrAction === 'object') {
+      // Old format: apiRequest({action, data})
+      return ipcRenderer.invoke('api-request', urlOrAction);
+    } else {
+      // Assume it's just an action string
+      return ipcRenderer.invoke('api-request', { action: urlOrAction, data });
+    }
+  },
   
   // 🔥 GET RESOURCES (Voices, Models)
   getResources: () => ipcRenderer.invoke('get-resources'),

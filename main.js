@@ -231,7 +231,8 @@ ipcMain.handle('get-session', async () => {
 });
 
 // 🔥 API PROXY - ĐÃ FIX LOGIN COOKIE & AUTO LOGOUT
-ipcMain.handle('api-request', async (event, { action, data }) => {
+// Updated to support dynamic URL
+ipcMain.handle('api-request', async (event, urlOrObject, data) => {
   const sessionData = loadSession();
   
   // 1. Kiểm tra session file
@@ -242,23 +243,34 @@ ipcMain.handle('api-request', async (event, { action, data }) => {
   const FormData = require('form-data');
   const fetch = require('node-fetch');
   
-  const API_ENDPOINT = Buffer.from(
-    'aHR0cHM6Ly9raW5nY29uZ3N0dWRpby5jb20vYWpheHMvdHRzMy5waHA=',
-    'base64'
-  ).toString('utf-8');
+  // Support both old format {action, data} and new format (url, data)
+  let API_ENDPOINT;
+  let requestData;
+  
+  if (typeof urlOrObject === 'string') {
+    // New format: api-request(url, data)
+    API_ENDPOINT = urlOrObject;
+    requestData = data || {};
+  } else if (urlOrObject && urlOrObject.action) {
+    // Old format: api-request({action, data})
+    API_ENDPOINT = 'https://kingcongstudio.com/ajaxs/tts3.php';
+    requestData = { action: urlOrObject.action, ...(urlOrObject.data || {}) };
+  } else {
+    return { status: 'error', message: 'Invalid API request format' };
+  }
 
   try {
     const form = new FormData();
-    form.append('action', action);
     
     // Thêm thông tin xác thực vào Body
     form.append('session_id', sessionData.session_id);
     form.append('user_id', sessionData.user_id);
+    form.append('username', sessionData.username);
     
     // Thêm data tùy chỉnh
-    if (data) {
-      Object.keys(data).forEach(key => {
-        const value = data[key];
+    if (requestData) {
+      Object.keys(requestData).forEach(key => {
+        const value = requestData[key];
         if (value !== undefined && value !== null) {
           // Convert boolean to string for FormData
           if (typeof value === 'boolean') {
@@ -279,7 +291,6 @@ ipcMain.handle('api-request', async (event, { action, data }) => {
         // Lấy cookie từ domain gốc
         const cookies = await mainWindow.webContents.session.cookies.get({ url: 'https://kingcongstudio.com' });
         cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
-        // console.log('🍪 Cookies attached:', cookieHeader); 
       } catch (err) {
         console.error('⚠️ Could not get cookies:', err);
       }
@@ -291,6 +302,8 @@ ipcMain.handle('api-request', async (event, { action, data }) => {
       headers['Cookie'] = cookieHeader;
     }
 
+    console.log(`📡 API Request: ${API_ENDPOINT}`);
+
     // 3. Gửi Request
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
@@ -301,8 +314,7 @@ ipcMain.handle('api-request', async (event, { action, data }) => {
     const result = await response.json();
     
     // 4. XỬ LÝ KHI SERVER TỪ CHỐI (AUTO LOGOUT)
-    // Nếu PHP trả về lỗi yêu cầu login -> Xóa session cũ và đá ra trang login
-    if (result.status === 'error' && (result.message.includes('login') || result.message.includes('Session'))) {
+    if (result.status === 'error' && result.message && (result.message.includes('login') || result.message.includes('Session'))) {
        console.log('❌ Session expired. Auto logging out...');
        
        if (fs.existsSync(SESSION_FILE)) {
