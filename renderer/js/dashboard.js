@@ -243,23 +243,15 @@ async updateUserInfo() {
                 this.calculateStats(data, total);
                 this.updateStatsUI();
                 this.renderRecentTasks(data);
-                
-                this.showLoading(false);
-                
-                // Show dashboard
-                const dashboard = document.getElementById('main-dashboard');
-                if (dashboard) {
-                    dashboard.classList.remove('hidden');
-                    dashboard.classList.add('fade-in', 'flex');
-                }
-                
             } else {
-                throw new Error(response.message || 'Failed to load data');
+                console.warn('⚠️ API returned non-success:', response.message);
             }
             
         } catch (error) {
             console.error('❌ Load dashboard error:', error);
-            this.showError('Failed to load dashboard data: ' + error.message);
+            this.showNotification('Không thể tải dữ liệu: ' + error.message, 'error');
+        } finally {
+            // 🔥 Luôn tắt loading dù thành công hay lỗi
             this.showLoading(false);
         }
     }
@@ -420,25 +412,27 @@ async updateUserInfo() {
         if (show) {
             loading.classList.remove('hidden');
             dashboard.classList.add('hidden');
+            dashboard.classList.remove('flex');
         } else {
             loading.classList.add('hidden');
+            // 🔥 FIX: Luôn hiện dashboard khi tắt loading
+            dashboard.classList.remove('hidden');
+            dashboard.classList.add('flex');
         }
     }
 
     showError(message) {
-        const content = document.getElementById('dashboard-content');
-        if(content) {
-            content.innerHTML = `
-                <div class="flex items-center justify-center h-full">
-                    <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-6 max-w-md">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="material-symbols-outlined text-red-400">error</span>
-                            <h3 class="text-lg font-bold text-red-400">Error</h3>
-                        </div>
-                        <p class="text-text-secondary">${message}</p>
-                    </div>
-                </div>
-            `;
+        // 🔥 FIX: Hiện notification thay vì thay thế toàn bộ content
+        this.showNotification(message, 'error');
+        
+        // Ẩn loading và hiện dashboard (dù rỗng)
+        const loading = document.getElementById('loading-state');
+        const dashboard = document.getElementById('main-dashboard');
+        
+        if (loading) loading.classList.add('hidden');
+        if (dashboard) {
+            dashboard.classList.remove('hidden');
+            dashboard.classList.add('flex');
         }
     }
 
