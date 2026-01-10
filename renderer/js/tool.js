@@ -831,52 +831,56 @@ class ProToolManager {
         try {
             const optAutoSRT = document.getElementById('optAutoSRT')?.checked;
             
-            // Get voice settings
+            // Get voice settings (giống bên tts.js)
             const speed = parseFloat(document.getElementById('voiceSpeed')?.value) || 1;
             const stability = parseFloat(document.getElementById('voiceStability')?.value) || 0.5;
             const similarity = parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75;
             const style = parseFloat(document.getElementById('voiceStyle')?.value) || 0;
             const speakerBoost = document.getElementById('speakerBoost')?.checked || false;
             
-            const requestData = {
-                action: 'create',
+            // Build params giống bên TTS tab
+            const params = {
+                action: 'create_speech', // ✅ Giống TTS tab
                 provider: this.provider,
-                model: this.model,
+                text: content,
                 voice_id: voiceId,
-                text: content.substring(0, 100) + (content.length > 100 ? '...' : ''), // Log preview only
-                speed: speed,
-                stability: stability,
-                similarity_boost: similarity,
-                style: style,
-                use_speaker_boost: speakerBoost ? '1' : '0',
-                auto_srt: optAutoSRT ? '1' : '0'
+                voice_name: '', // Optional
+                with_transcript: optAutoSRT,
+                model_id: this.model // ✅ Giống TTS tab (model_id không phải model)
             };
             
-            console.log('📤 API Request:', requestData);
+            // Thêm params theo provider (giống TTS tab)
+            if (this.provider === 'minimax') {
+                params.vol = 1;
+                params.speed = speed;
+                params.pitch = 0;
+            } else {
+                // ElevenLabs
+                params.speed = speed;
+                params.stability = stability;
+                params.similarity = similarity; // ✅ Giống TTS tab (similarity không phải similarity_boost)
+                params.style = style;
+                params.use_boost = speakerBoost; // ✅ Giống TTS tab (boolean không phải string)
+            }
+            
+            console.log('📤 API Request:', {
+                ...params,
+                text: content.substring(0, 100) + (content.length > 100 ? '...' : '')
+            });
             console.log('📤 Full text length:', content.length);
             
             const response = await window.electronAPI.apiRequest(
                 'https://kingcongstudio.com/ajaxs/tts3.php',
-                {
-                    action: 'create',
-                    provider: this.provider,
-                    model: this.model,
-                    voice_id: voiceId,
-                    text: content,
-                    speed: speed,
-                    stability: stability,
-                    similarity_boost: similarity,
-                    style: style,
-                    use_speaker_boost: speakerBoost ? '1' : '0',
-                    auto_srt: optAutoSRT ? '1' : '0'
-                }
+                params
             );
             
             console.log('📥 API Response:', response);
             
-            if (response.success && response.task_id) {
-                console.log('✅ Task created:', response.task_id);
-                return { success: true, taskId: response.task_id };
+            // Check response (server trả về status: 'success' không phải success: true)
+            if (response.status === 'success' && (response.task_id || response.history_id || response.queue_id)) {
+                const taskId = response.task_id || response.history_id;
+                console.log('✅ Task created:', taskId);
+                return { success: true, taskId: taskId, queueId: response.queue_id };
             } else {
                 console.error('❌ API Error:', response);
                 return { success: false, error: response.message || response.error || 'Failed to create task' };
@@ -902,25 +906,36 @@ class ProToolManager {
                 const response = await window.electronAPI.apiRequest(
                     'https://kingcongstudio.com/ajaxs/tts3.php',
                     {
-                        action: 'status',
+                        action: 'check_status', // ✅ Giống TTS tab
                         task_id: task.taskId
                     }
                 );
                 
                 console.log('📥 Poll response:', response);
                 
-                if (response.status === 'completed' || response.status === 'done') {
+                // Check task_status field (giống TTS tab)
+                const taskStatus = response.task_status || response.status;
+                const progress = parseInt(response.progress) || 0;
+                
+                console.log(`📊 Task ${task.taskId}: status=${taskStatus}, progress=${progress}%`);
+                
+                if (taskStatus === 'completed' || taskStatus === 'done') {
                     console.log('✅ Task completed:', task.taskId);
                     task.status = 'done';
-                    task.resultUrl = response.result_url || response.url;
+                    task.resultUrl = response.result_url || response.audio_url || response.url;
                     task.duration = response.duration || '-';
+                    task.progress = 100;
                     return;
-                } else if (response.status === 'failed' || response.status === 'error') {
+                } else if (taskStatus === 'failed' || taskStatus === 'error') {
                     console.log('❌ Task failed:', task.taskId, response.message);
                     task.status = 'failed';
                     task.error = response.message || 'Task failed';
                     return;
                 }
+                
+                // Update progress
+                task.progress = progress;
+                this.updateTaskDisplay();
                 
                 // Still processing, wait
                 await new Promise(r => setTimeout(r, 2000));
