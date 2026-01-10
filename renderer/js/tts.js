@@ -26,6 +26,9 @@ class TTSManager {
         // History
         this.historyData = [];
         
+        // Current voice tab
+        this.currentVoiceTab = 'library';
+        
         // Settings defaults
         this.settings = {
             minimax: {
@@ -42,7 +45,7 @@ class TTSManager {
                 stability: 0.5,
                 similarity: 0.75,
                 style: 0,
-                useBoost: false,
+                useBoost: true,
                 withTranscript: false
             }
         };
@@ -73,6 +76,9 @@ class TTSManager {
             // Setup event listeners
             this.setupEventListeners();
             
+            // Setup sliders
+            this.setupSliders();
+            
             // Load history
             await this.loadHistory();
             
@@ -88,8 +94,15 @@ class TTSManager {
         const { display_name, username, email, credits3, avatar_url } = this.session;
         
         // Header
-        document.getElementById('header-credits').textContent = (credits3 || 0).toLocaleString();
-        document.getElementById('header-email').textContent = email || username || '';
+        const headerCredits = document.getElementById('header-credits');
+        if (headerCredits) headerCredits.textContent = (credits3 || 0).toLocaleString();
+        
+        const headerEmail = document.getElementById('header-email');
+        if (headerEmail) headerEmail.textContent = email || username || '';
+        
+        // User Credits in footer
+        const userCredits = document.getElementById('userCredits');
+        if (userCredits) userCredits.textContent = (credits3 || 0).toLocaleString();
         
         // Sidebar
         const nameEl = document.getElementById('user-name');
@@ -128,7 +141,8 @@ class TTSManager {
                 console.log(`✅ Loaded: ${this.loadedVoices.elevenlabs.length} ElevenLabs, ${this.loadedVoices.minimax.length} Minimax voices`);
                 
                 // Render models
-                this.renderModels();
+                this.renderMinimaxModels();
+                this.renderElevenLabsModels();
             }
             
         } catch (error) {
@@ -157,6 +171,9 @@ class TTSManager {
                 avatar: v.avatar || v.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(v.name)}&background=random&size=128&color=fff&bold=true`,
                 tags: v.tags || [],
                 gender: v.gender || gender,
+                age: v.age || 'middle_aged',
+                language: v.language || 'en',
+                description: v.description || '',
                 preview_url: v.preview_url || v.sample_url,
                 source: v.source || 'system',
                 server_type: v.server_type || 'ai33',
@@ -170,13 +187,13 @@ class TTSManager {
         // Text input - char count
         const txtInput = document.getElementById('txtInput');
         if (txtInput) {
-            txtInput.addEventListener('input', () => this.updateCharCount());
-            txtInput.addEventListener('focus', () => {
-                document.getElementById('emptyState')?.classList.add('hidden');
-            });
-            txtInput.addEventListener('blur', () => {
-                if (!txtInput.value.trim()) {
-                    document.getElementById('emptyState')?.classList.remove('hidden');
+            txtInput.addEventListener('input', () => {
+                this.updateCharCount();
+                const emptyState = document.getElementById('emptyState');
+                if (txtInput.value.trim()) {
+                    emptyState?.classList.add('hidden');
+                } else {
+                    emptyState?.classList.remove('hidden');
                 }
             });
         }
@@ -190,6 +207,11 @@ class TTSManager {
         // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#') {
+                    // Let the default behavior handle navigation
+                    return;
+                }
                 e.preventDefault();
                 const page = link.dataset.page;
                 if (page === 'dashboard') {
@@ -207,15 +229,110 @@ class TTSManager {
         
         // Close modal on click outside
         document.getElementById('voiceModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'voiceModal') {
+            if (e.target.classList.contains('voice-modal')) {
                 this.closeVoiceModal();
             }
         });
         
         // Voice search
         document.getElementById('voiceSearch')?.addEventListener('input', (e) => {
-            this.filterVoices(e.target.value);
+            this.filterVoices();
         });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.provider-dropdown-wrapper')) {
+                document.getElementById('providerDropdown')?.classList.remove('show');
+            }
+            if (!e.target.closest('.lang-selector-wrapper')) {
+                document.getElementById('langDropdown')?.classList.remove('show');
+            }
+            if (!e.target.closest('#minimaxModelBtn') && !e.target.closest('#minimaxModelDropdown')) {
+                document.getElementById('minimaxModelDropdown')?.classList.remove('show');
+            }
+        });
+        
+        // Drag and drop for file upload
+        const dropZone = document.getElementById('dropZone');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.handleDroppedFile(files[0]);
+                }
+            });
+        }
+    }
+
+    setupSliders() {
+        // Minimax sliders
+        this.setupSlider('speed', 'speedVal', (v) => parseFloat(v).toFixed(2), (v) => {
+            this.settings.minimax.speed = parseFloat(v);
+        });
+        this.setupSlider('pitch', 'pitchVal', (v) => v, (v) => {
+            this.settings.minimax.pitch = parseInt(v);
+        });
+        this.setupSlider('vol', 'volVal', (v) => parseFloat(v).toFixed(2), (v) => {
+            this.settings.minimax.vol = parseFloat(v);
+        });
+        
+        // ElevenLabs sliders
+        this.setupSlider('elevenSpeed', 'elevenSpeedVal', (v) => parseFloat(v).toFixed(2), (v) => {
+            this.settings.elevenlabs.speed = parseFloat(v);
+        });
+        this.setupSlider('stability', 'stabilityVal', (v) => v + '%', (v) => {
+            this.settings.elevenlabs.stability = parseInt(v) / 100;
+        });
+        this.setupSlider('similarity', 'similarityVal', (v) => v + '%', (v) => {
+            this.settings.elevenlabs.similarity = parseInt(v) / 100;
+        });
+        this.setupSlider('style', 'styleVal', (v) => v + '%', (v) => {
+            this.settings.elevenlabs.style = parseInt(v) / 100;
+        });
+        
+        // Boost checkbox
+        const boostCheck = document.getElementById('boostCheck');
+        if (boostCheck) {
+            boostCheck.addEventListener('change', () => {
+                this.settings.elevenlabs.useBoost = boostCheck.checked;
+            });
+        }
+        
+        // Subtitle checkbox
+        const subtitleCheck = document.getElementById('subtitleCheck');
+        if (subtitleCheck) {
+            subtitleCheck.addEventListener('change', () => {
+                this.settings[this.currentProvider].withTranscript = subtitleCheck.checked;
+                this.updateEstimatedCost();
+            });
+        }
+    }
+
+    setupSlider(sliderId, displayId, formatFn, onChangeFn) {
+        const slider = document.getElementById(sliderId);
+        const display = document.getElementById(displayId);
+        
+        if (slider && display) {
+            const updateSlider = () => {
+                display.textContent = formatFn(slider.value);
+                // Update CSS variable for fill
+                const percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+                slider.style.setProperty('--value', percent + '%');
+                if (onChangeFn) onChangeFn(slider.value);
+            };
+            
+            slider.addEventListener('input', updateSlider);
+            updateSlider(); // Initial update
+        }
     }
 
     // =================== CHAR COUNT & COST ===================
@@ -223,16 +340,26 @@ class TTSManager {
         const text = document.getElementById('txtInput')?.value || '';
         const charCount = text.length;
         
-        document.getElementById('charCount').textContent = `${charCount.toLocaleString()} ký tự`;
+        document.getElementById('charCount').textContent = charCount.toLocaleString();
         
-        // Estimate cost
+        this.updateEstimatedCost();
+    }
+
+    updateEstimatedCost() {
+        const text = document.getElementById('txtInput')?.value || '';
+        const charCount = text.length;
+        
+        // Base cost
         const costFactor = this.getModelCostFactor();
-        const estimatedCost = Math.ceil(charCount * 1.12 * costFactor);
-        document.getElementById('estimatedCost').textContent = `~${estimatedCost.toLocaleString()} credits`;
+        let estimatedCost = Math.ceil(charCount * 1.12 * costFactor);
         
-        // Estimate duration (~150 chars per second)
-        const duration = Math.ceil(charCount / 15);
-        document.getElementById('estimatedDuration').textContent = `~${duration}s`;
+        // Add subtitle cost (+15%)
+        const subtitleCheck = document.getElementById('subtitleCheck');
+        if (subtitleCheck?.checked) {
+            estimatedCost = Math.ceil(estimatedCost * 1.15);
+        }
+        
+        document.getElementById('estimatedCost').textContent = estimatedCost.toLocaleString();
     }
 
     getModelCostFactor() {
@@ -250,6 +377,18 @@ class TTSManager {
     handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
+        this.handleDroppedFile(file);
+        event.target.value = '';
+    }
+
+    handleDroppedFile(file) {
+        const validExtensions = ['.txt', '.srt'];
+        const extension = '.' + file.name.split('.').pop().toLowerCase();
+        
+        if (!validExtensions.includes(extension)) {
+            this.showNotification('Chỉ hỗ trợ file .txt và .srt', 'warning');
+            return;
+        }
         
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -258,103 +397,252 @@ class TTSManager {
             this.updateCharCount();
             document.getElementById('emptyState')?.classList.add('hidden');
             
+            // Show file name
+            const fileDisplay = document.getElementById('fileNameDisplay');
+            if (fileDisplay) {
+                fileDisplay.textContent = file.name;
+                fileDisplay.style.display = 'block';
+            }
+            
             // Check if SRT file
-            if (file.name.endsWith('.srt')) {
+            if (extension === '.srt') {
+                document.getElementById('subtitleCheck').checked = true;
                 this.settings[this.currentProvider].withTranscript = true;
-                document.getElementById('srtCheckbox').checked = true;
+                this.updateEstimatedCost();
             }
         };
         reader.readAsText(file);
-        
-        // Reset input
-        event.target.value = '';
     }
 
-    // =================== PROVIDER & MODEL ===================
-    switchProvider(provider) {
+    clearTextInput() {
+        const txtInput = document.getElementById('txtInput');
+        if (txtInput && txtInput.value.trim()) {
+            if (confirm('Bạn có chắc muốn xóa toàn bộ văn bản?')) {
+                txtInput.value = '';
+                this.updateCharCount();
+                document.getElementById('emptyState')?.classList.remove('hidden');
+                document.getElementById('fileNameDisplay').style.display = 'none';
+            }
+        }
+    }
+
+    // =================== PROVIDER DROPDOWN ===================
+    toggleProviderDropdown() {
+        const dropdown = document.getElementById('providerDropdown');
+        dropdown?.classList.toggle('show');
+    }
+
+    selectProvider(provider) {
         this.currentProvider = provider;
         
-        // Update UI
-        document.querySelectorAll('.provider-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.provider === provider);
-        });
+        // Update dropdown button
+        const logoImg = document.getElementById('currentProviderLogo');
+        const nameSpan = document.getElementById('currentProviderName');
         
-        // Update provider badge
-        const badge = document.getElementById('providerBadge');
-        if (badge) {
-            badge.querySelector('span').textContent = provider === 'elevenlabs' ? 'ElevenLabs' : 'Minimax';
+        if (provider === 'elevenlabs') {
+            logoImg.src = 'https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99';
+            nameSpan.textContent = 'ElevenLabs';
+        } else {
+            logoImg.src = 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png';
+            nameSpan.textContent = 'Minimax';
         }
         
+        // Update active state in dropdown
+        document.querySelectorAll('.provider-option').forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.provider === provider);
+        });
+        
+        // Close dropdown
+        document.getElementById('providerDropdown')?.classList.remove('show');
+        
         // Show/hide provider-specific settings
-        document.getElementById('minimaxSettings')?.classList.toggle('hidden', provider !== 'minimax');
-        document.getElementById('elevenlabsSettings')?.classList.toggle('hidden', provider !== 'elevenlabs');
+        document.getElementById('minimax-settings')?.classList.toggle('hidden', provider !== 'minimax');
+        document.getElementById('elevenlabs-settings')?.classList.toggle('hidden', provider !== 'elevenlabs');
         
         // Clear voice selection
         this.selectedVoice = null;
-        document.getElementById('selectedVoiceName').textContent = 'Chọn giọng đọc...';
-        document.getElementById('selectedVoiceAvatar').src = '';
-        document.getElementById('selectedVoiceAvatar').classList.add('hidden');
-        
-        // Render models
-        this.renderModels();
+        document.getElementById('selectedVoiceName').textContent = 'Chọn giọng nói...';
         
         // Update cost
-        this.updateCharCount();
+        this.updateEstimatedCost();
         
         console.log('🔄 Switched to provider:', provider);
     }
 
-    renderModels() {
-        const models = this.loadedModels[this.currentProvider] || [];
-        const select = document.getElementById('modelSelect');
+    // =================== LANGUAGE DROPDOWN ===================
+    toggleLangDropdown() {
+        const dropdown = document.getElementById('langDropdown');
+        dropdown?.classList.toggle('show');
+    }
+
+    selectLanguage(langCode, langName) {
+        this.settings.minimax.language = langCode;
+        document.getElementById('selectedLang').textContent = langName;
         
-        if (!select) return;
+        // Update active state
+        document.querySelectorAll('.lang-option').forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.lang === langCode);
+        });
         
-        select.innerHTML = models.map(m => `
-            <option value="${m.id}" ${m.id === this.settings[this.currentProvider].model ? 'selected' : ''}>
-                ${m.name}
-            </option>
+        // Close dropdown
+        document.getElementById('langDropdown')?.classList.remove('show');
+    }
+
+    // =================== MODEL SELECTION ===================
+    toggleMinimaxModelDropdown() {
+        const dropdown = document.getElementById('minimaxModelDropdown');
+        dropdown?.classList.toggle('show');
+    }
+
+    renderMinimaxModels() {
+        const container = document.getElementById('minimaxModelDropdown');
+        const models = this.loadedModels.minimax || [];
+        
+        if (!container || models.length === 0) return;
+        
+        container.innerHTML = models.map(m => `
+            <div class="provider-option ${m.id === this.settings.minimax.model ? 'active' : ''}" 
+                 onclick="ttsManager.selectMinimaxModel('${m.id}', '${m.name}')">
+                <div class="provider-info">
+                    <div class="provider-name">${m.name}</div>
+                    <div class="provider-desc">${m.description || ''}</div>
+                </div>
+                <i class="bi bi-check-lg check-icon"></i>
+            </div>
+        `).join('');
+    }
+
+    selectMinimaxModel(modelId, modelName) {
+        this.settings.minimax.model = modelId;
+        document.getElementById('selectedMinimaxModel').textContent = modelName;
+        
+        // Update active state
+        document.querySelectorAll('#minimaxModelDropdown .provider-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        event.currentTarget.classList.add('active');
+        
+        // Close dropdown
+        document.getElementById('minimaxModelDropdown')?.classList.remove('show');
+        
+        // Update cost
+        this.updateEstimatedCost();
+    }
+
+    renderElevenLabsModels() {
+        const container = document.getElementById('mdContent');
+        const models = this.loadedModels.elevenlabs || [];
+        
+        if (!container || models.length === 0) return;
+        
+        container.innerHTML = models.map(m => `
+            <div class="model-option ${m.id === this.settings.elevenlabs.model ? 'selected' : ''}" 
+                 onclick="ttsManager.selectElevenLabsModel('${m.id}', '${m.name}')">
+                <div class="mo-header">
+                    <div>
+                        <div class="mo-name">${m.name}</div>
+                    </div>
+                </div>
+                <div class="mo-desc">${m.description || ''}</div>
+            </div>
         `).join('');
         
-        select.addEventListener('change', (e) => {
-            this.settings[this.currentProvider].model = e.target.value;
-            this.updateCharCount();
+        // Update selected model name in button
+        const currentModel = models.find(m => m.id === this.settings.elevenlabs.model);
+        if (currentModel) {
+            document.getElementById('selectedModelName').textContent = currentModel.name;
+        }
+    }
+
+    selectElevenLabsModel(modelId, modelName) {
+        this.settings.elevenlabs.model = modelId;
+        document.getElementById('selectedModelName').textContent = modelName;
+        
+        // Update active state
+        document.querySelectorAll('.model-option').forEach(opt => {
+            opt.classList.toggle('selected', opt.querySelector('.mo-name')?.textContent === modelName);
         });
+        
+        // Close sidebar
+        this.hideModelDetails();
+        
+        // Update cost
+        this.updateEstimatedCost();
+    }
+
+    showModelDetails() {
+        document.getElementById('modelSidebar')?.classList.add('active');
+    }
+
+    hideModelDetails() {
+        document.getElementById('modelSidebar')?.classList.remove('active');
     }
 
     // =================== VOICE MODAL ===================
     openVoiceModal() {
         const modal = document.getElementById('voiceModal');
         if (modal) {
-            modal.classList.remove('hidden');
+            modal.classList.add('show');
             this.renderVoices();
         }
     }
 
     closeVoiceModal() {
-        document.getElementById('voiceModal')?.classList.add('hidden');
+        document.getElementById('voiceModal')?.classList.remove('show');
     }
 
-    renderVoices(filter = '') {
+    switchVoiceTab(tabName) {
+        this.currentVoiceTab = tabName;
+        
+        // Update tab buttons
+        document.querySelectorAll('.vm-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+        
+        // Re-render voices
+        this.renderVoices();
+    }
+
+    renderVoices() {
         const container = document.getElementById('voiceGrid');
         if (!container) return;
         
         let voices = this.loadedVoices[this.currentProvider] || [];
         
-        // Filter
-        if (filter) {
-            const lowerFilter = filter.toLowerCase();
-            voices = voices.filter(v => 
-                v.name.toLowerCase().includes(lowerFilter) ||
-                (v.tags && v.tags.some(t => t.toLowerCase().includes(lowerFilter)))
-            );
-        }
+        // Apply filters
+        const searchQuery = document.getElementById('voiceSearch')?.value?.toLowerCase() || '';
+        const langFilter = document.getElementById('filterLang')?.value || '';
+        const genderFilter = document.getElementById('filterGender')?.value || '';
+        const ageFilter = document.getElementById('filterAge')?.value || '';
+        
+        voices = voices.filter(v => {
+            // Search filter
+            if (searchQuery) {
+                const matchName = v.name.toLowerCase().includes(searchQuery);
+                const matchTags = v.tags?.some(t => t.toLowerCase().includes(searchQuery));
+                if (!matchName && !matchTags) return false;
+            }
+            
+            // Language filter
+            if (langFilter && v.language !== langFilter) return false;
+            
+            // Gender filter
+            if (genderFilter && v.gender?.toLowerCase() !== genderFilter) return false;
+            
+            // Age filter
+            if (ageFilter && v.age !== ageFilter) return false;
+            
+            return true;
+        });
         
         if (voices.length === 0) {
             container.innerHTML = `
-                <div class="col-span-full text-center py-12 text-gray-500">
-                    <i class="bi bi-search text-4xl mb-4 block"></i>
-                    <p>Không tìm thấy giọng nói</p>
+                <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px;">
+                    <i class="bi bi-search" style="font-size: 48px; color: #444; display: block; margin-bottom: 16px;"></i>
+                    <p style="color:#888; font-size:14px;">Không tìm thấy giọng nói</p>
+                    <button onclick="ttsManager.resetFilters()" style="margin-top: 16px; padding: 8px 16px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 6px; cursor: pointer;">
+                        Xóa bộ lọc
+                    </button>
                 </div>
             `;
             return;
@@ -362,28 +650,40 @@ class TTSManager {
         
         container.innerHTML = voices.map(voice => `
             <div class="voice-card ${this.selectedVoice?.id === voice.id ? 'selected' : ''}" 
-                 data-voice-id="${voice.id}"
-                 onclick="ttsManager.selectVoice('${voice.id}')">
-                <div class="voice-avatar">
-                    <img src="${voice.avatar}" alt="${voice.name}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(voice.name)}&background=random'">
-                    ${voice.preview_url ? `
-                        <button class="preview-btn" onclick="event.stopPropagation(); ttsManager.previewVoice('${voice.preview_url}')">
-                            <i class="bi bi-play-fill"></i>
-                        </button>
-                    ` : ''}
-                </div>
-                <div class="voice-info">
-                    <h4>${voice.name}</h4>
-                    <div class="voice-tags">
-                        ${voice.tags.slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('')}
+                 data-voice-id="${voice.id}">
+                <div class="vc-top">
+                    <img class="vc-avatar" src="${voice.avatar}" alt="${voice.name}" 
+                         onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(voice.name)}&background=random&size=128'">
+                    <div class="vc-info">
+                        <div class="vc-name">${voice.name}</div>
+                        <div class="vc-tags">
+                            ${voice.tags?.slice(0, 3).map(t => `<span class="vc-tag">${t}</span>`).join('') || ''}
+                        </div>
                     </div>
+                </div>
+                ${voice.description ? `<div class="vc-desc">${voice.description}</div>` : ''}
+                <div class="vc-footer">
+                    <div class="vc-actions">
+                        ${voice.preview_url ? `
+                            <i class="bi bi-play-circle" onclick="event.stopPropagation(); ttsManager.previewVoice('${voice.preview_url}')" title="Nghe thử"></i>
+                        ` : ''}
+                    </div>
+                    <button class="vc-use-btn" onclick="ttsManager.selectVoice('${voice.id}')">Dùng</button>
                 </div>
             </div>
         `).join('');
     }
 
-    filterVoices(query) {
-        this.renderVoices(query);
+    filterVoices() {
+        this.renderVoices();
+    }
+
+    resetFilters() {
+        document.getElementById('voiceSearch').value = '';
+        document.getElementById('filterLang').value = '';
+        document.getElementById('filterGender').value = '';
+        document.getElementById('filterAge').value = '';
+        this.renderVoices();
     }
 
     selectVoice(voiceId) {
@@ -396,11 +696,7 @@ class TTSManager {
         
         // Update UI
         document.getElementById('selectedVoiceName').textContent = voice.name;
-        const avatar = document.getElementById('selectedVoiceAvatar');
-        if (avatar) {
-            avatar.src = voice.avatar;
-            avatar.classList.remove('hidden');
-        }
+        document.getElementById('voiceIdVal').value = voice.id;
         
         // Update modal selection
         document.querySelectorAll('.voice-card').forEach(card => {
@@ -426,6 +722,60 @@ class TTSManager {
         });
     }
 
+    // =================== RESET SETTINGS ===================
+    resetCurrentSettings() {
+        if (this.currentProvider === 'minimax') {
+            this.settings.minimax = {
+                model: 'speech-2.6-hd',
+                speed: 1.0,
+                pitch: 0,
+                vol: 1.0,
+                language: 'Auto',
+                withTranscript: false
+            };
+            
+            // Reset sliders
+            document.getElementById('speed').value = 1.0;
+            document.getElementById('pitch').value = 0;
+            document.getElementById('vol').value = 1.0;
+            document.getElementById('speedVal').textContent = '1.00';
+            document.getElementById('pitchVal').textContent = '0';
+            document.getElementById('volVal').textContent = '1.00';
+            document.getElementById('selectedLang').textContent = 'Tự xác định';
+            
+        } else {
+            this.settings.elevenlabs = {
+                model: 'eleven_multilingual_v2',
+                speed: 1.0,
+                stability: 0.5,
+                similarity: 0.75,
+                style: 0,
+                useBoost: true,
+                withTranscript: false
+            };
+            
+            // Reset sliders
+            document.getElementById('elevenSpeed').value = 1.0;
+            document.getElementById('stability').value = 50;
+            document.getElementById('similarity').value = 75;
+            document.getElementById('style').value = 0;
+            document.getElementById('elevenSpeedVal').textContent = '1.00';
+            document.getElementById('stabilityVal').textContent = '50%';
+            document.getElementById('similarityVal').textContent = '75%';
+            document.getElementById('styleVal').textContent = '0%';
+            document.getElementById('boostCheck').checked = true;
+        }
+        
+        // Reset subtitle
+        document.getElementById('subtitleCheck').checked = false;
+        this.settings[this.currentProvider].withTranscript = false;
+        
+        // Update cost
+        this.updateEstimatedCost();
+        
+        this.showNotification('Đã đặt lại cài đặt', 'success');
+    }
+
     // =================== TTS GENERATION ===================
     async startTTS() {
         const text = document.getElementById('txtInput')?.value.trim();
@@ -444,7 +794,7 @@ class TTSManager {
         }
         
         // Check credits
-        const estimatedCost = Math.ceil(text.length * 1.12 * this.getModelCostFactor());
+        const estimatedCost = parseInt(document.getElementById('estimatedCost').textContent.replace(/,/g, ''));
         if (estimatedCost > (this.session.credits3 || 0)) {
             this.showNotification('Không đủ credits!', 'error');
             return;
@@ -480,7 +830,7 @@ class TTSManager {
         const btn = document.getElementById('btnProcess');
         const originalText = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span> Đang xử lý...';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
         
         try {
             const response = await this.api.createSpeech(params);
@@ -489,11 +839,12 @@ class TTSManager {
                 // Update credits
                 this.session.credits3 = response.new_balance;
                 document.getElementById('header-credits').textContent = response.new_balance.toLocaleString();
+                document.getElementById('userCredits').textContent = response.new_balance.toLocaleString();
                 
                 // Add to history
                 this.addPendingTask({
                     task_id: response.task_id,
-                    text_preview: text.substring(0, 100) + '...',
+                    text_preview: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
                     credit_cost: response.credit_cost,
                     provider: this.currentProvider,
                     status: 'pending',
@@ -507,10 +858,6 @@ class TTSManager {
                 this.switchTab('history');
                 
                 this.showNotification('Đang xử lý yêu cầu...', 'success');
-                
-                // Clear input (optional)
-                // document.getElementById('txtInput').value = '';
-                // this.updateCharCount();
                 
             } else {
                 throw new Error(response.message || 'Tạo TTS thất bại');
@@ -545,9 +892,6 @@ class TTSManager {
                         this.stopPolling(taskId);
                         this.showNotification('Hoàn thành!', 'success');
                         
-                        // Play notification sound (optional)
-                        // new Audio('notification.mp3').play();
-                        
                     } else if (taskStatus === 'failed') {
                         this.stopPolling(taskId);
                         this.showNotification('Tác vụ thất bại: ' + (response.error_message || ''), 'error');
@@ -557,7 +901,7 @@ class TTSManager {
             } catch (error) {
                 console.error('Polling error:', error);
             }
-        }, 3000); // Poll every 3 seconds
+        }, 3000);
     }
 
     stopPolling(taskId) {
@@ -602,17 +946,20 @@ class TTSManager {
         const status = data.task_status;
         
         // Update status badge
-        const badge = card.querySelector('.status-badge');
+        const badge = card.querySelector('.hc-status');
         if (badge) {
-            badge.className = 'status-badge ' + status;
+            badge.className = 'hc-status status-' + status;
             badge.textContent = this.getStatusText(status);
         }
         
+        // Update class for processing animation
+        card.classList.toggle('processing', ['pending', 'processing', 'queued'].includes(status));
+        
         // Update progress
         if (data.progress !== undefined) {
-            const progress = card.querySelector('.progress-bar');
-            if (progress) {
-                progress.style.width = data.progress + '%';
+            const progressFill = card.querySelector('.hc-progress-fill');
+            if (progressFill) {
+                progressFill.style.width = data.progress + '%';
             }
         }
         
@@ -634,7 +981,7 @@ class TTSManager {
     }
 
     renderHistory() {
-        const container = document.getElementById('historyList');
+        const container = document.getElementById('historyListContainer');
         if (!container) return;
         
         if (this.historyData.length === 0) {
@@ -648,23 +995,30 @@ class TTSManager {
         }
         
         container.innerHTML = this.historyData.map(task => `
-            <div class="history-card" data-task-id="${task.task_id}">
+            <div class="history-card ${['pending', 'processing', 'queued'].includes(task.status) ? 'processing' : ''}" data-task-id="${task.task_id}">
                 <div class="hc-header">
-                    <span class="hc-time">${this.formatTime(task.created_at)}</span>
-                    <span class="status-badge ${task.status}">${this.getStatusText(task.status)}</span>
+                    <span class="hc-time">
+                        <i class="bi bi-clock"></i>
+                        ${this.formatTime(task.created_at)}
+                    </span>
+                    <span class="hc-status status-${task.status}">${this.getStatusText(task.status)}</span>
                 </div>
-                <p class="hc-preview">${this.escapeHtml(task.text_preview || task.text_input?.substring(0, 100) || '')}</p>
+                <p class="hc-content">${this.escapeHtml(task.text_preview || task.text_input?.substring(0, 100) || '')}</p>
                 <div class="task-content">
                     ${task.status === 'done' && task.audio_url 
                         ? this.renderPlayerHTML(task.task_id, task.audio_url)
                         : task.status === 'failed'
-                            ? `<div class="error-msg"><i class="bi bi-exclamation-circle"></i> ${task.error_message || 'Thất bại'}</div>`
-                            : `<div class="processing-status"><div class="spinner"></div> Đang xử lý...</div>`
+                            ? `<div style="color: #ef4444; font-size: 13px;"><i class="bi bi-exclamation-circle"></i> ${task.error_message || 'Thất bại'}</div>`
+                            : `
+                                <div class="hc-progress-track">
+                                    <div class="hc-progress-fill" style="width: ${task.progress || 0}%"></div>
+                                </div>
+                            `
                     }
                 </div>
-                <div class="hc-footer">
-                    <span class="credit-cost">${task.credit_cost || 0} credits</span>
-                    <button class="btn-delete" onclick="ttsManager.deleteTask('${task.task_id}')" title="Xóa">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #222;">
+                    <span class="hc-cost"><i class="bi bi-coin"></i> ${task.credit_cost || 0}</span>
+                    <button onclick="ttsManager.deleteTask('${task.task_id}')" style="background: transparent; border: none; color: #666; cursor: pointer; padding: 6px;" title="Xóa">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
@@ -674,24 +1028,31 @@ class TTSManager {
 
     renderPlayerHTML(taskId, audioUrl) {
         return `
-            <div class="audio-player" id="player-${taskId}">
-                <button class="play-btn" onclick="ttsManager.playAudio('${taskId}', '${audioUrl}')">
+            <div class="hc-player" id="player-${taskId}">
+                <button class="hc-play-btn" onclick="ttsManager.playAudio('${taskId}', '${audioUrl}')">
                     <i class="bi bi-play-fill"></i>
                 </button>
-                <div class="progress-track" onclick="ttsManager.seekAudio(event, '${taskId}')">
-                    <div class="progress-bar" id="progress-${taskId}"></div>
+                <div class="hc-progress-container">
+                    <div class="hc-progress" onclick="ttsManager.seekAudio(event, '${taskId}')">
+                        <div class="hc-progress-bar" id="progress-${taskId}"></div>
+                    </div>
+                    <div class="hc-time-display">
+                        <span id="currentTime-${taskId}">0:00</span>
+                        <span id="duration-${taskId}">0:00</span>
+                    </div>
                 </div>
-                <span class="timer" id="timer-${taskId}">0:00</span>
-                <a href="${audioUrl}" download class="download-btn" title="Tải xuống">
-                    <i class="bi bi-download"></i>
-                </a>
+                <div class="hc-actions">
+                    <a href="${audioUrl}" download class="hc-action-btn" title="Tải xuống">
+                        <i class="bi bi-download"></i>
+                    </a>
+                </div>
             </div>
         `;
     }
 
     // =================== AUDIO PLAYBACK ===================
     playAudio(taskId, url) {
-        const playBtn = document.querySelector(`#player-${taskId} .play-btn`);
+        const playBtn = document.querySelector(`#player-${taskId} .hc-play-btn`);
         
         // If same audio is playing, toggle pause/play
         if (this.currentAudio && this.currentAudio.dataset.taskId === taskId) {
@@ -708,13 +1069,17 @@ class TTSManager {
         // Stop previous audio
         if (this.currentAudio) {
             this.currentAudio.pause();
-            const prevBtn = document.querySelector(`#player-${this.currentAudio.dataset.taskId} .play-btn`);
+            const prevBtn = document.querySelector(`#player-${this.currentAudio.dataset.taskId} .hc-play-btn`);
             if (prevBtn) prevBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
         }
         
         // Create new audio
         this.currentAudio = new Audio(url);
         this.currentAudio.dataset.taskId = taskId;
+        
+        this.currentAudio.onloadedmetadata = () => {
+            document.getElementById(`duration-${taskId}`).textContent = this.formatDuration(this.currentAudio.duration);
+        };
         
         this.currentAudio.onplay = () => {
             playBtn.innerHTML = '<i class="bi bi-pause-fill"></i>';
@@ -727,12 +1092,13 @@ class TTSManager {
         this.currentAudio.onended = () => {
             playBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
             document.getElementById(`progress-${taskId}`).style.width = '0%';
+            document.getElementById(`currentTime-${taskId}`).textContent = '0:00';
         };
         
         this.currentAudio.ontimeupdate = () => {
             const progress = (this.currentAudio.currentTime / this.currentAudio.duration) * 100;
             document.getElementById(`progress-${taskId}`).style.width = progress + '%';
-            document.getElementById(`timer-${taskId}`).textContent = this.formatDuration(this.currentAudio.currentTime);
+            document.getElementById(`currentTime-${taskId}`).textContent = this.formatDuration(this.currentAudio.currentTime);
         };
         
         this.currentAudio.play().catch(err => console.error('Play error:', err));
@@ -763,6 +1129,11 @@ class TTSManager {
             // Stop polling
             this.stopPolling(taskId);
             
+            // Check if list is empty
+            if (this.historyData.length === 0) {
+                this.renderHistory();
+            }
+            
             this.showNotification('Đã xóa', 'success');
             
         } catch (error) {
@@ -773,12 +1144,16 @@ class TTSManager {
 
     // =================== TAB SWITCHING ===================
     switchTab(tabName) {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.tab === tabName);
-        });
+        // Update tab buttons
+        document.getElementById('btnSettings')?.classList.toggle('active', tabName === 'settings');
+        document.getElementById('btnHistory')?.classList.toggle('active', tabName === 'history');
         
-        document.getElementById('tabSettings')?.classList.toggle('show', tabName === 'settings');
-        document.getElementById('tabHistory')?.classList.toggle('show', tabName === 'history');
+        // Show/hide content
+        document.getElementById('viewSettings')?.classList.toggle('show', tabName === 'settings');
+        document.getElementById('viewHistory')?.classList.toggle('show', tabName === 'history');
+        
+        // Show/hide provider selector
+        document.getElementById('providerWrapper').style.display = tabName === 'settings' ? 'block' : 'none';
     }
 
     // =================== UTILITIES ===================
@@ -788,21 +1163,48 @@ class TTSManager {
 
     showNotification(message, type = 'info') {
         const colors = {
-            success: 'bg-green-500',
-            error: 'bg-red-500',
-            warning: 'bg-yellow-500',
-            info: 'bg-blue-500'
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
         };
         
         const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fadeIn`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${colors[type]};
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 9999;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        `;
         notification.textContent = message;
+        
+        // Add animation keyframes
+        if (!document.getElementById('notificationStyles')) {
+            const style = document.createElement('style');
+            style.id = 'notificationStyles';
+            style.textContent = `
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateX(100px); }
+                    to { opacity: 1; transform: translateX(0); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
         
         document.body.appendChild(notification);
         
         setTimeout(() => {
             notification.style.opacity = '0';
-            notification.style.transform = 'translateY(-20px)';
+            notification.style.transform = 'translateX(100px)';
+            notification.style.transition = 'all 0.3s ease';
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
@@ -821,10 +1223,12 @@ class TTSManager {
     formatTime(dateStr) {
         if (!dateStr) return '';
         const date = new Date(dateStr);
-        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + 
+               date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
     }
 
     formatDuration(seconds) {
+        if (isNaN(seconds)) return '0:00';
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -847,6 +1251,19 @@ function openFileUpload() { ttsManager.openFileUpload(); }
 function startTTS() { ttsManager.startTTS(); }
 function switchTab(tab) { ttsManager.switchTab(tab); }
 function switchProvider(provider) { ttsManager.switchProvider(provider); }
+function selectProvider(provider) { ttsManager.selectProvider(provider); }
+function toggleProviderDropdown() { ttsManager.toggleProviderDropdown(); }
+function toggleLangDropdown() { ttsManager.toggleLangDropdown(); }
+function selectLanguage(code, name) { ttsManager.selectLanguage(code, name); }
+function toggleMinimaxModelDropdown() { ttsManager.toggleMinimaxModelDropdown(); }
+function showModelDetails() { ttsManager.showModelDetails(); }
+function hideModelDetails() { ttsManager.hideModelDetails(); }
+function filterVoices() { ttsManager.filterVoices(); }
+function resetFilters() { ttsManager.resetFilters(); }
+function switchVoiceTab(tab) { ttsManager.switchVoiceTab(tab); }
+function clearTextInput() { ttsManager.clearTextInput(); }
+function resetCurrentSettings() { ttsManager.resetCurrentSettings(); }
+function updateEstimatedCost() { ttsManager.updateEstimatedCost(); }
 
 // =================== INIT ===================
 function initTTS() {
