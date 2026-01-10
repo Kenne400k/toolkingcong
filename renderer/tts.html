@@ -103,14 +103,63 @@
 
     <div class="flex h-screen w-full overflow-hidden">
         
-        <!-- =================== SIDEBAR (loaded from component) =================== -->
-        <div id="sidebar-container"></div>
+        <!-- =================== SIDEBAR =================== -->
+        <aside class="w-64 flex flex-col border-r border-custom bg-main hidden md:flex shrink-0" id="app-sidebar">
+            <div class="flex flex-col h-full p-4">
+                
+                <!-- User Info -->
+                <div class="flex gap-3 items-center p-3 mb-6">
+                    <div class="avatar-wrapper">
+                        <div class="avatar-inner" id="user-avatar">
+                            <span class="text-sm font-bold text-white">K</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <h1 class="text-white text-sm font-semibold truncate" id="user-name">VoiceStudio</h1>
+                        <p class="text-dim text-xs">Pro Plan</p>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="flex flex-col gap-1 flex-1">
+                    <a class="nav-link flex items-center gap-3 text-sm font-medium text-dim" data-page="dashboard">
+                        <span class="material-symbols-outlined text-xl">dashboard</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="nav-link active flex items-center gap-3 text-sm font-medium" data-page="tts">
+                        <span class="material-symbols-outlined text-xl">mic</span>
+                        <span>TTS Tool</span>
+                    </a>
+                    <a class="nav-link flex items-center gap-3 text-sm font-medium text-dim" data-page="history">
+                        <span class="material-symbols-outlined text-xl">history</span>
+                        <span>History</span>
+                    </a>
+                    
+                    <div class="mt-auto pt-4 border-t border-custom">
+                        <a class="nav-link flex items-center gap-3 text-sm font-medium text-dim" id="logout-btn">
+                            <span class="material-symbols-outlined text-xl">logout</span>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </aside>
         
         <!-- =================== MAIN CONTENT =================== -->
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-main">
             
-            <!-- Header (loaded from component) -->
-            <div id="header-container"></div>
+            <!-- Header -->
+            <header class="h-16 flex items-center justify-between border-b border-custom px-6 bg-main shrink-0" id="app-header">
+                <h2 class="text-white text-lg font-semibold" id="page-title">TTS Tool</h2>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg border border-custom">
+                        <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
+                        <span class="text-sm font-semibold text-white" id="header-credits">0</span>
+                        <span class="text-xs text-dim">Credits</span>
+                    </div>
+                    <span class="text-sm text-dim hidden sm:block" id="header-email">Loading...</span>
+                </div>
+            </header>
 
             <!-- TTS Content Area -->
             <div class="main-container flex-1 overflow-y-auto">
@@ -221,18 +270,6 @@
         </main>
     </div>
 
-    <script src="config/component-loader.js"></script>
     <script src="js/tts.js"></script>
-    <script>
-        // Load layout components
-        document.addEventListener('DOMContentLoaded', async () => {
-            await componentLoader.loadLayout({
-                headerContainer: '#header-container',
-                sidebarContainer: '#sidebar-container',
-                activePage: 'tts'
-            });
-            componentLoader.setPageTitle('TTS Tool');
-        });
-    </script>
 </body>
 </html>
