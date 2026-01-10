@@ -12,6 +12,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 🔥 API CALLS (GIẤU ENDPOINT)
   apiRequest: (action, data) => ipcRenderer.invoke('api-request', { action, data }),
   
+  // 🔥 GET RESOURCES (Voices, Models)
+  getResources: () => ipcRenderer.invoke('get-resources'),
+  
   // Navigation
   loadTTSPage: () => ipcRenderer.invoke('load-tts-page'),
   loadDashboard: () => ipcRenderer.invoke('load-dashboard')

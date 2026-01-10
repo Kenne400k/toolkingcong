@@ -319,6 +319,45 @@ ipcMain.handle('api-request', async (event, { action, data }) => {
   }
 });
 
+// 🔥 GET RESOURCES (Voices, Models)
+ipcMain.handle('get-resources', async () => {
+  const fetch = require('node-fetch');
+  
+  const RESOURCES_ENDPOINT = Buffer.from(
+    'aHR0cHM6Ly9raW5nY29uZ3N0dWRpby5jb20vYWpheHMvZ2V0X3Jlc291cmNlczMucGhw',
+    'base64'
+  ).toString('utf-8');
+
+  try {
+    // Lấy cookie từ session
+    let cookieHeader = '';
+    if (mainWindow) {
+      try {
+        const cookies = await mainWindow.webContents.session.cookies.get({ url: 'https://kingcongstudio.com' });
+        cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+      } catch (err) {
+        console.error('⚠️ Could not get cookies for resources:', err);
+      }
+    }
+
+    const response = await fetch(RESOURCES_ENDPOINT, {
+      method: 'GET',
+      headers: cookieHeader ? { 'Cookie': cookieHeader } : {}
+    });
+
+    const result = await response.json();
+    console.log('✅ Resources loaded');
+    return result;
+
+  } catch (error) {
+    console.error('❌ Get Resources Error:', error);
+    return { 
+      status: 'error', 
+      message: error.message 
+    };
+  }
+});
+
 // 🔥 LOAD TTS PAGE
 ipcMain.handle('load-tts-page', async () => {
   mainWindow.loadFile('renderer/tts.html');

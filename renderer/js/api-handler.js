@@ -220,6 +220,27 @@ class APIHandler {
         });
     }
 
+    /**
+     * Get resources (voices, models) from server
+     * @returns {Promise<object>} { status, data: { elevenlabs: {...}, minimax: {...} } }
+     */
+    async getResources() {
+        try {
+            console.log('🔄 Loading resources (voices, models)...');
+            const response = await window.electronAPI.getResources();
+            
+            if (response.status === 'success') {
+                console.log('✅ Resources loaded successfully');
+                return response;
+            } else {
+                throw new Error(response.message || 'Failed to load resources');
+            }
+        } catch (error) {
+            console.error('❌ Get resources error:', error);
+            throw error;
+        }
+    }
+
     // =================== BATCH OPERATIONS ===================
 
     /**
