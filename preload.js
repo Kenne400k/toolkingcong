@@ -40,5 +40,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectAudioFiles: () => ipcRenderer.invoke('select-audio-files'),
   readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
   saveFile: (options) => ipcRenderer.invoke('save-file', options),
-  downloadFile: (options) => ipcRenderer.invoke('download-file', options)
+  downloadFile: (options) => ipcRenderer.invoke('download-file', options),
+  joinAudioLocal: (options) => ipcRenderer.invoke('join-audio-local', options)
 });

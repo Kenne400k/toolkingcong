@@ -821,34 +821,110 @@ class ProToolManager {
         }
         
         const delay = document.getElementById('delayBetween')?.value || '1s';
-        const delayMs = parseFloat(delay) * 1000;
+        const delaySeconds = parseFloat(delay) || 1;
         
-        this.showNotification('Đang nối file...', 'info');
+        this.showNotification('Đang chuẩn bị nối file...', 'info');
         
         try {
-            // For Electron, we need to use IPC to call a backend function
-            // that uses ffmpeg or pydub to join audio files
-            const result = await window.electronAPI.apiRequest(
-                'join-audio',
-                {
-                    files: doneTasks.map(t => ({
-                        url: t.resultUrl,
-                        path: t.filePath
-                    })),
-                    delay: delayMs,
-                    outputName: `joined_${Date.now()}.mp3`
-                }
-            );
+            // Step 1: Download all files first
+            const downloadedFiles = [];
             
-            if (result.success) {
-                this.showNotification('Đã nối file thành công!', 'success');
-            } else {
-                this.showNotification('Lỗi: ' + (result.error || 'Unknown'), 'error');
+            for (const task of doneTasks) {
+                if (task.isAudioImport && task.filePath) {
+                    // Local file
+                    downloadedFiles.push(task.filePath);
+                } else if (task.resultUrl) {
+                    // Need to download
+                    const fileName = `${task.fileName || task.id}.mp3`;
+                    const result = await window.electronAPI.downloadFile({
+                        url: task.resultUrl,
+                        fileName: fileName
+                    });
+                    
+                    if (result.success) {
+                        downloadedFiles.push(result.filePath);
+                    }
+                }
             }
+            
+            if (downloadedFiles.length < 2) {
+                this.showNotification('Không đủ file để nối!', 'warning');
+                return;
+            }
+            
+            // Step 2: Create file list for ffmpeg
+            const fileListContent = downloadedFiles.map(f => `file '${f}'`).join('\n');
+            const outputName = `joined_${Date.now()}`;
+            
+            // Save file list
+            await window.electronAPI.saveFile({
+                fileName: `${outputName}_file_list.txt`,
+                content: fileListContent
+            });
+            
+            // Step 3: Try to join using backend
+            const joinResult = await window.electronAPI.joinAudioLocal({
+                files: downloadedFiles,
+                delay: delaySeconds,
+                outputName: outputName
+            });
+            
+            if (joinResult && joinResult.success) {
+                this.showNotification(`Đã nối ${downloadedFiles.length} file thành công!`, 'success');
+            } else {
+                // Create a manual instruction
+                this.showNotification(`Đã tạo file list. Dùng ffmpeg để nối: ffmpeg -f concat -safe 0 -i file_list.txt -c copy output.mp3`, 'info');
+            }
+            
         } catch (error) {
             console.error('Join error:', error);
             this.showNotification('Lỗi khi nối file: ' + error.message, 'error');
         }
+    }
+    
+    async createSRTFromTasks() {
+        const doneTasks = this.tasks.filter(t => t.status === 'done' && t.duration);
+        
+        if (doneTasks.length === 0) {
+            this.showNotification('Không có task hoàn thành để tạo SRT!', 'warning');
+            return;
+        }
+        
+        let srtContent = '';
+        let currentTime = 0;
+        
+        doneTasks.forEach((task, index) => {
+            const duration = parseFloat(task.duration) || 5;
+            const startTime = this.formatSRTTime(currentTime);
+            const endTime = this.formatSRTTime(currentTime + duration);
+            
+            srtContent += `${index + 1}\n`;
+            srtContent += `${startTime} --> ${endTime}\n`;
+            srtContent += `${task.content.substring(0, 200)}\n\n`;
+            
+            currentTime += duration;
+            
+            // Add delay
+            const delay = parseFloat(document.getElementById('delayBetween')?.value) || 1;
+            currentTime += delay;
+        });
+        
+        const outputName = `subtitle_${Date.now()}.srt`;
+        await window.electronAPI.saveFile({
+            fileName: outputName,
+            content: srtContent
+        });
+        
+        this.showNotification(`Đã tạo file ${outputName}`, 'success');
+    }
+    
+    formatSRTTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        const ms = Math.floor((seconds % 1) * 1000);
+        
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(ms).padStart(3, '0')}`;
     }
     
     // ==================== BACKUP/HISTORY ====================
@@ -1149,6 +1225,10 @@ function clearTasks() {
 
 function joinFiles() {
     proTool.joinFiles();
+}
+
+function createSRT() {
+    proTool.createSRTFromTasks();
 }
 
 function openBackup() {

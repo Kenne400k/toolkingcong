@@ -564,6 +564,52 @@ ipcMain.handle('load-tool-page', async () => {
   return { success: true };
 });
 
+// Join audio files locally (using ffmpeg if available)
+ipcMain.handle('join-audio-local', async (event, { files, delay, outputName }) => {
+  const { exec } = require('child_process');
+  const util = require('util');
+  const execPromise = util.promisify(exec);
+  
+  const outputDir = path.join(__dirname, 'output');
+  
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+  
+  try {
+    // Create file list for ffmpeg
+    const fileListPath = path.join(outputDir, `${outputName}_filelist.txt`);
+    const fileListContent = files.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n');
+    fs.writeFileSync(fileListPath, fileListContent);
+    
+    const outputPath = path.join(outputDir, `${outputName}.mp3`);
+    
+    // Try using ffmpeg
+    try {
+      const ffmpegCmd = `ffmpeg -f concat -safe 0 -i "${fileListPath}" -c copy "${outputPath}" -y`;
+      await execPromise(ffmpegCmd);
+      
+      return { 
+        success: true, 
+        filePath: outputPath,
+        message: `Joined ${files.length} files successfully`
+      };
+    } catch (ffmpegError) {
+      console.warn('ffmpeg not available or failed:', ffmpegError.message);
+      
+      // Create file list anyway for manual use
+      return {
+        success: false,
+        fileListPath,
+        message: 'ffmpeg not available. File list created for manual joining.'
+      };
+    }
+  } catch (error) {
+    console.error('Join audio error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 // =================== APP LIFECYCLE ===================
 app.whenReady().then(() => {
   createWindow();
