@@ -188,7 +188,7 @@ class ProToolManager {
         });
     }
     
-    // Load voices from server
+    // Load voices from server - giống tts.js
     async loadVoicesFromServer() {
         const modalBody = document.getElementById('voicesModalBody');
         document.getElementById('voicesModal').classList.add('show');
@@ -196,49 +196,59 @@ class ProToolManager {
         modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Loading voices...</div>`;
         
         try {
-            const result = await window.electronAPI.getResources();
+            const res = await window.electronAPI.getResources();
+            console.log('✅ getResources response:', res);
             
-            if (result && result.voices) {
-                this.serverVoices = result.voices;
-                this.renderVoicesModal(result.voices);
+            if (res && res.status === 'success' && res.data) {
+                // Lấy voices theo provider - giống tts.js
+                let voices = [];
+                
+                if (this.provider === 'elevenlabs' && res.data.elevenlabs && res.data.elevenlabs.voices) {
+                    voices = res.data.elevenlabs.voices;
+                } else if (this.provider === 'minimax' && res.data.minimax && res.data.minimax.voices) {
+                    voices = res.data.minimax.voices;
+                }
+                
+                console.log(`✅ Found ${voices.length} voices for ${this.provider}`);
+                
+                if (voices.length > 0) {
+                    this.serverVoices = voices;
+                    this.renderVoicesModal(voices);
+                } else {
+                    modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #888;">Không có voices cho ${this.provider}</div>`;
+                }
             } else {
-                modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Failed to load voices</div>`;
+                console.error('❌ Invalid response:', res);
+                modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Không thể tải voices. Response: ${JSON.stringify(res).substring(0, 100)}</div>`;
             }
         } catch (error) {
-            console.error('Load voices error:', error);
-            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Error: ${error.message}</div>`;
+            console.error('❌ Load voices error:', error);
+            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Lỗi: ${error.message}</div>`;
         }
     }
     
     renderVoicesModal(voices) {
         const modalBody = document.getElementById('voicesModalBody');
         
-        // Filter by provider
-        const filteredVoices = voices.filter(v => {
-            if (this.provider === 'elevenlabs') {
-                return !v.provider || v.provider === 'elevenlabs';
-            } else {
-                return v.provider === 'minimax';
-            }
-        });
-        
-        if (filteredVoices.length === 0) {
-            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">No voices found for ${this.provider}</div>`;
+        if (!voices || voices.length === 0) {
+            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Không có voices</div>`;
             return;
         }
         
         modalBody.innerHTML = `
             <div style="margin-bottom: 12px;">
-                <input type="text" class="form-input" id="voiceSearch" placeholder="Search voices..." oninput="proTool.filterVoices(this.value)">
+                <input type="text" class="form-input" id="voiceSearch" placeholder="Tìm kiếm voice..." oninput="proTool.filterVoices(this.value)">
             </div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 10px;">${voices.length} voices</div>
             <div id="voicesList" style="max-height: 400px; overflow-y: auto;">
-                ${filteredVoices.map(voice => `
-                    <div class="voice-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #1a1a1a; cursor: pointer;" onclick="proTool.selectVoice('${voice.voice_id}', '${voice.name}')">
-                        <div>
-                            <div style="font-size: 13px; color: #fff;">${voice.name}</div>
-                            <div style="font-size: 10px; color: #555;">${voice.voice_id}</div>
+                ${voices.map(voice => `
+                    <div class="voice-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #1a1a1a; cursor: pointer;" onclick="proTool.selectVoice('${voice.voice_id || voice.id}', '${voice.name}')">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 13px; color: #fff; font-weight: 500;">${voice.name}</div>
+                            <div style="font-size: 10px; color: #555; margin-top: 2px;">${voice.voice_id || voice.id}</div>
+                            ${voice.labels ? `<div style="font-size: 10px; color: #666; margin-top: 4px;">${Object.values(voice.labels).join(' • ')}</div>` : ''}
                         </div>
-                        <button class="btn btn-sm" onclick="event.stopPropagation(); proTool.selectVoice('${voice.voice_id}', '${voice.name}')">Select</button>
+                        <button class="btn btn-sm" style="flex-shrink: 0;" onclick="event.stopPropagation(); proTool.selectVoice('${voice.voice_id || voice.id}', '${voice.name}')">Chọn</button>
                     </div>
                 `).join('')}
             </div>
@@ -1299,15 +1309,15 @@ function selectProvider(provider) {
     const dropdown = document.getElementById('providerDropdown');
     dropdown.classList.remove('open');
     
-    // Update selected display
+    // Update selected display - dùng đúng URL logo như TTS
     const providerImg = document.getElementById('providerImg');
     const providerName = document.getElementById('providerName');
     
     if (provider === 'elevenlabs') {
-        providerImg.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Eleven_Labs.png/220px-Eleven_Labs.png';
+        providerImg.src = 'https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99';
         providerName.textContent = 'ElevenLabs';
     } else {
-        providerImg.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTH8Nm8dpzHx1s-0nrjTKSTfR3B25tYgYWdsg&s';
+        providerImg.src = 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png';
         providerName.textContent = 'Minimax';
     }
     
