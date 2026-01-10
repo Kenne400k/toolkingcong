@@ -1,137 +1,238 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html class="dark" lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KingCong Studio - AI TTS</title>
     <link rel="stylesheet" href="css/tts.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class", 
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#a855f7", 
+                        "bg-main": "#0a0a0a",
+                        "bg-secondary": "#121212", 
+                        "bg-tertiary": "#1a1a1a",
+                        "border-dark": "#2a2a2a"
+                    }, 
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <style>
+        /* =================== LAYOUT STYLES FOR SIDEBAR/HEADER =================== */
+        :root {
+            --primary: #a855f7;
+            --bg-main: #0a0a0a;
+            --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text-dim: #888;
+        }
+        
+        .text-dim { color: var(--text-dim); }
+        .bg-main { background: var(--bg-main); }
+        .bg-secondary { background: var(--bg-secondary); }
+        .border-custom { border-color: var(--border); }
+        
+        /* Avatar styles */
+        .avatar-wrapper {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0.1) 100%);
+            padding: 2px;
+            flex-shrink: 0;
+        }
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Nav link styles */
+        .nav-link {
+            position: relative;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--primary);
+            transition: height 0.3s ease;
+        }
+        .nav-link:hover { background: rgba(168, 85, 247, 0.08); }
+        .nav-link.active {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--primary) !important;
+        }
+        .nav-link.active::before { height: 60%; }
+    </style>
 </head>
-<body>
+<body class="bg-main">
 
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
     </div>
 
-    <header class="app-header">
-        <div class="header-left">
-            <img src="../image/Kingcong.jpg" alt="KingCong Studio" class="logo-img">
-        </div>
-        <div class="header-right">
-            <div class="credits-badge">
-                <i class="bi bi-coin"></i>
-                <span id="creditsValue">5000</span> Credits
-            </div>
-            <button class="btn-icon" title="Đăng xuất" onclick="handleLogout()">
-                <i class="bi bi-box-arrow-right"></i>
-            </button>
-        </div>
-    </header>
-
-    <div class="main-container">
+    <div class="flex h-screen w-full overflow-hidden">
         
-        <main class="editor-section">
-            <div class="quick-toolbar">
-                <div class="provider-badge">
-                    <img src="https://via.placeholder.com/20" class="provider-icon-mini">
-                    <span>ElevenLabs</span>
-                    <i class="bi bi-chevron-down"></i>
-                </div>
-            </div>
+        <!-- =================== SIDEBAR (loaded from component) =================== -->
+        <div id="sidebar-container"></div>
+        
+        <!-- =================== MAIN CONTENT =================== -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden bg-main">
+            
+            <!-- Header (loaded from component) -->
+            <div id="header-container"></div>
 
-            <div class="gradient-border-box textarea-wrapper">
-                <div class="textarea-inner">
-                    <textarea 
-                        id="txtInput" 
-                        placeholder="Nhập văn bản vào đây để bắt đầu chuyển đổi..."
-                        spellcheck="false"
-                    ></textarea>
-                    
-                    <div class="empty-state" id="emptyState">
-                        <i class="bi bi-keyboard"></i>
-                        <p>Bắt đầu nhập liệu hoặc tải file lên...</p>
+            <!-- TTS Content Area -->
+            <div class="main-container flex-1 overflow-y-auto">
+                
+                <!-- Editor Section -->
+                <div class="editor-section">
+                    <div class="quick-toolbar">
+                        <div class="provider-badge">
+                            <img src="https://via.placeholder.com/20" class="provider-icon-mini">
+                            <span>ElevenLabs</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+                    </div>
+
+                    <div class="gradient-border-box textarea-wrapper">
+                        <div class="textarea-inner">
+                            <textarea 
+                                id="txtInput" 
+                                placeholder="Nhập văn bản vào đây để bắt đầu chuyển đổi..."
+                                spellcheck="false"
+                            ></textarea>
+                            
+                            <div class="empty-state" id="emptyState">
+                                <i class="bi bi-keyboard"></i>
+                                <p>Bắt đầu nhập liệu hoặc tải file lên...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="editor-footer">
+                        <button class="btn-upload" onclick="openFileUpload()">
+                            <i class="bi bi-cloud-upload"></i> Tải file (.txt, .srt)
+                        </button>
+                        <div class="stats">
+                            <span>0 ký tự</span>
+                            <span class="divider">|</span>
+                            <span>~0s thời lượng</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="editor-footer">
-                <button class="btn-upload" onclick="openFileUpload()">
-                    <i class="bi bi-cloud-upload"></i> Tải file (.txt, .srt)
-                </button>
-                <div class="stats">
-                    <span>0 ký tự</span>
-                    <span class="divider">|</span>
-                    <span>~0s thời lượng</span>
-                </div>
+                <!-- Settings Sidebar -->
+                <aside class="sidebar-section">
+                    <div class="sidebar-tabs">
+                        <button class="tab-btn active" onclick="switchTab('settings')">Cài đặt</button>
+                        <button class="tab-btn" onclick="switchTab('history')">Lịch sử</button>
+                    </div>
+
+                    <div id="tabSettings" class="sidebar-content show">
+                        
+                        <div class="control-group">
+                            <label>Giọng đọc</label>
+                            <div class="gradient-border-box selector-box" onclick="openVoiceModal()">
+                                <div class="selector-inner">
+                                    <span class="selected-value">Chọn giọng đọc...</span>
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Mô hình (Model)</label>
+                            <div class="gradient-border-box selector-box">
+                                <div class="selector-inner">
+                                    <select class="native-select">
+                                        <option>Eleven Multilingual v2</option>
+                                        <option>Eleven Turbo v2.5</option>
+                                    </select>
+                                    <i class="bi bi-chevron-down dropdown-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-group toggle-group">
+                            <div class="toggle-row">
+                                <span>Tạo phụ đề (SRT)</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="action-area">
+                            <button class="btn-primary-gradient" onclick="startTTS()">
+                                <i class="bi bi-soundwave"></i>
+                                CHUYỂN ĐỔI NGAY
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tabHistory" class="sidebar-content">
+                        <div class="history-card">
+                            <div class="hc-header">
+                                <span class="hc-time">10:45 AM</span>
+                                <span class="hc-badge done">Hoàn thành</span>
+                            </div>
+                            <p class="hc-preview">Xin chào, đây là đoạn văn bản mẫu...</p>
+                            <div class="hc-player">
+                                <button class="btn-mini-play"><i class="bi bi-play-fill"></i></button>
+                                <div class="progress-bar"><div class="fill" style="width: 40%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                
             </div>
         </main>
-
-        <aside class="sidebar-section">
-            <div class="sidebar-tabs">
-                <button class="tab-btn active" onclick="switchTab('settings')">Cài đặt</button>
-                <button class="tab-btn" onclick="switchTab('history')">Lịch sử</button>
-            </div>
-
-            <div id="tabSettings" class="sidebar-content show">
-                
-                <div class="control-group">
-                    <label>Giọng đọc</label>
-                    <div class="gradient-border-box selector-box" onclick="openVoiceModal()">
-                        <div class="selector-inner">
-                            <span class="selected-value">Chọn giọng đọc...</span>
-                            <i class="bi bi-chevron-right"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="control-group">
-                    <label>Mô hình (Model)</label>
-                    <div class="gradient-border-box selector-box">
-                        <div class="selector-inner">
-                            <select class="native-select">
-                                <option>Eleven Multilingual v2</option>
-                                <option>Eleven Turbo v2.5</option>
-                            </select>
-                            <i class="bi bi-chevron-down dropdown-arrow"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="control-group toggle-group">
-                    <div class="toggle-row">
-                        <span>Tạo phụ đề (SRT)</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="action-area">
-                    <button class="btn-primary-gradient" onclick="startTTS()">
-                        <i class="bi bi-soundwave"></i>
-                        CHUYỂN ĐỔI NGAY
-                    </button>
-                </div>
-            </div>
-
-            <div id="tabHistory" class="sidebar-content">
-                <div class="history-card">
-                    <div class="hc-header">
-                        <span class="hc-time">10:45 AM</span>
-                        <span class="hc-badge done">Hoàn thành</span>
-                    </div>
-                    <p class="hc-preview">Xin chào, đây là đoạn văn bản mẫu...</p>
-                    <div class="hc-player">
-                        <button class="btn-mini-play"><i class="bi bi-play-fill"></i></button>
-                        <div class="progress-bar"><div class="fill" style="width: 40%"></div></div>
-                    </div>
-                </div>
-            </div>
-        </aside>
     </div>
 
+    <script src="config/component-loader.js"></script>
     <script src="js/tts.js"></script>
+    <script>
+        // Load layout components
+        document.addEventListener('DOMContentLoaded', async () => {
+            await componentLoader.loadLayout({
+                headerContainer: '#header-container',
+                sidebarContainer: '#sidebar-container',
+                activePage: 'tts'
+            });
+            componentLoader.setPageTitle('TTS Tool');
+        });
+    </script>
 </body>
 </html>
