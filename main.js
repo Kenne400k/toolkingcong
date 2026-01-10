@@ -258,8 +258,16 @@ ipcMain.handle('api-request', async (event, { action, data }) => {
     // Thêm data tùy chỉnh
     if (data) {
       Object.keys(data).forEach(key => {
-        if (data[key] !== undefined && data[key] !== null) {
-          form.append(key, data[key]);
+        const value = data[key];
+        if (value !== undefined && value !== null) {
+          // Convert boolean to string for FormData
+          if (typeof value === 'boolean') {
+            form.append(key, value ? 'true' : 'false');
+          } else if (typeof value === 'number') {
+            form.append(key, String(value));
+          } else {
+            form.append(key, value);
+          }
         }
       });
     }
