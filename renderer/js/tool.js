@@ -178,6 +178,91 @@ class ProToolManager {
             `;
         }
         this.model = modelSelect.value;
+        
+        // Update provider card UI
+        document.querySelectorAll('.provider-card').forEach(card => {
+            card.classList.remove('active');
+            if (card.dataset.provider === this.provider) {
+                card.classList.add('active');
+            }
+        });
+    }
+    
+    // Load voices from server
+    async loadVoicesFromServer() {
+        const modalBody = document.getElementById('voicesModalBody');
+        document.getElementById('voicesModal').classList.add('show');
+        
+        modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Loading voices...</div>`;
+        
+        try {
+            const result = await window.electronAPI.getResources();
+            
+            if (result && result.voices) {
+                this.serverVoices = result.voices;
+                this.renderVoicesModal(result.voices);
+            } else {
+                modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Failed to load voices</div>`;
+            }
+        } catch (error) {
+            console.error('Load voices error:', error);
+            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Error: ${error.message}</div>`;
+        }
+    }
+    
+    renderVoicesModal(voices) {
+        const modalBody = document.getElementById('voicesModalBody');
+        
+        // Filter by provider
+        const filteredVoices = voices.filter(v => {
+            if (this.provider === 'elevenlabs') {
+                return !v.provider || v.provider === 'elevenlabs';
+            } else {
+                return v.provider === 'minimax';
+            }
+        });
+        
+        if (filteredVoices.length === 0) {
+            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">No voices found for ${this.provider}</div>`;
+            return;
+        }
+        
+        modalBody.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <input type="text" class="form-input" id="voiceSearch" placeholder="Search voices..." oninput="proTool.filterVoices(this.value)">
+            </div>
+            <div id="voicesList" style="max-height: 400px; overflow-y: auto;">
+                ${filteredVoices.map(voice => `
+                    <div class="voice-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #1a1a1a; cursor: pointer;" onclick="proTool.selectVoice('${voice.voice_id}', '${voice.name}')">
+                        <div>
+                            <div style="font-size: 13px; color: #fff;">${voice.name}</div>
+                            <div style="font-size: 10px; color: #555;">${voice.voice_id}</div>
+                        </div>
+                        <button class="btn btn-sm" onclick="event.stopPropagation(); proTool.selectVoice('${voice.voice_id}', '${voice.name}')">Select</button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    filterVoices(query) {
+        const items = document.querySelectorAll('#voicesList .voice-item');
+        query = query.toLowerCase();
+        
+        items.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            item.style.display = text.includes(query) ? 'flex' : 'none';
+        });
+    }
+    
+    selectVoice(voiceId, voiceName) {
+        document.getElementById('selectedVoiceId').value = voiceId;
+        this.showNotification(`Selected: ${voiceName}`, 'success');
+        document.getElementById('voicesModal').classList.remove('show');
+    }
+    
+    closeVoicesModal() {
+        document.getElementById('voicesModal').classList.remove('show');
     }
     
     // ==================== FILE HANDLING ====================
@@ -1193,6 +1278,20 @@ function closeBackup() {
 
 function openOutputFolder() {
     proTool.openOutputFolder();
+}
+
+function selectProvider(provider) {
+    proTool.provider = provider;
+    document.getElementById('providerSelect').value = provider;
+    proTool.updateModelOptions();
+}
+
+function loadVoicesFromServer() {
+    proTool.loadVoicesFromServer();
+}
+
+function closeVoicesModal() {
+    proTool.closeVoicesModal();
 }
 
 // Add CSS animation

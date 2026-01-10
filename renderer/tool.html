@@ -14,43 +14,35 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg: #000;
-            --bg-secondary: #0a0a0a;
-            --bg-hover: #111;
-            --border: #1a1a1a;
-            --text: #fff;
-            --text-dim: #666;
-            --accent: #fff;
+            --primary: #a855f7;
+            --accent: #667eea;
+            --bg-main: #0a0a0a;
+            --bg-secondary: #121212;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text-dim: #888;
         }
         
-        /* Smooth scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         
         body {
-            background: var(--bg);
+            background: var(--bg-main);
             color: var(--text);
             font-family: 'Inter', -apple-system, sans-serif;
             overflow: hidden;
         }
         
-        /* All transitions smooth */
+        /* Smooth transitions */
         *, *::before, *::after {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
         }
         
-        /* =================== LAYOUT =================== */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-        }
-        
-        /* Main Sidebar */
+        /* =================== MAIN SIDEBAR (Giữ nguyên style cũ) =================== */
         .main-sidebar {
-            width: 220px;
-            background: var(--bg);
+            width: 240px;
+            background: var(--bg-main);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -68,11 +60,20 @@
             gap: 12px;
         }
         
-        .avatar {
-            width: 36px;
-            height: 36px;
-            background: #111;
+        .avatar-wrapper {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.1));
+            padding: 2px;
+            flex-shrink: 0;
+        }
+        
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -81,7 +82,7 @@
             overflow: hidden;
         }
         
-        .avatar img {
+        .avatar-inner img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -90,6 +91,7 @@
         .user-name {
             font-size: 14px;
             font-weight: 500;
+            color: #fff;
         }
         
         .user-plan {
@@ -113,21 +115,39 @@
             text-decoration: none;
             font-size: 13px;
             cursor: pointer;
+            position: relative;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: var(--primary);
+            border-radius: 0 2px 2px 0;
+            transition: height 0.2s ease;
         }
         
         .nav-item:hover {
-            background: var(--bg-hover);
+            background: rgba(168, 85, 247, 0.08);
             color: var(--text);
         }
         
         .nav-item.active {
-            background: #111;
-            color: var(--text);
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--primary);
+        }
+        
+        .nav-item.active::before {
+            height: 60%;
         }
         
         .nav-item i, .nav-item span.material-symbols-outlined {
-            font-size: 18px;
-            width: 20px;
+            font-size: 20px;
+            width: 24px;
         }
         
         .nav-footer {
@@ -135,58 +155,52 @@
             border-top: 1px solid var(--border);
         }
         
-        /* =================== MAIN AREA =================== */
-        .main-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        /* Top Bar */
+        /* =================== HEADER (Giữ nguyên style cũ) =================== */
         .top-bar {
-            height: 56px;
+            height: 60px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            background: var(--bg);
+            padding: 0 24px;
+            background: var(--bg-main);
             flex-shrink: 0;
         }
         
         .top-bar-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
+            color: #fff;
         }
         
         .credits-box {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 14px;
-            background: #0a0a0a;
+            padding: 8px 16px;
+            background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 13px;
         }
         
         .credits-box i {
-            color: #666;
+            color: var(--primary);
         }
         
-        /* =================== TOOL LAYOUT =================== */
+        /* =================== TOOL AREA (Đen trắng đơn giản) =================== */
         .tool-layout {
             flex: 1;
             display: flex;
             overflow: hidden;
+            background: #000;
         }
         
         /* Tool Sidebar */
         .tool-sidebar {
-            width: 280px;
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border);
+            width: 260px;
+            background: #050505;
+            border-right: 1px solid #1a1a1a;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -195,38 +209,91 @@
         
         .tool-section {
             padding: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .tool-section:last-child {
-            border-bottom: none;
+            border-bottom: 1px solid #1a1a1a;
         }
         
         .section-title {
             font-size: 10px;
             font-weight: 600;
-            color: var(--text-dim);
+            color: #555;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 12px;
         }
         
-        /* Form */
-        .form-group {
-            margin-bottom: 12px;
+        /* Provider Cards */
+        .provider-cards {
+            display: flex;
+            gap: 8px;
         }
         
-        .form-group:last-child {
-            margin-bottom: 0;
+        .provider-card {
+            flex: 1;
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .provider-card:hover {
+            border-color: #333;
+        }
+        
+        .provider-card.active {
+            border-color: #fff;
+            background: #111;
+        }
+        
+        .provider-card img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+        }
+        
+        .provider-card .provider-icon {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 6px;
+            background: #1a1a1a;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .provider-card span {
+            font-size: 11px;
+            color: #888;
+        }
+        
+        .provider-card.active span {
+            color: #fff;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 10px;
+            color: #555;
+            margin-bottom: 6px;
+            text-transform: uppercase;
         }
         
         .form-select, .form-input {
             width: 100%;
             padding: 10px 12px;
-            background: var(--bg);
-            border: 1px solid var(--border);
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
             border-radius: 6px;
-            color: var(--text);
+            color: #fff;
             font-size: 13px;
             outline: none;
         }
@@ -235,7 +302,7 @@
             border-color: #333;
         }
         
-        /* Checkboxes */
+        /* Checkboxes with tooltips */
         .checkbox-list {
             display: flex;
             flex-direction: column;
@@ -250,12 +317,13 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
-            color: var(--text-dim);
+            color: #666;
+            position: relative;
         }
         
         .checkbox-row:hover {
-            background: var(--bg);
-            color: var(--text);
+            background: #0a0a0a;
+            color: #fff;
         }
         
         .checkbox-row input {
@@ -264,13 +332,49 @@
             accent-color: #fff;
         }
         
-        .checkbox-row.checked {
-            color: var(--text);
+        .checkbox-row:has(input:checked) {
+            color: #fff;
+        }
+        
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #ccc;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 100;
+            margin-bottom: 6px;
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #333;
+        }
+        
+        .checkbox-row:hover .tooltip,
+        .toolbar-btn:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
         }
         
         /* Buttons */
         .btn {
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-radius: 6px;
             font-size: 12px;
             font-weight: 500;
@@ -279,13 +383,13 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--text);
+            border: 1px solid #1a1a1a;
+            background: #0a0a0a;
+            color: #fff;
         }
         
         .btn:hover {
-            background: var(--bg-hover);
+            background: #111;
             border-color: #333;
         }
         
@@ -303,14 +407,8 @@
             background: #e5e5e5;
         }
         
-        .btn-block {
-            width: 100%;
-        }
-        
-        .btn-sm {
-            padding: 6px 10px;
-            font-size: 11px;
-        }
+        .btn-block { width: 100%; }
+        .btn-sm { padding: 6px 10px; font-size: 11px; }
         
         /* =================== TOOL CONTENT =================== */
         .tool-content {
@@ -318,47 +416,49 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background: #000;
         }
         
         /* Toolbar */
         .toolbar {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-secondary);
+            gap: 6px;
+            padding: 10px 14px;
+            border-bottom: 1px solid #1a1a1a;
+            background: #050505;
             flex-wrap: wrap;
         }
         
         .toolbar-group {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         
         .toolbar-divider {
             width: 1px;
-            height: 24px;
-            background: var(--border);
-            margin: 0 8px;
+            height: 20px;
+            background: #1a1a1a;
+            margin: 0 6px;
         }
         
         .toolbar-btn {
             padding: 8px 12px;
-            background: var(--bg);
-            border: 1px solid var(--border);
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
             border-radius: 6px;
-            color: var(--text);
-            font-size: 12px;
+            color: #fff;
+            font-size: 11px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            position: relative;
         }
         
         .toolbar-btn:hover {
-            background: var(--bg-hover);
+            background: #111;
             border-color: #333;
         }
         
@@ -370,7 +470,7 @@
             background: #fff;
             color: #000;
             border: none;
-            font-weight: 500;
+            font-weight: 600;
         }
         
         .toolbar-btn.primary:hover {
@@ -378,22 +478,21 @@
         }
         
         .toolbar-btn.danger {
-            color: #f44;
-            border-color: #f44;
+            color: #f55;
         }
         
         .toolbar-btn.danger:hover {
-            background: rgba(255, 68, 68, 0.1);
+            background: rgba(255, 85, 85, 0.1);
+            border-color: #f55;
         }
         
         /* Task Area */
         .task-area {
             flex: 1;
             overflow: auto;
-            background: var(--bg);
+            background: #000;
         }
         
-        /* Task Table */
         .task-table {
             width: 100%;
             border-collapse: collapse;
@@ -402,20 +501,20 @@
         .task-table th {
             position: sticky;
             top: 0;
-            background: var(--bg-secondary);
+            background: #050505;
             text-align: left;
-            padding: 12px 16px;
+            padding: 10px 14px;
             font-size: 10px;
             font-weight: 600;
-            color: var(--text-dim);
+            color: #444;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid #1a1a1a;
         }
         
         .task-table td {
-            padding: 12px 16px;
-            font-size: 13px;
+            padding: 10px 14px;
+            font-size: 12px;
             border-bottom: 1px solid #0a0a0a;
         }
         
@@ -424,24 +523,25 @@
         }
         
         .task-content {
-            max-width: 400px;
+            max-width: 350px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #ccc;
         }
         
         .task-filename {
-            font-size: 11px;
-            color: var(--text-dim);
+            font-size: 10px;
+            color: #444;
             margin-top: 2px;
         }
         
         /* Status */
         .status {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
         }
         
@@ -452,14 +552,14 @@
         
         /* Footer */
         .tool-footer {
-            padding: 12px 16px;
-            border-top: 1px solid var(--border);
-            background: var(--bg-secondary);
+            padding: 10px 14px;
+            border-top: 1px solid #1a1a1a;
+            background: #050505;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-dim);
+            font-size: 11px;
+            color: #555;
         }
         
         .status-dot {
@@ -473,7 +573,7 @@
         
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.4; }
         }
         
         /* =================== MODALS =================== */
@@ -499,7 +599,7 @@
         
         .modal-box {
             background: #0a0a0a;
-            border: 1px solid var(--border);
+            border: 1px solid #1a1a1a;
             border-radius: 12px;
             width: 90%;
             max-width: 600px;
@@ -515,7 +615,7 @@
         
         .modal-header {
             padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid #1a1a1a;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -524,20 +624,20 @@
         .modal-header h3 {
             font-size: 14px;
             font-weight: 600;
+            color: #fff;
         }
         
         .modal-close {
             background: none;
             border: none;
-            color: var(--text-dim);
-            font-size: 18px;
+            color: #555;
+            font-size: 20px;
             cursor: pointer;
             padding: 4px;
+            line-height: 1;
         }
         
-        .modal-close:hover {
-            color: var(--text);
-        }
+        .modal-close:hover { color: #fff; }
         
         .modal-body {
             flex: 1;
@@ -547,7 +647,7 @@
         
         .modal-footer {
             padding: 16px 20px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid #1a1a1a;
             display: flex;
             justify-content: flex-end;
             gap: 8px;
@@ -562,22 +662,24 @@
         .voice-table th, .voice-table td {
             padding: 10px;
             text-align: left;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid #1a1a1a;
             font-size: 12px;
         }
         
         .voice-table th {
-            color: var(--text-dim);
+            color: #555;
             font-weight: 500;
+            font-size: 10px;
+            text-transform: uppercase;
         }
         
         .voice-table input {
             width: 100%;
             padding: 8px;
-            background: var(--bg);
-            border: 1px solid var(--border);
+            background: #000;
+            border: 1px solid #1a1a1a;
             border-radius: 4px;
-            color: var(--text);
+            color: #fff;
             font-size: 12px;
         }
         
@@ -586,13 +688,12 @@
             border-color: #333;
         }
         
-        /* Info text */
         .info-text {
             font-size: 11px;
-            color: var(--text-dim);
+            color: #666;
             line-height: 1.6;
             padding: 12px;
-            background: var(--bg);
+            background: #050505;
             border-radius: 6px;
             margin-bottom: 16px;
         }
@@ -602,18 +703,34 @@
             padding: 2px 6px;
             border-radius: 3px;
             font-family: monospace;
+            color: #fff;
+        }
+        
+        /* Voice selector in sidebar */
+        .voice-selector {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .voice-selector .btn {
+            flex: 1;
+            font-size: 10px;
+            padding: 8px;
         }
     </style>
 </head>
 
 <body>
-    <div class="app-container">
+    <div class="flex h-screen w-full overflow-hidden">
         
-        <!-- ========== MAIN SIDEBAR ========== -->
+        <!-- ========== MAIN SIDEBAR (Giữ nguyên màu cũ) ========== -->
         <aside class="main-sidebar" id="app-sidebar">
             <div class="sidebar-header">
                 <div class="user-info">
-                    <div class="avatar" id="user-avatar">K</div>
+                    <div class="avatar-wrapper">
+                        <div class="avatar-inner" id="user-avatar">K</div>
+                    </div>
                     <div>
                         <div class="user-name" id="user-name">KingCong</div>
                         <div class="user-plan">Pro Plan</div>
@@ -649,9 +766,9 @@
         </aside>
         
         <!-- ========== MAIN AREA ========== -->
-        <div class="main-area">
+        <div class="flex-1 flex flex-col overflow-hidden">
             
-            <!-- Top Bar -->
+            <!-- Header (Giữ nguyên màu cũ) -->
             <div class="top-bar" id="app-header">
                 <div class="top-bar-title">Pro Tool</div>
                 <div class="credits-box">
@@ -660,22 +777,33 @@
                 </div>
             </div>
             
-            <!-- Tool Layout -->
+            <!-- Tool Layout (Đen trắng bên trong) -->
             <div class="tool-layout">
                 
                 <!-- Tool Sidebar -->
                 <div class="tool-sidebar">
                     
-                    <!-- Voice -->
+                    <!-- Provider Selection -->
+                    <div class="tool-section">
+                        <div class="section-title">Provider</div>
+                        <div class="provider-cards">
+                            <div class="provider-card active" data-provider="elevenlabs" onclick="selectProvider('elevenlabs')">
+                                <div class="provider-icon">🎙️</div>
+                                <span>ElevenLabs</span>
+                            </div>
+                            <div class="provider-card" data-provider="minimax" onclick="selectProvider('minimax')">
+                                <div class="provider-icon">🔊</div>
+                                <span>Minimax</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="providerSelect" value="elevenlabs">
+                    </div>
+                    
+                    <!-- Voice Settings -->
                     <div class="tool-section">
                         <div class="section-title">Voice</div>
                         <div class="form-group">
-                            <select class="form-select" id="providerSelect">
-                                <option value="elevenlabs">ElevenLabs</option>
-                                <option value="minimax">Minimax</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
+                            <label class="form-label">Model</label>
                             <select class="form-select" id="modelSelect">
                                 <option value="eleven_multilingual_v2">Multilingual V2</option>
                                 <option value="eleven_turbo_v2_5">Turbo V2.5</option>
@@ -683,62 +811,77 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID...">
+                            <label class="form-label">Voice ID</label>
+                            <input type="text" class="form-input" id="selectedVoiceId" placeholder="Nhập Voice ID...">
                         </div>
-                        <button class="btn btn-block" onclick="openVoiceLibrary()">
-                            <i class="bi bi-collection"></i> Voice Library
-                        </button>
+                        <div class="voice-selector">
+                            <button class="btn" onclick="openVoiceLibrary()">
+                                <i class="bi bi-collection"></i> Library
+                            </button>
+                            <button class="btn" onclick="loadVoicesFromServer()">
+                                <i class="bi bi-cloud-download"></i> Load
+                            </button>
+                        </div>
                     </div>
                     
-                    <!-- Options -->
+                    <!-- Options with Tooltips -->
                     <div class="tool-section">
                         <div class="section-title">Options</div>
                         <div class="checkbox-list">
                             <label class="checkbox-row">
                                 <input type="checkbox" id="optLoop">
-                                Loop (chia nhỏ)
+                                Loop
+                                <span class="tooltip">Chia văn bản thành các đoạn nhỏ (mặc định 10.000 ký tự)</span>
                             </label>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="optAutoSplit">
                                 Auto Split
+                                <span class="tooltip">Tự động chia theo dấu câu: 。、,:.!?</span>
                             </label>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="opt1Line1File">
                                 1 Line = 1 File
+                                <span class="tooltip">Mỗi dòng trong file text sẽ thành 1 file audio riêng</span>
                             </label>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="optSilentChar">
-                                Silent by char
+                                Silent Char
+                                <span class="tooltip">Thêm pause: dấu ,; → 0.3s | dấu .:?! → 0.5s</span>
                             </label>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="optRemoveSpecial">
-                                Remove special
+                                Remove Special
+                                <span class="tooltip">Xóa ký tự đặc biệt: @ # $ % ^ & * = + | \ / ~ ` [ ] { }</span>
                             </label>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="optAutoSRT">
                                 Auto SRT
+                                <span class="tooltip">Tự động tạo file phụ đề SRT kèm theo audio</span>
                             </label>
                         </div>
                     </div>
                     
-                    <!-- Advanced -->
+                    <!-- Advanced Settings -->
                     <div class="tool-section">
                         <div class="section-title">Advanced</div>
                         <div class="form-group">
-                            <input type="number" class="form-input" id="maxChars" value="10000" placeholder="Max chars">
+                            <label class="form-label">Max chars/segment</label>
+                            <input type="number" class="form-input" id="maxChars" value="10000">
                         </div>
                         <div class="form-group">
-                            <input type="text" class="form-input" id="delayBetween" value="1s" placeholder="Delay">
+                            <label class="form-label">Delay between</label>
+                            <input type="text" class="form-input" id="delayBetween" value="1s" placeholder="1s">
                         </div>
                         <div class="form-group">
-                            <input type="number" class="form-input" id="threadCount" value="3" min="1" max="20" placeholder="Threads">
+                            <label class="form-label">Threads</label>
+                            <input type="number" class="form-input" id="threadCount" value="3" min="1" max="20">
                         </div>
                     </div>
                     
                     <!-- Quick Actions -->
-                    <div class="tool-section" style="margin-top: auto;">
+                    <div class="tool-section" style="margin-top: auto; border-bottom: none;">
                         <button class="btn btn-block" onclick="openBackup()">
-                            <i class="bi bi-clock-history"></i> Backup
+                            <i class="bi bi-clock-history"></i> Backup / History
                         </button>
                     </div>
                 </div>
@@ -746,17 +889,20 @@
                 <!-- Tool Content -->
                 <div class="tool-content">
                     
-                    <!-- Toolbar -->
+                    <!-- Toolbar with Tooltips -->
                     <div class="toolbar">
                         <div class="toolbar-group">
                             <button class="toolbar-btn" onclick="importFile()">
                                 <i class="bi bi-file-text"></i> File
+                                <span class="tooltip">Import file .txt hoặc .srt</span>
                             </button>
                             <button class="toolbar-btn" onclick="importFolder()">
                                 <i class="bi bi-folder"></i> Folder
+                                <span class="tooltip">Import cả thư mục chứa file text</span>
                             </button>
                             <button class="toolbar-btn" onclick="importVoice()">
                                 <i class="bi bi-music-note"></i> MP3
+                                <span class="tooltip">Import file MP3 (1.mp3, 2.mp3...) để nối</span>
                             </button>
                         </div>
                         
@@ -765,9 +911,11 @@
                         <div class="toolbar-group">
                             <button class="toolbar-btn primary" onclick="startProcessing()" id="btnStart">
                                 <i class="bi bi-play-fill"></i> Start
+                                <span class="tooltip">Bắt đầu xử lý tất cả tasks</span>
                             </button>
                             <button class="toolbar-btn danger" onclick="stopProcessing()" id="btnStop" disabled>
                                 <i class="bi bi-stop-fill"></i> Stop
+                                <span class="tooltip">Dừng xử lý</span>
                             </button>
                         </div>
                         
@@ -776,18 +924,22 @@
                         <div class="toolbar-group">
                             <button class="toolbar-btn" onclick="joinFiles()">
                                 <i class="bi bi-link"></i> Join
+                                <span class="tooltip">Nối tất cả file MP3 đã hoàn thành với delay</span>
                             </button>
                             <button class="toolbar-btn" onclick="createSRT()">
                                 <i class="bi bi-badge-cc"></i> SRT
+                                <span class="tooltip">Tạo file phụ đề SRT từ các tasks</span>
                             </button>
                         </div>
                         
-                        <div style="margin-left: auto;">
+                        <div style="margin-left: auto; display: flex; gap: 4px;">
                             <button class="toolbar-btn" onclick="clearTasks()">
                                 <i class="bi bi-trash"></i>
+                                <span class="tooltip">Xóa tất cả tasks</span>
                             </button>
                             <button class="toolbar-btn" onclick="openOutputFolder()">
                                 <i class="bi bi-folder2-open"></i>
+                                <span class="tooltip">Mở thư mục output</span>
                             </button>
                         </div>
                     </div>
@@ -797,16 +949,15 @@
                         <table class="task-table" id="taskTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
-                                    <th style="width: 50px;">#</th>
+                                    <th style="width: 36px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                    <th style="width: 40px;">#</th>
                                     <th>Content</th>
-                                    <th style="width: 120px;">Voice</th>
-                                    <th style="width: 100px;">Status</th>
-                                    <th style="width: 80px;"></th>
+                                    <th style="width: 100px;">Voice</th>
+                                    <th style="width: 80px;">Status</th>
+                                    <th style="width: 70px;"></th>
                                 </tr>
                             </thead>
                             <tbody id="taskTableBody">
-                                <!-- Tasks here -->
                             </tbody>
                         </table>
                     </div>
@@ -828,17 +979,17 @@
     <div class="modal" id="voiceLibraryModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3>Voice Library</h3>
+                <h3><i class="bi bi-collection"></i> Voice Library</h3>
                 <button class="modal-close" onclick="closeVoiceLibrary()">×</button>
             </div>
             <div class="modal-body">
                 <div class="info-text">
-                    Dùng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu dòng để chọn voice tương ứng.
+                    Dùng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu mỗi dòng trong file text để sử dụng voice tương ứng cho hội thoại nhiều người.
                 </div>
                 <table class="voice-table">
                     <thead>
                         <tr>
-                            <th style="width: 50px;">ID</th>
+                            <th style="width: 40px;">ID</th>
                             <th>Voice ID</th>
                             <th>Name</th>
                             <th style="width: 40px;"></th>
@@ -854,7 +1005,7 @@
                     </tbody>
                 </table>
                 <button class="btn" style="margin-top: 12px;" onclick="addVoiceRow()">
-                    <i class="bi bi-plus"></i> Add
+                    <i class="bi bi-plus"></i> Add Voice
                 </button>
             </div>
             <div class="modal-footer">
@@ -864,15 +1015,33 @@
         </div>
     </div>
     
+    <!-- ========== VOICES FROM SERVER MODAL ========== -->
+    <div class="modal" id="voicesModal">
+        <div class="modal-box" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3><i class="bi bi-cloud-download"></i> Voices from Server</h3>
+                <button class="modal-close" onclick="closeVoicesModal()">×</button>
+            </div>
+            <div class="modal-body" id="voicesModalBody">
+                <div style="text-align: center; padding: 40px; color: #555;">
+                    Loading voices...
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeVoicesModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- ========== BACKUP MODAL ========== -->
     <div class="modal" id="backupModal">
         <div class="modal-box" style="max-width: 800px;">
             <div class="modal-header">
-                <h3>Backup / History</h3>
+                <h3><i class="bi bi-clock-history"></i> Backup / History</h3>
                 <button class="modal-close" onclick="closeBackup()">×</button>
             </div>
             <div class="modal-body" id="backupBody">
-                <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+                <div style="text-align: center; padding: 40px; color: #555;">
                     Loading...
                 </div>
             </div>
