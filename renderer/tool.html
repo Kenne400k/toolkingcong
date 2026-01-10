@@ -353,9 +353,36 @@
             display: none !important;
         }
         
-        /* Checkbox row với title hover effect */
-        .checkbox-row[title]:hover {
-            background: #111;
+        /* Info tip icon */
+        .info-tip {
+            margin-left: auto;
+            color: #444;
+            font-size: 12px;
+            cursor: help;
+        }
+        
+        .info-tip:hover {
+            color: #888;
+        }
+        
+        .checkbox-row span {
+            flex: 1;
+        }
+        
+        /* Floating tooltip div - sẽ được tạo bằng JS */
+        #floatingTip {
+            position: fixed;
+            padding: 8px 12px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #eee;
+            z-index: 999999;
+            pointer-events: none;
+            max-width: 250px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: none;
         }
         
         /* Buttons */
@@ -724,29 +751,35 @@
                     <div class="tool-section">
                         <div class="section-title">Options</div>
                         <div class="checkbox-list">
-                            <label class="checkbox-row" title="Chia văn bản thành đoạn nhỏ (mặc định 10.000 ký tự mỗi đoạn)">
+                            <label class="checkbox-row">
                                 <input type="checkbox" id="optLoop">
-                                Loop
+                                <span>Loop</span>
+                                <i class="bi bi-info-circle info-tip" data-tip="Chia văn bản thành đoạn nhỏ (10.000 ký tự)"></i>
                             </label>
-                            <label class="checkbox-row" title="Tự động chia theo dấu câu: 。、,:.!?">
+                            <label class="checkbox-row">
                                 <input type="checkbox" id="optAutoSplit">
-                                Auto Split
+                                <span>Auto Split</span>
+                                <i class="bi bi-info-circle info-tip" data-tip="Chia theo dấu câu: 。、,:.!?"></i>
                             </label>
-                            <label class="checkbox-row" title="Mỗi dòng trong file text sẽ thành 1 file audio riêng">
+                            <label class="checkbox-row">
                                 <input type="checkbox" id="opt1Line1File">
-                                1 Line = 1 File
+                                <span>1 Line = 1 File</span>
+                                <i class="bi bi-info-circle info-tip" data-tip="Mỗi dòng = 1 file audio riêng"></i>
                             </label>
-                            <label class="checkbox-row" title="Thêm khoảng nghỉ: dấu ,; → 0.3s | dấu .:?! → 0.5s">
+                            <label class="checkbox-row">
                                 <input type="checkbox" id="optSilentChar">
-                                Silent Char
+                                <span>Silent Char</span>
+                                <i class="bi bi-info-circle info-tip" data-tip=",; → 0.3s pause | .:?! → 0.5s pause"></i>
                             </label>
-                            <label class="checkbox-row" title="Xóa ký tự đặc biệt: @ # $ % ^ & * = + | \ ~ ` [ ] { }">
+                            <label class="checkbox-row">
                                 <input type="checkbox" id="optRemoveSpecial">
-                                Remove Special
+                                <span>Remove Special</span>
+                                <i class="bi bi-info-circle info-tip" data-tip="Xóa: @#$%^&*=+|\~`[]{}"></i>
                             </label>
-                            <label class="checkbox-row" title="Tự động tạo file phụ đề .srt kèm theo audio">
+                            <label class="checkbox-row">
                                 <input type="checkbox" id="optAutoSRT">
-                                Auto SRT
+                                <span>Auto SRT</span>
+                                <i class="bi bi-info-circle info-tip" data-tip="Tự động tạo file phụ đề .srt"></i>
                             </label>
                         </div>
                     </div>
@@ -931,6 +964,9 @@
         </div>
     </div>
     
+    <!-- Floating tooltip -->
+    <div id="floatingTip"></div>
+    
     <script src="js/api-handler.js"></script>
     <script src="js/shared-ui.js"></script>
     <script src="js/tool.js"></script>
@@ -960,6 +996,34 @@
                 document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value;
             }
         }
+        
+        // Floating tooltip for info icons
+        const floatingTip = document.getElementById('floatingTip');
+        
+        document.querySelectorAll('.info-tip').forEach(icon => {
+            icon.addEventListener('mouseenter', function(e) {
+                const tip = this.getAttribute('data-tip');
+                if (!tip) return;
+                
+                floatingTip.textContent = tip;
+                floatingTip.style.display = 'block';
+                
+                // Position tooltip
+                const rect = this.getBoundingClientRect();
+                floatingTip.style.left = (rect.right + 10) + 'px';
+                floatingTip.style.top = (rect.top - 5) + 'px';
+                
+                // Check if tooltip goes off screen
+                const tipRect = floatingTip.getBoundingClientRect();
+                if (tipRect.right > window.innerWidth) {
+                    floatingTip.style.left = (rect.left - tipRect.width - 10) + 'px';
+                }
+            });
+            
+            icon.addEventListener('mouseleave', function() {
+                floatingTip.style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>

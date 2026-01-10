@@ -26,6 +26,7 @@ class ProToolManager {
         this.setupFileInputs();
         this.loadVoiceLibrary();
         this.loadSettings();
+        this.loadResourcesOnInit(); // Load models & voices từ server
         console.log('✅ ProToolManager initialized');
     }
     
@@ -162,36 +163,73 @@ class ProToolManager {
         const modelSelect = document.getElementById('modelSelect');
         if (!modelSelect) return;
         
-        if (this.provider === 'elevenlabs') {
-            modelSelect.innerHTML = `
-                <option value="eleven_multilingual_v2">Multilingual V2</option>
-                <option value="eleven_turbo_v2_5">Turbo V2.5</option>
-                <option value="eleven_flash_v2">Flash V2</option>
-                <option value="eleven_monolingual_v1">Monolingual V1</option>
-            `;
+        // Nếu đã load models từ server thì dùng
+        const models = this.loadedModels?.[this.provider] || [];
+        
+        if (models.length > 0) {
+            modelSelect.innerHTML = models.map(m => 
+                `<option value="${m.id}">${m.name}${m.cost_factor < 1 ? ` (${Math.round((1-m.cost_factor)*100)}% rẻ hơn)` : ''}</option>`
+            ).join('');
         } else {
-            modelSelect.innerHTML = `
-                <option value="speech-2.5-hd-preview">Speech 2.5 HD</option>
-                <option value="speech-2.5-turbo-preview">Speech 2.5 Turbo</option>
-                <option value="speech-02-hd">Speech 02 HD</option>
-                <option value="speech-02-turbo">Speech 02 Turbo</option>
-            `;
+            // Fallback nếu chưa load
+            if (this.provider === 'elevenlabs') {
+                modelSelect.innerHTML = `
+                    <option value="eleven_multilingual_v2">Multilingual V2</option>
+                    <option value="eleven_turbo_v2_5">Turbo V2.5</option>
+                    <option value="eleven_flash_v2">Flash V2</option>
+                `;
+            } else {
+                modelSelect.innerHTML = `
+                    <option value="speech-02-hd">Speech 02 HD</option>
+                    <option value="speech-02-turbo">Speech 02 Turbo</option>
+                `;
+            }
         }
         this.model = modelSelect.value;
-        
-        // Update provider card UI
-        document.querySelectorAll('.provider-card').forEach(card => {
-            card.classList.remove('active');
-            if (card.dataset.provider === this.provider) {
-                card.classList.add('active');
+    }
+    
+    // Load resources khi khởi động
+    async loadResourcesOnInit() {
+        try {
+            const res = await window.electronAPI.getResources();
+            console.log('📦 Resources loaded:', res);
+            
+            if (res && res.status === 'success' && res.data) {
+                // Lưu models
+                this.loadedModels = {
+                    elevenlabs: res.data.elevenlabs?.models || [],
+                    minimax: res.data.minimax?.models || []
+                };
+                
+                // Lưu voices
+                this.loadedVoices = {
+                    elevenlabs: res.data.elevenlabs?.voices || [],
+                    minimax: res.data.minimax?.voices || []
+                };
+                
+                console.log('✅ Models:', this.loadedModels);
+                console.log('✅ Voices:', this.loadedVoices);
+                
+                // Update model dropdown
+                this.updateModelOptions();
             }
-        });
+        } catch (error) {
+            console.error('❌ Load resources error:', error);
+        }
     }
     
     // Load voices from server - giống tts.js
     async loadVoicesFromServer() {
         const modalBody = document.getElementById('voicesModalBody');
         document.getElementById('voicesModal').classList.add('show');
+        
+        // Nếu đã có voices trong cache thì dùng luôn
+        const cachedVoices = this.loadedVoices?.[this.provider];
+        if (cachedVoices && cachedVoices.length > 0) {
+            console.log(`✅ Using cached ${cachedVoices.length} voices for ${this.provider}`);
+            this.renderVoicesModal(cachedVoices);
+            return;
+        }
         
         modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Loading voices...</div>`;
         
@@ -200,26 +238,30 @@ class ProToolManager {
             console.log('✅ getResources response:', res);
             
             if (res && res.status === 'success' && res.data) {
-                // Lấy voices theo provider - giống tts.js
-                let voices = [];
+                // Lưu tất cả voices
+                this.loadedVoices = {
+                    elevenlabs: res.data.elevenlabs?.voices || [],
+                    minimax: res.data.minimax?.voices || []
+                };
                 
-                if (this.provider === 'elevenlabs' && res.data.elevenlabs && res.data.elevenlabs.voices) {
-                    voices = res.data.elevenlabs.voices;
-                } else if (this.provider === 'minimax' && res.data.minimax && res.data.minimax.voices) {
-                    voices = res.data.minimax.voices;
-                }
+                // Lưu models luôn
+                this.loadedModels = {
+                    elevenlabs: res.data.elevenlabs?.models || [],
+                    minimax: res.data.minimax?.models || []
+                };
+                this.updateModelOptions();
                 
+                const voices = this.loadedVoices[this.provider] || [];
                 console.log(`✅ Found ${voices.length} voices for ${this.provider}`);
                 
                 if (voices.length > 0) {
-                    this.serverVoices = voices;
                     this.renderVoicesModal(voices);
                 } else {
                     modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #888;">Không có voices cho ${this.provider}</div>`;
                 }
             } else {
                 console.error('❌ Invalid response:', res);
-                modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Không thể tải voices. Response: ${JSON.stringify(res).substring(0, 100)}</div>`;
+                modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Không thể tải voices</div>`;
             }
         } catch (error) {
             console.error('❌ Load voices error:', error);
