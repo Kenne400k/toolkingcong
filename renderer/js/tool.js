@@ -439,6 +439,17 @@ class ProToolManager {
         return text;
     }
     
+    removeSpecialCharacters(text) {
+        // Remove special characters that might cause issues with TTS
+        // Keep basic punctuation: . , ! ? : ; ' "
+        // Remove: @ # $ % ^ & * = + | \ / ~ ` [ ] { } < >
+        return text
+            .replace(/[@#$%^&*=+|\\\/~`\[\]{}]/g, '')
+            .replace(/[<>]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+    
     // ==================== TASK MANAGEMENT ====================
     
     addTask(task) {
@@ -578,6 +589,7 @@ class ProToolManager {
         document.getElementById('statusText').textContent = 'Đang xử lý...';
         
         const optSilentChar = document.getElementById('optSilentChar')?.checked;
+        const optRemoveSpecial = document.getElementById('optRemoveSpecial')?.checked;
         const threadCount = parseInt(document.getElementById('threadCount')?.value) || 3;
         
         // Process tasks with thread pool
@@ -589,8 +601,15 @@ class ProToolManager {
             this.updateTaskDisplay();
             
             try {
-                // Apply silent character if enabled
+                // Apply text transformations
                 let content = task.content;
+                
+                // Remove special characters if enabled
+                if (optRemoveSpecial) {
+                    content = this.removeSpecialCharacters(content);
+                }
+                
+                // Apply silent character if enabled
                 if (optSilentChar) {
                     content = this.applySilentCharacter(content);
                 }
