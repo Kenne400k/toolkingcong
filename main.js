@@ -1,5 +1,5 @@
 // main.js
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -430,6 +430,139 @@ function loadSession() {
   }
   return null;
 }
+
+// =================== PRO TOOL HANDLERS ===================
+
+// Open output folder
+ipcMain.handle('open-output-folder', async () => {
+  const outputPath = path.join(__dirname, 'output');
+  
+  // Create output folder if not exists
+  if (!fs.existsSync(outputPath)) {
+    fs.mkdirSync(outputPath, { recursive: true });
+  }
+  
+  shell.openPath(outputPath);
+  return { success: true, path: outputPath };
+});
+
+// Open file dialog for selecting files
+ipcMain.handle('select-files', async (event, options = {}) => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile', 'multiSelections'],
+    filters: options.filters || [
+      { name: 'Text Files', extensions: ['txt', 'srt'] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  });
+  
+  if (result.canceled) {
+    return { success: false, canceled: true };
+  }
+  
+  return { success: true, filePaths: result.filePaths };
+});
+
+// Open folder dialog
+ipcMain.handle('select-folder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory']
+  });
+  
+  if (result.canceled) {
+    return { success: false, canceled: true };
+  }
+  
+  // Read all text files in folder
+  const folderPath = result.filePaths[0];
+  const files = fs.readdirSync(folderPath)
+    .filter(f => f.endsWith('.txt') || f.endsWith('.srt'))
+    .map(f => path.join(folderPath, f));
+  
+  return { success: true, folderPath, files };
+});
+
+// Select MP3 files for import
+ipcMain.handle('select-audio-files', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile', 'multiSelections'],
+    filters: [
+      { name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }
+    ]
+  });
+  
+  if (result.canceled) {
+    return { success: false, canceled: true };
+  }
+  
+  return { success: true, filePaths: result.filePaths };
+});
+
+// Read file content
+ipcMain.handle('read-file', async (event, filePath) => {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const fileName = path.basename(filePath, path.extname(filePath));
+    return { success: true, content, fileName, filePath };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Save file
+ipcMain.handle('save-file', async (event, { fileName, content, dir }) => {
+  try {
+    const outputDir = dir || path.join(__dirname, 'output');
+    
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+    
+    const filePath = path.join(outputDir, fileName);
+    fs.writeFileSync(filePath, content);
+    
+    return { success: true, filePath };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Download file from URL
+ipcMain.handle('download-file', async (event, { url, fileName }) => {
+  const fetch = require('node-fetch');
+  
+  try {
+    const outputDir = path.join(__dirname, 'output');
+    
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+    
+    const response = await fetch(url);
+    const buffer = await response.buffer();
+    
+    const filePath = path.join(outputDir, fileName);
+    fs.writeFileSync(filePath, buffer);
+    
+    return { success: true, filePath };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Load Tool page
+ipcMain.handle('load-tool-page', async () => {
+  mainWindow.loadFile('renderer/tool.html');
+  const session = loadSession();
+  
+  mainWindow.webContents.once('did-finish-load', () => {
+    mainWindow.webContents.executeJavaScript(`
+      window.__SESSION__ = ${JSON.stringify(session)};
+    `);
+  });
+  
+  return { success: true };
+});
 
 // =================== APP LIFECYCLE ===================
 app.whenReady().then(() => {

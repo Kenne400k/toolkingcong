@@ -161,6 +161,8 @@ class SharedUI {
                     window.location.href = 'dashboard.html';
                 } else if (page === 'tts') {
                     window.location.href = 'tts.html';
+                } else if (page === 'tool') {
+                    window.location.href = 'tool.html';
                 } else if (page === 'history') {
                     // Open detailed history modal if available
                     if (typeof openDetailedHistory === 'function') {
@@ -191,6 +193,8 @@ class SharedUI {
         
         if (currentPath.includes('tts.html')) {
             currentPage = 'tts';
+        } else if (currentPath.includes('tool.html')) {
+            currentPage = 'tool';
         } else if (currentPath.includes('history.html')) {
             currentPage = 'history';
         }

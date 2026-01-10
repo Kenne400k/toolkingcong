@@ -30,5 +30,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Navigation
   loadTTSPage: () => ipcRenderer.invoke('load-tts-page'),
-  loadDashboard: () => ipcRenderer.invoke('load-dashboard')
+  loadDashboard: () => ipcRenderer.invoke('load-dashboard'),
+  loadToolPage: () => ipcRenderer.invoke('load-tool-page'),
+  
+  // 🔥 PRO TOOL - File Operations
+  openOutputFolder: () => ipcRenderer.invoke('open-output-folder'),
+  selectFiles: (options) => ipcRenderer.invoke('select-files', options),
+  selectFolder: () => ipcRenderer.invoke('select-folder'),
+  selectAudioFiles: () => ipcRenderer.invoke('select-audio-files'),
+  readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
+  saveFile: (options) => ipcRenderer.invoke('save-file', options),
+  downloadFile: (options) => ipcRenderer.invoke('download-file', options)
 });
