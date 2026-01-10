@@ -942,48 +942,7 @@
     </script>
 
     <script src="js/api-handler.js"></script>
+    <script src="js/shared-ui.js"></script>
     <script src="js/tts.js"></script>
-    
-    <!-- Navigation Script -->
-    <script>
-        // Load user session
-        async function loadSession() {
-            try {
-                const session = await window.electronAPI.getSession();
-                if (session) {
-                    document.getElementById('userCredits').textContent = session.credits?.toLocaleString() || '0';
-                    document.getElementById('userCreditsFooter').textContent = session.credits?.toLocaleString() || '0';
-                    document.getElementById('header-email').textContent = session.email || '';
-                    document.getElementById('user-name').textContent = session.username || 'KingCong TTS';
-                }
-            } catch (e) {
-                console.error('Error loading session:', e);
-            }
-        }
-        
-        // Navigation
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                const page = link.getAttribute('data-page');
-                if (page === 'dashboard') {
-                    window.location.href = 'dashboard.html';
-                } else if (page === 'tts') {
-                    // Already on TTS page
-                } else if (page === 'history') {
-                    openDetailedHistory();
-                }
-            });
-        });
-        
-        // Logout
-        document.getElementById('logout-btn')?.addEventListener('click', async () => {
-            await window.electronAPI.logout();
-        });
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadSession();
-        });
-    </script>
 </body>
 </html>
