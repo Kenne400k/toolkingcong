@@ -30,6 +30,9 @@
         };
     </script>
     
+    <!-- Dùng chung CSS với TTS -->
+    <link rel="stylesheet" href="css/tts.css">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -37,9 +40,9 @@
             --primary: #a855f7;
             --accent: #667eea;
             --bg-main: #0a0a0a;
-            --bg-secondary: #121212;
+            --bg-secondary: #111;
             --bg-tertiary: #1a1a1a;
-            --border: #2a2a2a;
+            --border: #222;
             --text: #e5e5e5;
             --text-dim: #888;
             --success: #4ade80;
@@ -49,8 +52,8 @@
         
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
         
         body {
             background: var(--bg-main);
@@ -110,169 +113,213 @@
         .bg-secondary { background: var(--bg-secondary); }
         .border-custom { border-color: var(--border); }
         
-        /* Tool Container */
-        .tool-container {
+        #app-sidebar { display: flex !important; }
+        #app-header { display: flex !important; }
+        
+        /* ==================== TOOL LAYOUT ==================== */
+        .tool-content {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+        
+        .tool-grid {
             display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 0;
-            height: 100%;
-            overflow: hidden;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
         
-        /* Left Panel - Controls */
-        .tool-sidebar {
+        @media (max-width: 1024px) {
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Card Style */
+        .tool-card {
             background: var(--bg-secondary);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-        
-        .tool-section {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .tool-section-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .tool-section-title i {
-            font-size: 14px;
-        }
-        
-        /* Buttons */
-        .tool-btn {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
             border: 1px solid var(--border);
-            background: var(--bg-tertiary);
-            color: var(--text);
-        }
-        
-        .tool-btn:hover {
-            background: #222;
-            border-color: #444;
-        }
-        
-        .tool-btn-primary {
-            background: linear-gradient(135deg, var(--accent) 0%, #764ba2 100%);
-            border: none;
-            color: #fff;
-        }
-        
-        .tool-btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .tool-btn-success {
-            background: var(--success);
-            border: none;
-            color: #000;
-        }
-        
-        .tool-btn-danger {
-            background: transparent;
-            border-color: var(--error);
-            color: var(--error);
-        }
-        
-        .tool-btn-danger:hover {
-            background: rgba(239, 68, 68, 0.1);
-        }
-        
-        /* Form Controls */
-        .tool-input, .tool-select {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-main);
-            color: var(--text);
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        
-        .tool-input:focus, .tool-select:focus {
-            border-color: var(--accent);
-        }
-        
-        .tool-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-dim);
-            margin-bottom: 6px;
-        }
-        
-        .tool-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            padding: 8px 0;
-        }
-        
-        .tool-checkbox input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--accent);
-        }
-        
-        /* Right Panel - Task List */
-        .tool-main {
-            display: flex;
-            flex-direction: column;
+            border-radius: 16px;
             overflow: hidden;
         }
         
-        .tool-header {
+        .tool-card-header {
             padding: 16px 20px;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-secondary);
-        }
-        
-        .tool-header-title {
-            font-size: 16px;
-            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .tool-header-actions {
-            display: flex;
+        .tool-card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+        }
+        
+        .tool-card-header i {
+            font-size: 18px;
+            color: var(--accent);
+        }
+        
+        .tool-card-body {
+            padding: 20px;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        
+        .form-control::placeholder {
+            color: #555;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             gap: 8px;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background: #e5e5e5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #333;
+            color: #ccc;
+        }
+        
+        .btn-secondary:hover {
+            background: #1a1a1a;
+            border-color: #555;
+            color: #fff;
+        }
+        
+        .btn-danger {
+            background: transparent;
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+        
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        /* Button Grid */
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .btn-group .btn-full {
+            grid-column: 1 / -1;
+        }
+        
+        /* Checkboxes */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .checkbox-item:hover {
+            border-color: #444;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+        
+        .checkbox-item span {
+            font-size: 13px;
+            color: #ccc;
+        }
+        
+        .checkbox-item .info-icon {
+            margin-left: auto;
+            color: #555;
+            font-size: 14px;
         }
         
         /* Task Table */
-        .task-table-container {
-            flex: 1;
+        .task-table-wrapper {
+            max-height: 400px;
             overflow: auto;
-            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
         }
         
         .task-table {
@@ -282,29 +329,33 @@
         
         .task-table th {
             text-align: left;
-            padding: 12px;
+            padding: 12px 14px;
             font-size: 11px;
             font-weight: 600;
             color: var(--text-dim);
             text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-secondary);
+            background: #0a0a0a;
             position: sticky;
             top: 0;
+            border-bottom: 1px solid var(--border);
         }
         
         .task-table td {
-            padding: 12px;
+            padding: 12px 14px;
             font-size: 13px;
             border-bottom: 1px solid #1a1a1a;
-            vertical-align: middle;
         }
         
         .task-table tr:hover {
             background: rgba(102, 126, 234, 0.05);
         }
         
-        .task-status {
+        .task-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Status Badge */
+        .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -314,268 +365,238 @@
             font-weight: 500;
         }
         
-        .task-status.pending {
+        .status-badge.pending {
             background: rgba(251, 191, 36, 0.1);
             color: var(--warning);
         }
         
-        .task-status.processing {
+        .status-badge.processing {
             background: rgba(102, 126, 234, 0.1);
             color: var(--accent);
         }
         
-        .task-status.done {
+        .status-badge.done {
             background: rgba(74, 222, 128, 0.1);
             color: var(--success);
         }
         
-        .task-status.failed {
+        .status-badge.failed {
             background: rgba(239, 68, 68, 0.1);
             color: var(--error);
         }
         
-        /* Voice Library Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .modal-overlay.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .modal-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .modal-header h3 {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px;
-        }
-        
-        .modal-close:hover {
-            color: var(--text);
-        }
-        
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-        
-        /* Voice Library Table */
-        .voice-library-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .voice-library-table th,
-        .voice-library-table td {
-            padding: 10px 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .voice-library-table th {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            background: var(--bg-main);
-        }
-        
-        .voice-library-table input {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background: var(--bg-main);
-            color: var(--text);
-            font-size: 12px;
-        }
-        
-        /* Progress Bar */
-        .progress-bar {
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--primary));
-            transition: width 0.3s ease;
-        }
-        
-        /* Status Bar */
-        .status-bar {
-            padding: 10px 20px;
-            background: var(--bg-main);
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-        
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--success);
-        }
-        
         /* Empty State */
         .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
+            text-align: center;
+            padding: 40px 20px;
             color: var(--text-dim);
         }
         
         .empty-state i {
             font-size: 48px;
+            opacity: 0.3;
             margin-bottom: 16px;
-            opacity: 0.5;
         }
         
         .empty-state h4 {
             font-size: 16px;
             font-weight: 600;
+            color: #fff;
             margin-bottom: 8px;
-            color: var(--text);
         }
         
         .empty-state p {
             font-size: 13px;
         }
         
-        /* Grid layout for buttons */
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+        /* Info Box */
+        .info-box {
+            padding: 14px;
+            background: rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            font-size: 12px;
+            color: #bbb;
+            line-height: 1.6;
         }
         
-        .btn-grid-full {
-            grid-column: 1 / -1;
+        .info-box strong {
+            color: var(--accent);
         }
         
-        /* Advanced Settings Panel */
-        .advanced-panel {
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
             display: none;
-            padding: 12px;
-            background: var(--bg-main);
-            border-radius: 8px;
-            margin-top: 12px;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.2s;
         }
         
-        .advanced-panel.show {
-            display: block;
+        .modal-overlay.show {
+            display: flex;
+            opacity: 1;
         }
         
-        .advanced-row {
+        .modal-box {
+            background: #0d0d0d;
+            border: 1px solid #222;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 95%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #222;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
         }
         
-        .advanced-row:last-child {
-            border-bottom: none;
-        }
-        
-        .slider-container {
-            margin: 12px 0;
-        }
-        
-        .slider-header {
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
             display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-dim);
-            margin-bottom: 6px;
+            align-items: center;
+            gap: 10px;
         }
         
-        /* Tooltip styles */
-        .tool-checkbox[title] {
-            cursor: help;
-        }
-        
-        .tool-checkbox[title]:hover {
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 6px;
-        }
-        
-        input[type="range"] {
-            width: 100%;
-            height: 4px;
-            border-radius: 2px;
-            background: var(--border);
-            outline: none;
-            -webkit-appearance: none;
-        }
-        
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: var(--accent);
+        .modal-close {
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #222;
+            color: #fff;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #222;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Voice Library Table */
+        .voice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .voice-table th,
+        .voice-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
+        
+        .voice-table th {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            background: #0a0a0a;
+        }
+        
+        .voice-table input {
+            width: 100%;
+            padding: 8px 10px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+        }
+        
+        .voice-table input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+        
+        /* Progress Section */
+        .progress-section {
+            padding: 16px 20px;
+            background: #0a0a0a;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+        
+        .progress-stats {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Quick action buttons */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .quick-btn {
+            flex: 1;
+            padding: 10px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ccc;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .quick-btn:hover {
+            border-color: var(--accent);
+            color: #fff;
         }
     </style>
 </head>
@@ -586,7 +607,6 @@
         <!-- =================== SIDEBAR =================== -->
         <aside class="w-64 flex flex-col border-r border-custom bg-main shrink-0" id="app-sidebar">
             <div class="flex flex-col h-full p-4">
-                <!-- User Info -->
                 <div class="flex gap-3 items-center p-3 mb-6">
                     <div class="avatar-wrapper">
                         <div class="avatar-inner" id="user-avatar">
@@ -599,7 +619,6 @@
                     </div>
                 </div>
                 
-                <!-- Navigation -->
                 <nav class="flex flex-col gap-1 flex-1">
                     <a class="nav-link flex items-center gap-3 text-sm font-medium text-dim" data-page="dashboard" href="dashboard.html">
                         <span class="material-symbols-outlined text-xl">dashboard</span>
@@ -630,6 +649,7 @@
         
         <!-- =================== MAIN CONTENT =================== -->
         <main class="flex-1 flex flex-col h-full overflow-hidden bg-main">
+            
             <!-- Header -->
             <header class="h-16 flex items-center justify-between border-b border-custom px-6 bg-main shrink-0" id="app-header">
                 <h2 class="text-white text-lg font-semibold">Pro Tool</h2>
@@ -639,228 +659,233 @@
                         <span class="text-sm font-semibold text-white" id="userCredits">0</span>
                         <span class="text-xs text-dim">Credits</span>
                     </div>
-                    <span class="text-sm text-dim hidden sm:block" id="header-email">Loading...</span>
                 </div>
             </header>
             
             <!-- Tool Content -->
-            <div class="tool-container flex-1">
-                <!-- Left Sidebar - Controls -->
-                <div class="tool-sidebar">
+            <div class="tool-content">
+                <div class="tool-grid">
                     
-                    <!-- Provider Selection -->
-                    <div class="tool-section">
-                        <div class="tool-section-title">
-                            <i class="bi bi-broadcast"></i>
-                            Provider
-                        </div>
-                        <select class="tool-select" id="providerSelect">
-                            <option value="elevenlabs">ElevenLabs</option>
-                            <option value="minimax">Minimax</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Voice Selection -->
-                    <div class="tool-section">
-                        <div class="tool-section-title">
-                            <i class="bi bi-mic-fill"></i>
-                            Voice
-                        </div>
-                        <div class="tool-input" id="voiceSelector" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="openVoiceLibrary()">
-                            <span id="selectedVoiceDisplay">Chọn giọng nói...</span>
-                            <i class="bi bi-chevron-right"></i>
-                        </div>
-                        <input type="hidden" id="selectedVoiceId">
+                    <!-- ========== LEFT: Settings ========== -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
                         
-                        <button class="tool-btn" style="margin-top: 8px;" onclick="openVoiceLibrary()">
-                            <i class="bi bi-collection"></i>
-                            Thư viện giọng nói
-                        </button>
-                    </div>
-                    
-                    <!-- Model Selection -->
-                    <div class="tool-section">
-                        <div class="tool-section-title">
-                            <i class="bi bi-cpu"></i>
-                            Model
-                        </div>
-                        <select class="tool-select" id="modelSelect">
-                            <option value="eleven_multilingual_v2">Multilingual V2</option>
-                            <option value="eleven_turbo_v2_5">Turbo V2.5</option>
-                            <option value="eleven_flash_v2">Flash V2</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Import Buttons -->
-                    <div class="tool-section">
-                        <div class="tool-section-title">
-                            <i class="bi bi-folder-plus"></i>
-                            Import
-                        </div>
-                        <div class="btn-grid">
-                            <button class="tool-btn" onclick="importFile()">
-                                <i class="bi bi-file-earmark-text"></i>
-                                File
-                            </button>
-                            <button class="tool-btn" onclick="importFolder()">
-                                <i class="bi bi-folder2-open"></i>
-                                Folder
-                            </button>
-                            <button class="tool-btn btn-grid-full" onclick="importVoice()">
-                                <i class="bi bi-music-note-list"></i>
-                                Import Voice (MP3)
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Options -->
-                    <div class="tool-section">
-                        <div class="tool-section-title">
-                            <i class="bi bi-sliders"></i>
-                            Tùy chọn
-                        </div>
-                        <label class="tool-checkbox">
-                            <input type="checkbox" id="optLoop">
-                            <span>Loop (Chia nhỏ văn bản)</span>
-                        </label>
-                        <label class="tool-checkbox">
-                            <input type="checkbox" id="optAutoSplit">
-                            <span>Auto Split (。、,:.!?)</span>
-                        </label>
-                        <label class="tool-checkbox">
-                            <input type="checkbox" id="opt1Line1File">
-                            <span>1 Dòng = 1 File</span>
-                        </label>
-                        <label class="tool-checkbox" title="Thêm break tags cho dấu câu: , ; → 0.3s | . : ? ! → 0.5s">
-                            <input type="checkbox" id="optSilentChar">
-                            <span>Silent by character <i class="bi bi-info-circle" style="opacity: 0.5;"></i></span>
-                        </label>
-                        <label class="tool-checkbox" title="Tự động xóa các ký tự đặc biệt: @ # $ % ^ & * = + | \ / ~ ` [ ] { } < >">
-                            <input type="checkbox" id="optRemoveSpecial">
-                            <span>Auto remove special chars <i class="bi bi-info-circle" style="opacity: 0.5;"></i></span>
-                        </label>
-                        <label class="tool-checkbox">
-                            <input type="checkbox" id="optAutoSRT">
-                            <span>Tự động tạo SRT</span>
-                        </label>
-                        
-                        <button class="tool-btn" style="margin-top: 8px;" onclick="toggleAdvanced()">
-                            <i class="bi bi-gear"></i>
-                            Cài đặt nâng cao
-                        </button>
-                        
-                        <div class="advanced-panel" id="advancedPanel">
-                            <div class="advanced-row">
-                                <span>Max ký tự/segment</span>
-                                <input type="number" class="tool-input" style="width: 80px;" value="10000" id="maxChars">
+                        <!-- Import Card -->
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <i class="bi bi-folder-plus"></i>
+                                <h3>Import</h3>
                             </div>
-                            <div class="advanced-row">
-                                <span>Delay giữa segments</span>
-                                <input type="text" class="tool-input" style="width: 80px;" value="1s" id="delayBetween">
+                            <div class="tool-card-body">
+                                <div class="btn-group">
+                                    <button class="btn btn-secondary" onclick="importFile()">
+                                        <i class="bi bi-file-text"></i>
+                                        Import File
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="importFolder()">
+                                        <i class="bi bi-folder2-open"></i>
+                                        Import Folder
+                                    </button>
+                                    <button class="btn btn-secondary btn-full" onclick="importVoice()">
+                                        <i class="bi bi-music-note-list"></i>
+                                        Import Voice (MP3)
+                                    </button>
+                                </div>
+                                
+                                <div class="info-box" style="margin-top: 16px;">
+                                    <strong>💡 Hỗ trợ:</strong> .txt, .srt, .mp3<br>
+                                    <strong>📝 Multi-voice:</strong> Dùng #1, #2, #3 đầu dòng để chọn voice từ thư viện
+                                </div>
                             </div>
-                            <div class="advanced-row">
-                                <span>Threads</span>
-                                <input type="number" class="tool-input" style="width: 80px;" value="3" min="1" max="20" id="threadCount">
+                        </div>
+                        
+                        <!-- Voice Settings Card -->
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <i class="bi bi-mic-fill"></i>
+                                <h3>Voice Settings</h3>
+                            </div>
+                            <div class="tool-card-body">
+                                <div class="form-group">
+                                    <label class="form-label">Provider</label>
+                                    <select class="form-control" id="providerSelect">
+                                        <option value="elevenlabs">ElevenLabs</option>
+                                        <option value="minimax">Minimax</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Model</label>
+                                    <select class="form-control" id="modelSelect">
+                                        <option value="eleven_multilingual_v2">Multilingual V2</option>
+                                        <option value="eleven_turbo_v2_5">Turbo V2.5</option>
+                                        <option value="eleven_flash_v2">Flash V2</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Voice ID</label>
+                                    <input type="text" class="form-control" id="selectedVoiceId" placeholder="Nhập Voice ID hoặc chọn từ thư viện...">
+                                </div>
+                                
+                                <button class="btn btn-secondary btn-block" style="margin-top: 12px;" onclick="openVoiceLibrary()">
+                                    <i class="bi bi-collection"></i>
+                                    Mở Thư Viện Voice
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Options Card -->
+                        <div class="tool-card">
+                            <div class="tool-card-header">
+                                <i class="bi bi-sliders"></i>
+                                <h3>Options</h3>
+                            </div>
+                            <div class="tool-card-body">
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item" title="Chia văn bản thành các đoạn nhỏ (10k ký tự)">
+                                        <input type="checkbox" id="optLoop">
+                                        <span>Loop (Chia nhỏ văn bản)</span>
+                                        <i class="bi bi-info-circle info-icon"></i>
+                                    </label>
+                                    
+                                    <label class="checkbox-item" title="Tự động chia theo dấu câu: 。、,:.!?">
+                                        <input type="checkbox" id="optAutoSplit">
+                                        <span>Auto Split (。、,:.!?)</span>
+                                        <i class="bi bi-info-circle info-icon"></i>
+                                    </label>
+                                    
+                                    <label class="checkbox-item" title="Mỗi dòng trong file = 1 file audio">
+                                        <input type="checkbox" id="opt1Line1File">
+                                        <span>1 Dòng = 1 File</span>
+                                        <i class="bi bi-info-circle info-icon"></i>
+                                    </label>
+                                    
+                                    <label class="checkbox-item" title="Thêm pause: , ; → 0.3s | . : ? ! → 0.5s">
+                                        <input type="checkbox" id="optSilentChar">
+                                        <span>Silent by character</span>
+                                        <i class="bi bi-info-circle info-icon"></i>
+                                    </label>
+                                    
+                                    <label class="checkbox-item" title="Xóa ký tự đặc biệt: @ # $ % ^ & * ...">
+                                        <input type="checkbox" id="optRemoveSpecial">
+                                        <span>Auto remove special chars</span>
+                                        <i class="bi bi-info-circle info-icon"></i>
+                                    </label>
+                                    
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="optAutoSRT">
+                                        <span>Tự động tạo SRT</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="quick-actions">
+                                    <div class="quick-btn" onclick="toggleAdvanced()">
+                                        <i class="bi bi-gear"></i>
+                                        Advanced
+                                    </div>
+                                    <div class="quick-btn" onclick="openBackup()">
+                                        <i class="bi bi-clock-history"></i>
+                                        Backup
+                                    </div>
+                                </div>
+                                
+                                <!-- Advanced Settings (Hidden) -->
+                                <div id="advancedPanel" style="display: none; margin-top: 16px; padding: 14px; background: #0a0a0a; border-radius: 10px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <span style="font-size: 12px; color: #888;">Max ký tự/segment</span>
+                                        <input type="number" class="form-control" style="width: 100px; padding: 8px;" value="10000" id="maxChars">
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                        <span style="font-size: 12px; color: #888;">Delay giữa segments</span>
+                                        <input type="text" class="form-control" style="width: 100px; padding: 8px;" value="1s" id="delayBetween">
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 12px; color: #888;">Threads</span>
+                                        <input type="number" class="form-control" style="width: 100px; padding: 8px;" value="3" min="1" max="20" id="threadCount">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ========== RIGHT: Task List ========== -->
+                    <div class="tool-card" style="display: flex; flex-direction: column;">
+                        <div class="tool-card-header" style="justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="bi bi-list-task"></i>
+                                <h3>Danh sách tác vụ</h3>
+                                <span style="font-size: 12px; color: var(--text-dim);" id="taskCount">(0)</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-sm btn-secondary" onclick="clearTasks()">
+                                    <i class="bi bi-trash"></i>
+                                    Xóa
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="openOutputFolder()">
+                                    <i class="bi bi-folder2"></i>
+                                    Output
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="tool-card-body" style="flex: 1; overflow: hidden; padding: 0;">
+                            <!-- Empty State -->
+                            <div class="empty-state" id="emptyState">
+                                <i class="bi bi-inbox"></i>
+                                <h4>Chưa có tác vụ</h4>
+                                <p>Import file hoặc folder để bắt đầu</p>
                             </div>
                             
-                            <div style="margin-top: 12px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 11px; color: var(--text-dim);">
-                                <strong style="color: var(--accent);">💡 Silent by character:</strong><br>
-                                • Dấu phẩy, chấm phẩy (,;) → 0.3s pause<br>
-                                • Dấu chấm, hỏi, chấm than (.:?!) → 0.5s pause<br><br>
-                                <strong style="color: var(--accent);">📝 Multi-voice format:</strong><br>
-                                File có dạng #1, #2, #3 sẽ tự động match với Voice Library
+                            <!-- Task Table -->
+                            <div class="task-table-wrapper" id="taskTableWrapper" style="display: none; height: 100%;">
+                                <table class="task-table" id="taskTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                            <th>#</th>
+                                            <th>Nội dung</th>
+                                            <th>Voice</th>
+                                            <th>Status</th>
+                                            <th style="width: 80px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="taskTableBody">
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="tool-section">
-                        <div class="btn-grid">
-                            <button class="tool-btn tool-btn-primary btn-grid-full" onclick="startProcessing()" id="btnStart">
-                                <i class="bi bi-play-fill"></i>
-                                Bắt đầu
-                            </button>
-                            <button class="tool-btn tool-btn-danger" onclick="stopProcessing()" id="btnStop" disabled>
-                                <i class="bi bi-stop-fill"></i>
-                                Dừng
-                            </button>
-                            <button class="tool-btn" onclick="joinFiles()">
-                                <i class="bi bi-link-45deg"></i>
-                                Nối MP3
-                            </button>
-                            <button class="tool-btn" onclick="createSRT()">
-                                <i class="bi bi-card-text"></i>
-                                Tạo SRT
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Backup Button -->
-                    <div class="tool-section" style="margin-top: auto;">
-                        <button class="tool-btn btn-grid-full" onclick="openBackup()">
-                            <i class="bi bi-clock-history"></i>
-                            Backup (Lịch sử)
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Right Panel - Task List -->
-                <div class="tool-main">
-                    <div class="tool-header">
-                        <div class="tool-header-title">
-                            <i class="bi bi-list-task"></i>
-                            Danh sách tác vụ
-                            <span class="text-dim" id="taskCount">(0 files)</span>
-                        </div>
-                        <div class="tool-header-actions">
-                            <button class="tool-btn" onclick="clearTasks()">
-                                <i class="bi bi-trash"></i>
-                                Xóa tất cả
-                            </button>
-                            <button class="tool-btn" onclick="openOutputFolder()">
-                                <i class="bi bi-folder2"></i>
-                                Mở Output
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="task-table-container" id="taskTableContainer">
-                        <!-- Empty State -->
-                        <div class="empty-state" id="emptyState">
-                            <i class="bi bi-inbox"></i>
-                            <h4>Chưa có tác vụ nào</h4>
-                            <p>Import file hoặc folder để bắt đầu</p>
+                        
+                        <!-- Action Buttons -->
+                        <div style="padding: 16px 20px; border-top: 1px solid var(--border);">
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-full" onclick="startProcessing()" id="btnStart">
+                                    <i class="bi bi-play-fill"></i>
+                                    Bắt đầu xử lý
+                                </button>
+                                <button class="btn btn-danger" onclick="stopProcessing()" id="btnStop" disabled>
+                                    <i class="bi bi-stop-fill"></i>
+                                    Dừng
+                                </button>
+                                <button class="btn btn-secondary" onclick="joinFiles()">
+                                    <i class="bi bi-link-45deg"></i>
+                                    Nối MP3
+                                </button>
+                                <button class="btn btn-secondary" onclick="createSRT()">
+                                    <i class="bi bi-card-text"></i>
+                                    Tạo SRT
+                                </button>
+                            </div>
                         </div>
                         
-                        <!-- Task Table (hidden by default) -->
-                        <table class="task-table" id="taskTable" style="display: none;">
-                            <thead>
-                                <tr>
-                                    <th style="width: 40px;">
-                                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
-                                    </th>
-                                    <th>ID</th>
-                                    <th>Nội dung</th>
-                                    <th>Voice</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thời gian</th>
-                                    <th style="width: 100px;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="taskTableBody">
-                                <!-- Tasks will be inserted here -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Status Bar -->
-                    <div class="status-bar">
-                        <div class="status-indicator">
-                            <span class="status-dot"></span>
-                            <span id="statusText">Sẵn sàng</span>
-                        </div>
-                        <div>
-                            <span id="progressText">Done: 0 | Processing: 0 | Total: 0</span>
+                        <!-- Progress Bar -->
+                        <div class="progress-section">
+                            <div class="progress-info">
+                                <span class="progress-dot"></span>
+                                <span id="statusText">Sẵn sàng</span>
+                            </div>
+                            <div class="progress-stats" id="progressText">
+                                Done: 0 | Processing: 0 | Total: 0
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -868,47 +893,48 @@
         </main>
     </div>
     
-    <!-- Voice Library Modal -->
+    <!-- =================== VOICE LIBRARY MODAL =================== -->
     <div class="modal-overlay" id="voiceLibraryModal">
-        <div class="modal-content">
+        <div class="modal-box">
             <div class="modal-header">
                 <h3><i class="bi bi-collection"></i> Thư viện Voice ID</h3>
-                <button class="modal-close" onclick="closeVoiceLibrary()">&times;</button>
+                <button class="modal-close" onclick="closeVoiceLibrary()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <div class="modal-body">
-                <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 16px;">
-                    Thêm Voice ID vào thư viện để sử dụng cho hội thoại nhiều người (#1, #2, #3...)
-                </p>
-                <table class="voice-library-table">
+                <div class="info-box" style="margin-bottom: 20px;">
+                    <strong>📝 Hướng dẫn:</strong> Thêm Voice ID vào thư viện để sử dụng cho hội thoại nhiều người.<br>
+                    Trong file text, dùng <code style="background:#222; padding:2px 6px; border-radius:4px;">#1</code>, <code style="background:#222; padding:2px 6px; border-radius:4px;">#2</code>, <code style="background:#222; padding:2px 6px; border-radius:4px;">#3</code> ở đầu dòng để chọn voice tương ứng.
+                </div>
+                
+                <table class="voice-table">
                     <thead>
                         <tr>
                             <th style="width: 60px;">ID</th>
                             <th>Voice ID</th>
                             <th>Tên</th>
-                            <th style="width: 80px;">Actions</th>
+                            <th style="width: 60px;"></th>
                         </tr>
                     </thead>
                     <tbody id="voiceLibraryBody">
                         <tr data-id="1">
-                            <td><input type="text" value="1" readonly style="width: 40px; text-align: center;"></td>
-                            <td><input type="text" placeholder="Nhập Voice ID..." class="voice-id-input"></td>
-                            <td><input type="text" placeholder="Tên giọng..."></td>
-                            <td>
-                                <button class="tool-btn tool-btn-danger" style="padding: 4px 8px;" onclick="removeVoiceRow(this)">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
+                            <td><input type="text" value="1" readonly style="width: 40px; text-align: center; background: transparent;"></td>
+                            <td><input type="text" placeholder="Nhập Voice ID..."></td>
+                            <td><input type="text" placeholder="Tên giọng (tùy chọn)"></td>
+                            <td><button class="btn btn-sm btn-danger" onclick="removeVoiceRow(this)"><i class="bi bi-trash"></i></button></td>
                         </tr>
                     </tbody>
                 </table>
-                <button class="tool-btn" style="margin-top: 12px;" onclick="addVoiceRow()">
+                
+                <button class="btn btn-secondary" style="margin-top: 12px;" onclick="addVoiceRow()">
                     <i class="bi bi-plus"></i>
                     Thêm Voice
                 </button>
             </div>
             <div class="modal-footer">
-                <button class="tool-btn" onclick="closeVoiceLibrary()">Đóng</button>
-                <button class="tool-btn tool-btn-primary" onclick="saveVoiceLibrary()">
+                <button class="btn btn-secondary" onclick="closeVoiceLibrary()">Đóng</button>
+                <button class="btn btn-primary" onclick="saveVoiceLibrary()">
                     <i class="bi bi-check-lg"></i>
                     Lưu thư viện
                 </button>
@@ -916,12 +942,14 @@
         </div>
     </div>
     
-    <!-- Backup Modal (History) -->
+    <!-- =================== BACKUP MODAL =================== -->
     <div class="modal-overlay" id="backupModal">
-        <div class="modal-content" style="max-width: 1000px;">
+        <div class="modal-box" style="max-width: 900px;">
             <div class="modal-header">
                 <h3><i class="bi bi-clock-history"></i> Backup - Lịch sử tác vụ</h3>
-                <button class="modal-close" onclick="closeBackup()">&times;</button>
+                <button class="modal-close" onclick="closeBackup()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
             <div class="modal-body" id="backupBody">
                 <div class="empty-state">
@@ -930,11 +958,11 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="tool-btn" onclick="refreshBackup()">
+                <button class="btn btn-secondary" onclick="refreshBackup()">
                     <i class="bi bi-arrow-clockwise"></i>
                     Làm mới
                 </button>
-                <button class="tool-btn" onclick="closeBackup()">Đóng</button>
+                <button class="btn btn-secondary" onclick="closeBackup()">Đóng</button>
             </div>
         </div>
     </div>

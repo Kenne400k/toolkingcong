@@ -463,19 +463,19 @@ class ProToolManager {
     
     updateTaskDisplay() {
         const emptyState = document.getElementById('emptyState');
-        const taskTable = document.getElementById('taskTable');
+        const taskTableWrapper = document.getElementById('taskTableWrapper');
         const taskTableBody = document.getElementById('taskTableBody');
         const taskCount = document.getElementById('taskCount');
         
         if (this.tasks.length === 0) {
-            emptyState.style.display = 'flex';
-            taskTable.style.display = 'none';
+            emptyState.style.display = 'block';
+            taskTableWrapper.style.display = 'none';
         } else {
             emptyState.style.display = 'none';
-            taskTable.style.display = 'table';
+            taskTableWrapper.style.display = 'block';
         }
         
-        taskCount.textContent = `(${this.tasks.length} files)`;
+        taskCount.textContent = `(${this.tasks.length})`;
         
         // Render tasks
         taskTableBody.innerHTML = this.tasks.map((task, index) => `
@@ -483,35 +483,31 @@ class ProToolManager {
                 <td>
                     <input type="checkbox" class="task-checkbox" data-id="${task.id}">
                 </td>
-                <td>${index + 1}</td>
+                <td style="color: #666;">${index + 1}</td>
                 <td>
-                    <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${this.escapeHtml(task.content.substring(0, 100))}${task.content.length > 100 ? '...' : ''}
+                    <div style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #fff;">
+                        ${this.escapeHtml(task.content.substring(0, 80))}${task.content.length > 80 ? '...' : ''}
                     </div>
-                    <div style="font-size: 11px; color: var(--text-dim);">${task.fileName}</div>
+                    <div style="font-size: 11px; color: #555; margin-top: 2px;">${task.fileName}</div>
+                </td>
+                <td style="font-size: 12px;">
+                    ${task.voiceName || (task.voiceId ? task.voiceId.substring(0, 8) + '...' : '-')}
+                    ${task.voiceNum ? `<span style="color: #667eea; font-size: 10px;"> #${task.voiceNum}</span>` : ''}
                 </td>
                 <td>
-                    ${task.voiceName || task.voiceId?.substring(0, 10) || '-'}
-                    ${task.voiceNum ? `<br><span style="font-size: 10px; color: var(--accent);">#${task.voiceNum}</span>` : ''}
-                </td>
-                <td>
-                    <span class="task-status ${task.status}">
-                        ${this.getStatusIcon(task.status)}
+                    <span class="status-badge ${task.status}">
                         ${this.getStatusText(task.status)}
                     </span>
-                </td>
-                <td style="font-size: 11px; color: var(--text-dim);">
-                    ${task.duration || '-'}
                 </td>
                 <td>
                     <div style="display: flex; gap: 4px;">
                         ${task.resultUrl ? `
-                            <button class="tool-btn" style="padding: 4px 8px;" onclick="proTool.downloadTask('${task.id}')">
+                            <button class="btn btn-sm btn-secondary" style="padding: 4px 8px;" onclick="proTool.downloadTask('${task.id}')">
                                 <i class="bi bi-download"></i>
                             </button>
                         ` : ''}
-                        <button class="tool-btn tool-btn-danger" style="padding: 4px 8px;" onclick="proTool.removeTask('${task.id}')">
-                            <i class="bi bi-trash"></i>
+                        <button class="btn btn-sm btn-danger" style="padding: 4px 8px;" onclick="proTool.removeTask('${task.id}')">
+                            <i class="bi bi-x"></i>
                         </button>
                     </div>
                 </td>
@@ -783,14 +779,10 @@ class ProToolManager {
         if (this.voiceLibrary.length === 0) {
             tbody.innerHTML = `
                 <tr data-id="1">
-                    <td><input type="text" value="1" readonly style="width: 40px; text-align: center;"></td>
-                    <td><input type="text" placeholder="Nhập Voice ID..." class="voice-id-input"></td>
-                    <td><input type="text" placeholder="Tên giọng..."></td>
-                    <td>
-                        <button class="tool-btn tool-btn-danger" style="padding: 4px 8px;" onclick="removeVoiceRow(this)">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
+                    <td><input type="text" value="1" readonly style="width: 40px; text-align: center; background: transparent;"></td>
+                    <td><input type="text" placeholder="Nhập Voice ID..."></td>
+                    <td><input type="text" placeholder="Tên giọng (tùy chọn)"></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="removeVoiceRow(this)"><i class="bi bi-trash"></i></button></td>
                 </tr>
             `;
             return;
@@ -798,14 +790,10 @@ class ProToolManager {
         
         tbody.innerHTML = this.voiceLibrary.map((voice, index) => `
             <tr data-id="${voice.id}">
-                <td><input type="text" value="${voice.id}" readonly style="width: 40px; text-align: center;"></td>
-                <td><input type="text" value="${voice.voiceId}" placeholder="Nhập Voice ID..." class="voice-id-input"></td>
-                <td><input type="text" value="${voice.name || ''}" placeholder="Tên giọng..."></td>
-                <td>
-                    <button class="tool-btn tool-btn-danger" style="padding: 4px 8px;" onclick="removeVoiceRow(this)">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
+                <td><input type="text" value="${voice.id}" readonly style="width: 40px; text-align: center; background: transparent;"></td>
+                <td><input type="text" value="${voice.voiceId}" placeholder="Nhập Voice ID..."></td>
+                <td><input type="text" value="${voice.name || ''}" placeholder="Tên giọng (tùy chọn)"></td>
+                <td><button class="btn btn-sm btn-danger" onclick="removeVoiceRow(this)"><i class="bi bi-trash"></i></button></td>
             </tr>
         `).join('');
     }
@@ -978,40 +966,44 @@ class ProToolManager {
         const backupBody = document.getElementById('backupBody');
         
         backupBody.innerHTML = `
-            <table class="voice-library-table">
-                <thead>
-                    <tr>
-                        <th>Task ID</th>
-                        <th>Nội dung</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày tạo</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tasks.map(task => `
+            <div class="task-table-wrapper" style="max-height: 500px;">
+                <table class="task-table">
+                    <thead>
                         <tr>
-                            <td style="font-size: 11px;">${task.id || task.task_id}</td>
-                            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
-                                ${this.escapeHtml((task.text || task.input_text || '').substring(0, 100))}
-                            </td>
-                            <td>
-                                <span class="task-status ${task.status?.toLowerCase()}">
-                                    ${this.getStatusText(task.status?.toLowerCase())}
-                                </span>
-                            </td>
-                            <td style="font-size: 11px;">${task.created_at || task.date || '-'}</td>
-                            <td>
-                                ${task.result_url ? `
-                                    <button class="tool-btn" style="padding: 4px 8px;" onclick="proTool.downloadFromUrl('${task.result_url}')">
-                                        <i class="bi bi-download"></i>
-                                    </button>
-                                ` : '-'}
-                            </td>
+                            <th>Task ID</th>
+                            <th>Nội dung</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tạo</th>
+                            <th>Actions</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        ${tasks.map(task => `
+                            <tr>
+                                <td style="font-size: 11px; color: #666;">${(task.id || task.task_id || '').substring(0, 12)}...</td>
+                                <td>
+                                    <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        ${this.escapeHtml((task.text || task.input_text || '').substring(0, 80))}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge ${task.status?.toLowerCase()}">
+                                        ${this.getStatusText(task.status?.toLowerCase())}
+                                    </span>
+                                </td>
+                                <td style="font-size: 11px; color: #888;">${task.created_at || task.date || '-'}</td>
+                                <td>
+                                    ${task.result_url ? `
+                                        <button class="btn btn-sm btn-secondary" onclick="proTool.downloadFromUrl('${task.result_url}')">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                    ` : '<span style="color: #555;">-</span>'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
         `;
     }
     
@@ -1179,14 +1171,10 @@ function addVoiceRow() {
     const newRow = document.createElement('tr');
     newRow.setAttribute('data-id', nextId);
     newRow.innerHTML = `
-        <td><input type="text" value="${nextId}" readonly style="width: 40px; text-align: center;"></td>
-        <td><input type="text" placeholder="Nhập Voice ID..." class="voice-id-input"></td>
-        <td><input type="text" placeholder="Tên giọng..."></td>
-        <td>
-            <button class="tool-btn tool-btn-danger" style="padding: 4px 8px;" onclick="removeVoiceRow(this)">
-                <i class="bi bi-trash"></i>
-            </button>
-        </td>
+        <td><input type="text" value="${nextId}" readonly style="width: 40px; text-align: center; background: transparent;"></td>
+        <td><input type="text" placeholder="Nhập Voice ID..."></td>
+        <td><input type="text" placeholder="Tên giọng (tùy chọn)"></td>
+        <td><button class="btn btn-sm btn-danger" onclick="removeVoiceRow(this)"><i class="bi bi-trash"></i></button></td>
     `;
     tbody.appendChild(newRow);
 }
