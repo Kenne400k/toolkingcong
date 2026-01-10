@@ -550,6 +550,16 @@
             margin-bottom: 6px;
         }
         
+        /* Tooltip styles */
+        .tool-checkbox[title] {
+            cursor: help;
+        }
+        
+        .tool-checkbox[title]:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 6px;
+        }
+        
         input[type="range"] {
             width: 100%;
             height: 4px;
@@ -721,13 +731,13 @@
                             <input type="checkbox" id="opt1Line1File">
                             <span>1 Dòng = 1 File</span>
                         </label>
-                        <label class="tool-checkbox">
+                        <label class="tool-checkbox" title="Thêm break tags cho dấu câu: , ; → 0.3s | . : ? ! → 0.5s">
                             <input type="checkbox" id="optSilentChar">
-                            <span>Silent by character</span>
+                            <span>Silent by character <i class="bi bi-info-circle" style="opacity: 0.5;"></i></span>
                         </label>
-                        <label class="tool-checkbox">
+                        <label class="tool-checkbox" title="Tự động xóa các ký tự đặc biệt: @ # $ % ^ & * = + | \ / ~ ` [ ] { } < >">
                             <input type="checkbox" id="optRemoveSpecial">
-                            <span>Auto remove special chars</span>
+                            <span>Auto remove special chars <i class="bi bi-info-circle" style="opacity: 0.5;"></i></span>
                         </label>
                         <label class="tool-checkbox">
                             <input type="checkbox" id="optAutoSRT">
@@ -751,6 +761,14 @@
                             <div class="advanced-row">
                                 <span>Threads</span>
                                 <input type="number" class="tool-input" style="width: 80px;" value="3" min="1" max="20" id="threadCount">
+                            </div>
+                            
+                            <div style="margin-top: 12px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 11px; color: var(--text-dim);">
+                                <strong style="color: var(--accent);">💡 Silent by character:</strong><br>
+                                • Dấu phẩy, chấm phẩy (,;) → 0.3s pause<br>
+                                • Dấu chấm, hỏi, chấm than (.:?!) → 0.5s pause<br><br>
+                                <strong style="color: var(--accent);">📝 Multi-voice format:</strong><br>
+                                File có dạng #1, #2, #3 sẽ tự động match với Voice Library
                             </div>
                         </div>
                     </div>
