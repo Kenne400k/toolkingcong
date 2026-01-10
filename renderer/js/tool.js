@@ -45,6 +45,7 @@ class ProToolManager {
     
     // Import file using Electron dialog
     async importFilesDialog() {
+        console.log('📂 Import files dialog...');
         try {
             const result = await window.electronAPI.selectFiles({
                 filters: [
@@ -52,18 +53,27 @@ class ProToolManager {
                 ]
             });
             
-            if (!result.success || result.canceled) return;
+            console.log('📂 Select result:', result);
+            
+            if (!result.success || result.canceled) {
+                console.log('📂 Canceled or failed');
+                return;
+            }
             
             for (const filePath of result.filePaths) {
+                console.log('📂 Reading file:', filePath);
                 const fileResult = await window.electronAPI.readFile(filePath);
+                console.log('📂 File result:', { success: fileResult.success, fileName: fileResult.fileName, contentLength: fileResult.content?.length });
+                
                 if (fileResult.success) {
                     await this.processImportedText(fileResult.content, fileResult.fileName);
                 }
             }
             
+            console.log('📂 Total tasks after import:', this.tasks.length);
             this.updateTaskDisplay();
         } catch (error) {
-            console.error('Import file error:', error);
+            console.error('❌ Import file error:', error);
             this.showNotification('Lỗi khi import file', 'error');
         }
     }
@@ -133,27 +143,40 @@ class ProToolManager {
     
     // Process imported text with options
     async processImportedText(text, fileName) {
+        console.log('📄 Processing text:', fileName, '| Length:', text?.length);
+        
         const optLoop = document.getElementById('optLoop')?.checked;
         const optAutoSplit = document.getElementById('optAutoSplit')?.checked;
         const opt1Line1File = document.getElementById('opt1Line1File')?.checked;
         
+        console.log('⚙️ Options - Loop:', optLoop, '| AutoSplit:', optAutoSplit, '| 1Line1File:', opt1Line1File);
+        
         // Check for multi-voice format (#1, #2, #3)
         const hasMultiVoice = /#\d+\s/.test(text);
+        console.log('👥 Has multi-voice format:', hasMultiVoice);
         
         if (hasMultiVoice) {
+            console.log('📄 Processing as multi-voice');
             this.processMultiVoiceText(text, fileName);
         } else if (optLoop) {
+            console.log('📄 Processing as loop');
             this.processLoopText(text, fileName);
         } else if (optAutoSplit) {
+            console.log('📄 Processing as auto-split');
             this.processAutoSplitText(text, fileName);
         } else if (opt1Line1File) {
+            console.log('📄 Processing as 1-line-1-file');
             this.processLineByLineText(text, fileName);
         } else {
+            console.log('📄 Processing as single task');
+            const voiceId = document.getElementById('selectedVoiceId')?.value || '';
+            console.log('📄 Using voiceId:', voiceId);
+            
             this.addTask({
                 id: this.generateTaskId(),
                 content: text,
                 fileName: fileName,
-                voiceId: document.getElementById('selectedVoiceId')?.value || '',
+                voiceId: voiceId,
                 status: 'pending'
             });
         }
@@ -592,6 +615,13 @@ class ProToolManager {
     addTask(task) {
         task.createdAt = new Date().toISOString();
         this.tasks.push(task);
+        console.log('➕ Added task:', {
+            id: task.id,
+            fileName: task.fileName,
+            contentLength: task.content?.length,
+            voiceId: task.voiceId,
+            status: task.status
+        });
     }
     
     generateTaskId() {
@@ -680,16 +710,30 @@ class ProToolManager {
     // ==================== PROCESSING ====================
     
     async startProcessing() {
-        if (this.isProcessing) return;
+        console.log('🚀 Starting processing...');
+        console.log('📊 Provider:', this.provider, '| Model:', this.model);
+        
+        if (this.isProcessing) {
+            console.log('⚠️ Already processing');
+            return;
+        }
         
         const pendingTasks = this.tasks.filter(t => t.status === 'pending');
+        console.log('📋 Pending tasks:', pendingTasks.length);
+        
         if (pendingTasks.length === 0) {
             this.showNotification('Không có tác vụ nào để xử lý!', 'warning');
             return;
         }
         
         const selectedVoiceId = document.getElementById('selectedVoiceId')?.value;
-        if (!selectedVoiceId && pendingTasks.some(t => !t.voiceId)) {
+        console.log('🎤 Selected Voice ID:', selectedVoiceId);
+        
+        const tasksWithoutVoice = pendingTasks.filter(t => !t.voiceId);
+        console.log('📋 Tasks without voiceId:', tasksWithoutVoice.length);
+        
+        if (!selectedVoiceId && tasksWithoutVoice.length > 0) {
+            console.log('❌ No voice ID selected for tasks that need it');
             this.showNotification('Vui lòng chọn Voice ID!', 'warning');
             return;
         }
@@ -708,38 +752,53 @@ class ProToolManager {
         const activeThreads = [];
         
         const processTask = async (task) => {
+            console.log('🔄 Processing task:', task.id, task.content?.substring(0, 50));
             task.status = 'processing';
             this.updateTaskDisplay();
             
             try {
                 // Apply text transformations
                 let content = task.content;
+                console.log('📝 Original content length:', content?.length);
                 
                 // Remove special characters if enabled
                 if (optRemoveSpecial) {
                     content = this.removeSpecialCharacters(content);
+                    console.log('🔧 After removeSpecial:', content?.length);
                 }
                 
                 // Apply silent character if enabled
                 if (optSilentChar) {
                     content = this.applySilentCharacter(content);
+                    console.log('🔧 After silentChar:', content?.length);
+                }
+                
+                const voiceIdToUse = task.voiceId || selectedVoiceId;
+                console.log('🎤 Voice ID to use:', voiceIdToUse);
+                
+                if (!voiceIdToUse) {
+                    throw new Error('No Voice ID specified');
                 }
                 
                 // Make API call
-                const result = await this.createTTSTask(content, task.voiceId || selectedVoiceId);
+                const result = await this.createTTSTask(content, voiceIdToUse);
+                console.log('📋 Create task result:', result);
                 
                 if (result.success) {
                     task.taskId = result.taskId;
                     task.status = 'processing';
+                    console.log('⏳ Polling status for task:', result.taskId);
                     
                     // Poll for completion
                     await this.pollTaskStatus(task);
+                    console.log('✅ Task final status:', task.status);
                 } else {
                     task.status = 'failed';
                     task.error = result.error || 'Unknown error';
+                    console.error('❌ Task failed:', task.error);
                 }
             } catch (error) {
-                console.error('Task error:', error);
+                console.error('❌ Task exception:', error);
                 task.status = 'failed';
                 task.error = error.message;
             }
@@ -779,6 +838,23 @@ class ProToolManager {
             const style = parseFloat(document.getElementById('voiceStyle')?.value) || 0;
             const speakerBoost = document.getElementById('speakerBoost')?.checked || false;
             
+            const requestData = {
+                action: 'create',
+                provider: this.provider,
+                model: this.model,
+                voice_id: voiceId,
+                text: content.substring(0, 100) + (content.length > 100 ? '...' : ''), // Log preview only
+                speed: speed,
+                stability: stability,
+                similarity_boost: similarity,
+                style: style,
+                use_speaker_boost: speakerBoost ? '1' : '0',
+                auto_srt: optAutoSRT ? '1' : '0'
+            };
+            
+            console.log('📤 API Request:', requestData);
+            console.log('📤 Full text length:', content.length);
+            
             const response = await window.electronAPI.apiRequest(
                 'https://kingcongstudio.com/ajaxs/tts3.php',
                 {
@@ -796,21 +872,33 @@ class ProToolManager {
                 }
             );
             
+            console.log('📥 API Response:', response);
+            
             if (response.success && response.task_id) {
+                console.log('✅ Task created:', response.task_id);
                 return { success: true, taskId: response.task_id };
             } else {
-                return { success: false, error: response.message || 'Failed to create task' };
+                console.error('❌ API Error:', response);
+                return { success: false, error: response.message || response.error || 'Failed to create task' };
             }
         } catch (error) {
+            console.error('❌ Request Error:', error);
             return { success: false, error: error.message };
         }
     }
     
     async pollTaskStatus(task, maxAttempts = 60) {
+        console.log('⏳ Starting poll for task:', task.taskId);
+        
         for (let i = 0; i < maxAttempts; i++) {
-            if (!this.isProcessing) break;
+            if (!this.isProcessing) {
+                console.log('⏸️ Processing stopped, breaking poll');
+                break;
+            }
             
             try {
+                console.log(`🔄 Poll attempt ${i + 1}/${maxAttempts} for task:`, task.taskId);
+                
                 const response = await window.electronAPI.apiRequest(
                     'https://kingcongstudio.com/ajaxs/tts3.php',
                     {
@@ -819,12 +907,16 @@ class ProToolManager {
                     }
                 );
                 
+                console.log('📥 Poll response:', response);
+                
                 if (response.status === 'completed' || response.status === 'done') {
+                    console.log('✅ Task completed:', task.taskId);
                     task.status = 'done';
                     task.resultUrl = response.result_url || response.url;
                     task.duration = response.duration || '-';
                     return;
                 } else if (response.status === 'failed' || response.status === 'error') {
+                    console.log('❌ Task failed:', task.taskId, response.message);
                     task.status = 'failed';
                     task.error = response.message || 'Task failed';
                     return;
@@ -833,10 +925,11 @@ class ProToolManager {
                 // Still processing, wait
                 await new Promise(r => setTimeout(r, 2000));
             } catch (error) {
-                console.error('Poll error:', error);
+                console.error('❌ Poll error:', error);
             }
         }
         
+        console.log('⏰ Poll timeout for task:', task.taskId);
         // Timeout - mark as still processing (can check backup later)
         task.status = 'processing';
     }
@@ -894,8 +987,12 @@ class ProToolManager {
         });
         
         localStorage.setItem('voiceLibrary', JSON.stringify(this.voiceLibrary));
+        console.log('✅ Voice Library saved:', this.voiceLibrary);
         this.showNotification('Saved!', 'success');
-        this.closeVoiceLibrary();
+        
+        // Close modal - use DOM directly
+        const modal = document.getElementById('voiceLibraryModal');
+        if (modal) modal.classList.remove('show');
     }
     
     renderVoiceLibraryTable() {
