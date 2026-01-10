@@ -720,6 +720,13 @@ class ProToolManager {
         try {
             const optAutoSRT = document.getElementById('optAutoSRT')?.checked;
             
+            // Get voice settings
+            const speed = parseFloat(document.getElementById('voiceSpeed')?.value) || 1;
+            const stability = parseFloat(document.getElementById('voiceStability')?.value) || 0.5;
+            const similarity = parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75;
+            const style = parseFloat(document.getElementById('voiceStyle')?.value) || 0;
+            const speakerBoost = document.getElementById('speakerBoost')?.checked || false;
+            
             const response = await window.electronAPI.apiRequest(
                 'https://kingcongstudio.com/ajaxs/tts3.php',
                 {
@@ -728,7 +735,11 @@ class ProToolManager {
                     model: this.model,
                     voice_id: voiceId,
                     text: content,
-                    speed: 1,
+                    speed: speed,
+                    stability: stability,
+                    similarity_boost: similarity,
+                    style: style,
+                    use_speaker_boost: speakerBoost ? '1' : '0',
                     auto_srt: optAutoSRT ? '1' : '0'
                 }
             );
@@ -1283,6 +1294,31 @@ function openOutputFolder() {
 function selectProvider(provider) {
     proTool.provider = provider;
     document.getElementById('providerSelect').value = provider;
+    
+    // Update dropdown UI
+    const dropdown = document.getElementById('providerDropdown');
+    dropdown.classList.remove('open');
+    
+    // Update selected display
+    const providerImg = document.getElementById('providerImg');
+    const providerName = document.getElementById('providerName');
+    
+    if (provider === 'elevenlabs') {
+        providerImg.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Eleven_Labs.png/220px-Eleven_Labs.png';
+        providerName.textContent = 'ElevenLabs';
+    } else {
+        providerImg.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTH8Nm8dpzHx1s-0nrjTKSTfR3B25tYgYWdsg&s';
+        providerName.textContent = 'Minimax';
+    }
+    
+    // Update active state
+    document.querySelectorAll('.provider-option').forEach(opt => {
+        opt.classList.remove('active');
+        if (opt.dataset.provider === provider) {
+            opt.classList.add('active');
+        }
+    });
+    
     proTool.updateModelOptions();
 }
 

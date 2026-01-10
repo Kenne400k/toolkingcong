@@ -34,12 +34,11 @@
             overflow: hidden;
         }
         
-        /* Smooth transitions */
         *, *::before, *::after {
             transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
         }
         
-        /* =================== MAIN SIDEBAR (Giữ nguyên style cũ) =================== */
+        /* =================== MAIN SIDEBAR =================== */
         .main-sidebar {
             width: 240px;
             background: var(--bg-main);
@@ -82,28 +81,11 @@
             overflow: hidden;
         }
         
-        .avatar-inner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-size: 14px; font-weight: 500; color: #fff; }
+        .user-plan { font-size: 11px; color: var(--text-dim); }
         
-        .user-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #fff;
-        }
-        
-        .user-plan {
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-        
-        /* Nav */
-        .nav-menu {
-            flex: 1;
-            padding: 12px;
-        }
+        .nav-menu { flex: 1; padding: 12px; }
         
         .nav-item {
             display: flex;
@@ -131,31 +113,13 @@
             transition: height 0.2s ease;
         }
         
-        .nav-item:hover {
-            background: rgba(168, 85, 247, 0.08);
-            color: var(--text);
-        }
+        .nav-item:hover { background: rgba(168, 85, 247, 0.08); color: var(--text); }
+        .nav-item.active { background: rgba(168, 85, 247, 0.12); color: var(--primary); }
+        .nav-item.active::before { height: 60%; }
+        .nav-item i, .nav-item span.material-symbols-outlined { font-size: 20px; width: 24px; }
+        .nav-footer { padding: 12px; border-top: 1px solid var(--border); }
         
-        .nav-item.active {
-            background: rgba(168, 85, 247, 0.12);
-            color: var(--primary);
-        }
-        
-        .nav-item.active::before {
-            height: 60%;
-        }
-        
-        .nav-item i, .nav-item span.material-symbols-outlined {
-            font-size: 20px;
-            width: 24px;
-        }
-        
-        .nav-footer {
-            padding: 12px;
-            border-top: 1px solid var(--border);
-        }
-        
-        /* =================== HEADER (Giữ nguyên style cũ) =================== */
+        /* =================== HEADER =================== */
         .top-bar {
             height: 60px;
             border-bottom: 1px solid var(--border);
@@ -167,11 +131,7 @@
             flex-shrink: 0;
         }
         
-        .top-bar-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
-        }
+        .top-bar-title { font-size: 16px; font-weight: 600; color: #fff; }
         
         .credits-box {
             display: flex;
@@ -184,11 +144,9 @@
             font-size: 13px;
         }
         
-        .credits-box i {
-            color: var(--primary);
-        }
+        .credits-box i { color: var(--primary); }
         
-        /* =================== TOOL AREA (Đen trắng đơn giản) =================== */
+        /* =================== TOOL AREA =================== */
         .tool-layout {
             flex: 1;
             display: flex;
@@ -196,9 +154,8 @@
             background: #000;
         }
         
-        /* Tool Sidebar */
         .tool-sidebar {
-            width: 260px;
+            width: 280px;
             background: #050505;
             border-right: 1px solid #1a1a1a;
             display: flex;
@@ -208,7 +165,7 @@
         }
         
         .tool-section {
-            padding: 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid #1a1a1a;
         }
         
@@ -218,74 +175,70 @@
             color: #555;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
-        /* Provider Cards */
-        .provider-cards {
+        /* Provider Dropdown */
+        .provider-select {
             display: flex;
-            gap: 8px;
-        }
-        
-        .provider-card {
-            flex: 1;
-            padding: 12px;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
             border-radius: 8px;
             cursor: pointer;
-            text-align: center;
         }
         
-        .provider-card:hover {
-            border-color: #333;
+        .provider-select:hover { border-color: #333; }
+        
+        .provider-select img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
         }
         
-        .provider-card.active {
-            border-color: #fff;
+        .provider-select span { flex: 1; font-size: 13px; }
+        .provider-select i { color: #555; font-size: 12px; }
+        
+        /* Provider Dropdown Menu */
+        .provider-dropdown {
+            position: relative;
+        }
+        
+        .provider-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
             background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 100;
+            display: none;
         }
         
-        .provider-card img {
-            width: 32px;
-            height: 32px;
-            margin-bottom: 6px;
-            border-radius: 6px;
-        }
+        .provider-dropdown.open .provider-menu { display: block; }
         
-        .provider-card .provider-icon {
-            width: 32px;
-            height: 32px;
-            margin: 0 auto 6px;
-            background: #1a1a1a;
-            border-radius: 6px;
+        .provider-option {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 16px;
+            gap: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
         }
         
-        .provider-card span {
-            font-size: 11px;
-            color: #888;
-        }
-        
-        .provider-card.active span {
-            color: #fff;
-        }
+        .provider-option:hover { background: #1a1a1a; }
+        .provider-option.active { background: #1a1a1a; }
+        .provider-option img { width: 24px; height: 24px; border-radius: 4px; }
+        .provider-option span { font-size: 13px; }
         
         /* Form */
-        .form-group {
-            margin-bottom: 10px;
-        }
-        
-        .form-label {
-            display: block;
-            font-size: 10px;
-            color: #555;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
+        .form-group { margin-bottom: 10px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-label { display: block; font-size: 10px; color: #555; margin-bottom: 6px; text-transform: uppercase; }
         
         .form-select, .form-input {
             width: 100%;
@@ -298,16 +251,43 @@
             outline: none;
         }
         
-        .form-select:focus, .form-input:focus {
-            border-color: #333;
+        .form-select:focus, .form-input:focus { border-color: #333; }
+        
+        /* Sliders */
+        .slider-group {
+            margin-bottom: 12px;
         }
         
-        /* Checkboxes with tooltips */
-        .checkbox-list {
+        .slider-header {
             display: flex;
-            flex-direction: column;
-            gap: 2px;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 6px;
         }
+        
+        .slider-value { color: #fff; }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: #1a1a1a;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        /* Checkboxes */
+        .checkbox-list { display: flex; flex-direction: column; gap: 2px; }
         
         .checkbox-row {
             display: flex;
@@ -321,27 +301,21 @@
             position: relative;
         }
         
-        .checkbox-row:hover {
-            background: #0a0a0a;
-            color: #fff;
+        .checkbox-row:hover { background: #0a0a0a; color: #fff; }
+        .checkbox-row input { width: 14px; height: 14px; accent-color: #fff; }
+        .checkbox-row:has(input:checked) { color: #fff; }
+        
+        /* Tooltip - DROPDOWN (hiện bên dưới, căn giữa) */
+        .has-tooltip {
+            position: relative;
         }
         
-        .checkbox-row input {
-            width: 14px;
-            height: 14px;
-            accent-color: #fff;
-        }
-        
-        .checkbox-row:has(input:checked) {
-            color: #fff;
-        }
-        
-        /* Tooltip */
         .tooltip {
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
+            margin-top: 8px;
             padding: 8px 12px;
             background: #1a1a1a;
             border: 1px solid #333;
@@ -352,24 +326,41 @@
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            z-index: 100;
-            margin-bottom: 6px;
+            z-index: 1000;
         }
         
-        .tooltip::after {
+        .tooltip::before {
             content: '';
             position: absolute;
-            top: 100%;
+            bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
             border: 5px solid transparent;
-            border-top-color: #333;
+            border-bottom-color: #333;
         }
         
-        .checkbox-row:hover .tooltip,
-        .toolbar-btn:hover .tooltip {
+        .has-tooltip:hover .tooltip {
             opacity: 1;
             visibility: visible;
+        }
+        
+        /* Tooltip cho sidebar - căn phải */
+        .tooltip-right {
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 8px;
+            margin-top: 0;
+        }
+        
+        .tooltip-right::before {
+            bottom: auto;
+            left: auto;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right-color: #333;
         }
         
         /* Buttons */
@@ -388,27 +379,14 @@
             color: #fff;
         }
         
-        .btn:hover {
-            background: #111;
-            border-color: #333;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-primary {
-            background: #fff;
-            color: #000;
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background: #e5e5e5;
-        }
-        
+        .btn:hover { background: #111; border-color: #333; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: #fff; color: #000; border: none; }
+        .btn-primary:hover { background: #e5e5e5; }
         .btn-block { width: 100%; }
         .btn-sm { padding: 6px 10px; font-size: 11px; }
+        .btn-group { display: flex; gap: 6px; }
+        .btn-group .btn { flex: 1; }
         
         /* =================== TOOL CONTENT =================== */
         .tool-content {
@@ -430,18 +408,8 @@
             flex-wrap: wrap;
         }
         
-        .toolbar-group {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .toolbar-divider {
-            width: 1px;
-            height: 20px;
-            background: #1a1a1a;
-            margin: 0 6px;
-        }
+        .toolbar-group { display: flex; align-items: center; gap: 4px; }
+        .toolbar-divider { width: 1px; height: 20px; background: #1a1a1a; margin: 0 6px; }
         
         .toolbar-btn {
             padding: 8px 12px;
@@ -457,46 +425,17 @@
             position: relative;
         }
         
-        .toolbar-btn:hover {
-            background: #111;
-            border-color: #333;
-        }
-        
-        .toolbar-btn:active {
-            transform: scale(0.97);
-        }
-        
-        .toolbar-btn.primary {
-            background: #fff;
-            color: #000;
-            border: none;
-            font-weight: 600;
-        }
-        
-        .toolbar-btn.primary:hover {
-            background: #e5e5e5;
-        }
-        
-        .toolbar-btn.danger {
-            color: #f55;
-        }
-        
-        .toolbar-btn.danger:hover {
-            background: rgba(255, 85, 85, 0.1);
-            border-color: #f55;
-        }
+        .toolbar-btn:hover { background: #111; border-color: #333; }
+        .toolbar-btn:active { transform: scale(0.97); }
+        .toolbar-btn.primary { background: #fff; color: #000; border: none; font-weight: 600; }
+        .toolbar-btn.primary:hover { background: #e5e5e5; }
+        .toolbar-btn.danger { color: #f55; }
+        .toolbar-btn.danger:hover { background: rgba(255, 85, 85, 0.1); border-color: #f55; }
         
         /* Task Area */
-        .task-area {
-            flex: 1;
-            overflow: auto;
-            background: #000;
-        }
+        .task-area { flex: 1; overflow: auto; background: #000; }
         
-        .task-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .task-table { width: 100%; border-collapse: collapse; }
         
         .task-table th {
             position: sticky;
@@ -518,9 +457,7 @@
             border-bottom: 1px solid #0a0a0a;
         }
         
-        .task-table tr:hover td {
-            background: #050505;
-        }
+        .task-table tr:hover td { background: #050505; }
         
         .task-content {
             max-width: 350px;
@@ -530,13 +467,8 @@
             color: #ccc;
         }
         
-        .task-filename {
-            font-size: 10px;
-            color: #444;
-            margin-top: 2px;
-        }
+        .task-filename { font-size: 10px; color: #444; margin-top: 2px; }
         
-        /* Status */
         .status {
             display: inline-block;
             padding: 3px 8px;
@@ -592,10 +524,7 @@
             backdrop-filter: blur(4px);
         }
         
-        .modal.show {
-            display: flex;
-            opacity: 1;
-        }
+        .modal.show { display: flex; opacity: 1; }
         
         .modal-box {
             background: #0a0a0a;
@@ -609,9 +538,7 @@
             transform: scale(0.95) translateY(10px);
         }
         
-        .modal.show .modal-box {
-            transform: scale(1) translateY(0);
-        }
+        .modal.show .modal-box { transform: scale(1) translateY(0); }
         
         .modal-header {
             padding: 16px 20px;
@@ -621,72 +548,17 @@
             justify-content: space-between;
         }
         
-        .modal-header h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            color: #555;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px;
-            line-height: 1;
-        }
-        
+        .modal-header h3 { font-size: 14px; font-weight: 600; color: #fff; }
+        .modal-close { background: none; border: none; color: #555; font-size: 20px; cursor: pointer; padding: 4px; line-height: 1; }
         .modal-close:hover { color: #fff; }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid #1a1a1a; display: flex; justify-content: flex-end; gap: 8px; }
         
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid #1a1a1a;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-        
-        /* Voice Table */
-        .voice-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .voice-table th, .voice-table td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #1a1a1a;
-            font-size: 12px;
-        }
-        
-        .voice-table th {
-            color: #555;
-            font-weight: 500;
-            font-size: 10px;
-            text-transform: uppercase;
-        }
-        
-        .voice-table input {
-            width: 100%;
-            padding: 8px;
-            background: #000;
-            border: 1px solid #1a1a1a;
-            border-radius: 4px;
-            color: #fff;
-            font-size: 12px;
-        }
-        
-        .voice-table input:focus {
-            outline: none;
-            border-color: #333;
-        }
+        .voice-table { width: 100%; border-collapse: collapse; }
+        .voice-table th, .voice-table td { padding: 10px; text-align: left; border-bottom: 1px solid #1a1a1a; font-size: 12px; }
+        .voice-table th { color: #555; font-weight: 500; font-size: 10px; text-transform: uppercase; }
+        .voice-table input { width: 100%; padding: 8px; background: #000; border: 1px solid #1a1a1a; border-radius: 4px; color: #fff; font-size: 12px; }
+        .voice-table input:focus { outline: none; border-color: #333; }
         
         .info-text {
             font-size: 11px;
@@ -705,26 +577,13 @@
             font-family: monospace;
             color: #fff;
         }
-        
-        /* Voice selector in sidebar */
-        .voice-selector {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-        }
-        
-        .voice-selector .btn {
-            flex: 1;
-            font-size: 10px;
-            padding: 8px;
-        }
     </style>
 </head>
 
 <body>
     <div class="flex h-screen w-full overflow-hidden">
         
-        <!-- ========== MAIN SIDEBAR (Giữ nguyên màu cũ) ========== -->
+        <!-- ========== MAIN SIDEBAR ========== -->
         <aside class="main-sidebar" id="app-sidebar">
             <div class="sidebar-header">
                 <div class="user-info">
@@ -768,7 +627,6 @@
         <!-- ========== MAIN AREA ========== -->
         <div class="flex-1 flex flex-col overflow-hidden">
             
-            <!-- Header (Giữ nguyên màu cũ) -->
             <div class="top-bar" id="app-header">
                 <div class="top-bar-title">Pro Tool</div>
                 <div class="credits-box">
@@ -777,29 +635,35 @@
                 </div>
             </div>
             
-            <!-- Tool Layout (Đen trắng bên trong) -->
             <div class="tool-layout">
                 
                 <!-- Tool Sidebar -->
                 <div class="tool-sidebar">
                     
-                    <!-- Provider Selection -->
+                    <!-- Provider -->
                     <div class="tool-section">
                         <div class="section-title">Provider</div>
-                        <div class="provider-cards">
-                            <div class="provider-card active" data-provider="elevenlabs" onclick="selectProvider('elevenlabs')">
-                                <div class="provider-icon">🎙️</div>
-                                <span>ElevenLabs</span>
+                        <div class="provider-dropdown" id="providerDropdown">
+                            <div class="provider-select" onclick="toggleProviderDropdown()">
+                                <img id="providerImg" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Eleven_Labs.png/220px-Eleven_Labs.png" alt="">
+                                <span id="providerName">ElevenLabs</span>
+                                <i class="bi bi-chevron-down"></i>
                             </div>
-                            <div class="provider-card" data-provider="minimax" onclick="selectProvider('minimax')">
-                                <div class="provider-icon">🔊</div>
-                                <span>Minimax</span>
+                            <div class="provider-menu">
+                                <div class="provider-option active" data-provider="elevenlabs" onclick="selectProvider('elevenlabs')">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Eleven_Labs.png/220px-Eleven_Labs.png" alt="">
+                                    <span>ElevenLabs</span>
+                                </div>
+                                <div class="provider-option" data-provider="minimax" onclick="selectProvider('minimax')">
+                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTH8Nm8dpzHx1s-0nrjTKSTfR3B25tYgYWdsg&s" alt="">
+                                    <span>Minimax</span>
+                                </div>
                             </div>
                         </div>
                         <input type="hidden" id="providerSelect" value="elevenlabs">
                     </div>
                     
-                    <!-- Voice Settings -->
+                    <!-- Voice -->
                     <div class="tool-section">
                         <div class="section-title">Voice</div>
                         <div class="form-group">
@@ -812,9 +676,9 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Voice ID</label>
-                            <input type="text" class="form-input" id="selectedVoiceId" placeholder="Nhập Voice ID...">
+                            <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID...">
                         </div>
-                        <div class="voice-selector">
+                        <div class="btn-group" style="margin-top: 8px;">
                             <button class="btn" onclick="openVoiceLibrary()">
                                 <i class="bi bi-collection"></i> Library
                             </button>
@@ -824,53 +688,90 @@
                         </div>
                     </div>
                     
-                    <!-- Options with Tooltips -->
+                    <!-- Voice Settings -->
+                    <div class="tool-section">
+                        <div class="section-title">Voice Settings</div>
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>Speed</span>
+                                <span class="slider-value" id="speedValue">1.0</span>
+                            </div>
+                            <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1" oninput="updateSlider('speed')">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>Stability</span>
+                                <span class="slider-value" id="stabilityValue">0.5</span>
+                            </div>
+                            <input type="range" id="voiceStability" min="0" max="1" step="0.05" value="0.5" oninput="updateSlider('stability')">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>Similarity</span>
+                                <span class="slider-value" id="similarityValue">0.75</span>
+                            </div>
+                            <input type="range" id="voiceSimilarity" min="0" max="1" step="0.05" value="0.75" oninput="updateSlider('similarity')">
+                        </div>
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span>Style</span>
+                                <span class="slider-value" id="styleValue">0.0</span>
+                            </div>
+                            <input type="range" id="voiceStyle" min="0" max="1" step="0.05" value="0" oninput="updateSlider('style')">
+                        </div>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="speakerBoost">
+                            Speaker Boost
+                        </label>
+                    </div>
+                    
+                    <!-- Options -->
                     <div class="tool-section">
                         <div class="section-title">Options</div>
                         <div class="checkbox-list">
-                            <label class="checkbox-row">
+                            <label class="checkbox-row has-tooltip">
                                 <input type="checkbox" id="optLoop">
                                 Loop
-                                <span class="tooltip">Chia văn bản thành các đoạn nhỏ (mặc định 10.000 ký tự)</span>
+                                <span class="tooltip tooltip-right">Chia văn bản thành đoạn nhỏ (10.000 ký tự)</span>
                             </label>
-                            <label class="checkbox-row">
+                            <label class="checkbox-row has-tooltip">
                                 <input type="checkbox" id="optAutoSplit">
                                 Auto Split
-                                <span class="tooltip">Tự động chia theo dấu câu: 。、,:.!?</span>
+                                <span class="tooltip tooltip-right">Chia theo dấu câu: 。、,:.!?</span>
                             </label>
-                            <label class="checkbox-row">
+                            <label class="checkbox-row has-tooltip">
                                 <input type="checkbox" id="opt1Line1File">
                                 1 Line = 1 File
-                                <span class="tooltip">Mỗi dòng trong file text sẽ thành 1 file audio riêng</span>
+                                <span class="tooltip tooltip-right">Mỗi dòng = 1 file audio riêng</span>
                             </label>
-                            <label class="checkbox-row">
+                            <label class="checkbox-row has-tooltip">
                                 <input type="checkbox" id="optSilentChar">
                                 Silent Char
-                                <span class="tooltip">Thêm pause: dấu ,; → 0.3s | dấu .:?! → 0.5s</span>
+                                <span class="tooltip tooltip-right">,; → 0.3s | .:?! → 0.5s pause</span>
                             </label>
-                            <label class="checkbox-row">
+                            <label class="checkbox-row has-tooltip">
                                 <input type="checkbox" id="optRemoveSpecial">
                                 Remove Special
-                                <span class="tooltip">Xóa ký tự đặc biệt: @ # $ % ^ & * = + | \ / ~ ` [ ] { }</span>
+                                <span class="tooltip tooltip-right">Xóa ký tự: @#$%^&*=+|\~`[]{}...</span>
                             </label>
-                            <label class="checkbox-row">
+                            <label class="checkbox-row has-tooltip">
                                 <input type="checkbox" id="optAutoSRT">
                                 Auto SRT
-                                <span class="tooltip">Tự động tạo file phụ đề SRT kèm theo audio</span>
+                                <span class="tooltip tooltip-right">Tự động tạo file phụ đề .srt</span>
                             </label>
                         </div>
                     </div>
                     
-                    <!-- Advanced Settings -->
+                    <!-- Advanced -->
                     <div class="tool-section">
                         <div class="section-title">Advanced</div>
                         <div class="form-group">
-                            <label class="form-label">Max chars/segment</label>
+                            <label class="form-label">Max chars</label>
                             <input type="number" class="form-input" id="maxChars" value="10000">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Delay between</label>
-                            <input type="text" class="form-input" id="delayBetween" value="1s" placeholder="1s">
+                            <label class="form-label">Delay (s)</label>
+                            <input type="number" class="form-input" id="delayBetween" value="1" step="0.1">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Threads</label>
@@ -878,8 +779,8 @@
                         </div>
                     </div>
                     
-                    <!-- Quick Actions -->
-                    <div class="tool-section" style="margin-top: auto; border-bottom: none;">
+                    <!-- Actions -->
+                    <div class="tool-section" style="border-bottom: none;">
                         <button class="btn btn-block" onclick="openBackup()">
                             <i class="bi bi-clock-history"></i> Backup / History
                         </button>
@@ -889,31 +790,31 @@
                 <!-- Tool Content -->
                 <div class="tool-content">
                     
-                    <!-- Toolbar with Tooltips -->
+                    <!-- Toolbar -->
                     <div class="toolbar">
                         <div class="toolbar-group">
-                            <button class="toolbar-btn" onclick="importFile()">
+                            <button class="toolbar-btn has-tooltip" onclick="importFile()">
                                 <i class="bi bi-file-text"></i> File
-                                <span class="tooltip">Import file .txt hoặc .srt</span>
+                                <span class="tooltip">Import .txt, .srt</span>
                             </button>
-                            <button class="toolbar-btn" onclick="importFolder()">
+                            <button class="toolbar-btn has-tooltip" onclick="importFolder()">
                                 <i class="bi bi-folder"></i> Folder
-                                <span class="tooltip">Import cả thư mục chứa file text</span>
+                                <span class="tooltip">Import cả thư mục</span>
                             </button>
-                            <button class="toolbar-btn" onclick="importVoice()">
+                            <button class="toolbar-btn has-tooltip" onclick="importVoice()">
                                 <i class="bi bi-music-note"></i> MP3
-                                <span class="tooltip">Import file MP3 (1.mp3, 2.mp3...) để nối</span>
+                                <span class="tooltip">Import MP3 để nối</span>
                             </button>
                         </div>
                         
                         <div class="toolbar-divider"></div>
                         
                         <div class="toolbar-group">
-                            <button class="toolbar-btn primary" onclick="startProcessing()" id="btnStart">
+                            <button class="toolbar-btn primary has-tooltip" onclick="startProcessing()" id="btnStart">
                                 <i class="bi bi-play-fill"></i> Start
-                                <span class="tooltip">Bắt đầu xử lý tất cả tasks</span>
+                                <span class="tooltip">Bắt đầu xử lý</span>
                             </button>
-                            <button class="toolbar-btn danger" onclick="stopProcessing()" id="btnStop" disabled>
+                            <button class="toolbar-btn danger has-tooltip" onclick="stopProcessing()" id="btnStop" disabled>
                                 <i class="bi bi-stop-fill"></i> Stop
                                 <span class="tooltip">Dừng xử lý</span>
                             </button>
@@ -922,24 +823,24 @@
                         <div class="toolbar-divider"></div>
                         
                         <div class="toolbar-group">
-                            <button class="toolbar-btn" onclick="joinFiles()">
+                            <button class="toolbar-btn has-tooltip" onclick="joinFiles()">
                                 <i class="bi bi-link"></i> Join
-                                <span class="tooltip">Nối tất cả file MP3 đã hoàn thành với delay</span>
+                                <span class="tooltip">Nối MP3 với delay</span>
                             </button>
-                            <button class="toolbar-btn" onclick="createSRT()">
+                            <button class="toolbar-btn has-tooltip" onclick="createSRT()">
                                 <i class="bi bi-badge-cc"></i> SRT
-                                <span class="tooltip">Tạo file phụ đề SRT từ các tasks</span>
+                                <span class="tooltip">Tạo file phụ đề</span>
                             </button>
                         </div>
                         
                         <div style="margin-left: auto; display: flex; gap: 4px;">
-                            <button class="toolbar-btn" onclick="clearTasks()">
+                            <button class="toolbar-btn has-tooltip" onclick="clearTasks()">
                                 <i class="bi bi-trash"></i>
-                                <span class="tooltip">Xóa tất cả tasks</span>
+                                <span class="tooltip">Xóa tất cả</span>
                             </button>
-                            <button class="toolbar-btn" onclick="openOutputFolder()">
+                            <button class="toolbar-btn has-tooltip" onclick="openOutputFolder()">
                                 <i class="bi bi-folder2-open"></i>
-                                <span class="tooltip">Mở thư mục output</span>
+                                <span class="tooltip">Mở output</span>
                             </button>
                         </div>
                     </div>
@@ -975,7 +876,7 @@
         </div>
     </div>
     
-    <!-- ========== VOICE LIBRARY MODAL ========== -->
+    <!-- Voice Library Modal -->
     <div class="modal" id="voiceLibraryModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -984,7 +885,7 @@
             </div>
             <div class="modal-body">
                 <div class="info-text">
-                    Dùng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu mỗi dòng trong file text để sử dụng voice tương ứng cho hội thoại nhiều người.
+                    Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu mỗi dòng để dùng voice tương ứng cho hội thoại nhiều người.
                 </div>
                 <table class="voice-table">
                     <thead>
@@ -996,17 +897,10 @@
                         </tr>
                     </thead>
                     <tbody id="voiceLibraryBody">
-                        <tr>
-                            <td>1</td>
-                            <td><input type="text" placeholder="Voice ID..."></td>
-                            <td><input type="text" placeholder="Name..."></td>
-                            <td><button class="btn btn-sm" onclick="removeVoiceRow(this)">×</button></td>
-                        </tr>
+                        <tr><td>1</td><td><input type="text" placeholder="Voice ID..."></td><td><input type="text" placeholder="Name..."></td><td><button class="btn btn-sm" onclick="removeVoiceRow(this)">×</button></td></tr>
                     </tbody>
                 </table>
-                <button class="btn" style="margin-top: 12px;" onclick="addVoiceRow()">
-                    <i class="bi bi-plus"></i> Add Voice
-                </button>
+                <button class="btn" style="margin-top: 12px;" onclick="addVoiceRow()"><i class="bi bi-plus"></i> Add</button>
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeVoiceLibrary()">Cancel</button>
@@ -1015,17 +909,15 @@
         </div>
     </div>
     
-    <!-- ========== VOICES FROM SERVER MODAL ========== -->
+    <!-- Voices Modal -->
     <div class="modal" id="voicesModal">
         <div class="modal-box" style="max-width: 700px;">
             <div class="modal-header">
-                <h3><i class="bi bi-cloud-download"></i> Voices from Server</h3>
+                <h3><i class="bi bi-cloud-download"></i> Server Voices</h3>
                 <button class="modal-close" onclick="closeVoicesModal()">×</button>
             </div>
             <div class="modal-body" id="voicesModalBody">
-                <div style="text-align: center; padding: 40px; color: #555;">
-                    Loading voices...
-                </div>
+                <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeVoicesModal()">Close</button>
@@ -1033,7 +925,7 @@
         </div>
     </div>
     
-    <!-- ========== BACKUP MODAL ========== -->
+    <!-- Backup Modal -->
     <div class="modal" id="backupModal">
         <div class="modal-box" style="max-width: 800px;">
             <div class="modal-header">
@@ -1041,14 +933,10 @@
                 <button class="modal-close" onclick="closeBackup()">×</button>
             </div>
             <div class="modal-body" id="backupBody">
-                <div style="text-align: center; padding: 40px; color: #555;">
-                    Loading...
-                </div>
+                <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="refreshBackup()">
-                    <i class="bi bi-arrow-clockwise"></i> Refresh
-                </button>
+                <button class="btn" onclick="refreshBackup()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
                 <button class="btn" onclick="closeBackup()">Close</button>
             </div>
         </div>
@@ -1057,5 +945,32 @@
     <script src="js/api-handler.js"></script>
     <script src="js/shared-ui.js"></script>
     <script src="js/tool.js"></script>
+    
+    <script>
+        // Provider dropdown
+        function toggleProviderDropdown() {
+            document.getElementById('providerDropdown').classList.toggle('open');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.provider-dropdown')) {
+                document.getElementById('providerDropdown').classList.remove('open');
+            }
+        });
+        
+        // Slider updates
+        function updateSlider(type) {
+            if (type === 'speed') {
+                document.getElementById('speedValue').textContent = document.getElementById('voiceSpeed').value;
+            } else if (type === 'stability') {
+                document.getElementById('stabilityValue').textContent = document.getElementById('voiceStability').value;
+            } else if (type === 'similarity') {
+                document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value;
+            } else if (type === 'style') {
+                document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value;
+            }
+        }
+    </script>
 </body>
 </html>
