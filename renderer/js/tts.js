@@ -2955,7 +2955,7 @@ function selectProvider(provider) {
         if (DEBUG) console.log('🛠️ [DEBUG] Render giao diện: MINIMAX');
         
         $('#currentProviderName').text('Minimax');
-        $('#currentProviderLogo').attr('src', 'https://ai33.pro/minimax.png?v=3');
+        $('#currentProviderLogo').attr('src', 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png');
         
         $('#elevenlabs-settings').addClass('hidden');
         $('#minimax-settings').removeClass('hidden');
@@ -2972,7 +2972,7 @@ function selectProvider(provider) {
         if (DEBUG) console.log('🛠️ [DEBUG] Render giao diện: ELEVENLABS');
 
         $('#currentProviderName').text('Elevenlabs');
-        $('#currentProviderLogo').attr('src', 'https://ai33.pro/11max.png?v=3');
+        $('#currentProviderLogo').attr('src', 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/ElevenLabs_logo.svg/512px-ElevenLabs_logo.svg.png');
         
         $('#elevenlabs-settings').removeClass('hidden');
         $('#minimax-settings').addClass('hidden');
@@ -5875,7 +5875,7 @@ function startPolling(taskId) {
                 // TRƯỜNG HỢP: HOÀN THÀNH
                 else if (res.status === 'done' || res.task_status === 'done') {
                     clearInterval(interval);
-                    
+
                     // Sidebar
                     $(`#progress-${taskId}`).css('width', '100%');
                     $(`#icon-spin-${taskId}`)
@@ -5883,7 +5883,7 @@ function startPolling(taskId) {
                         .addClass('bi-check-circle-fill');
                     $(`#time-elapsed-${taskId}`).text('Hoàn thành');
                     $card.removeClass('processing');
-                    
+
                     // Lấy dữ liệu file
                     let audio = res.audio_url || (res.metadata ? res.metadata.audio_url : null);
                     let srt = res.srt_url || (res.metadata ? res.metadata.srt_url : null);
@@ -5891,12 +5891,24 @@ function startPolling(taskId) {
                     let duration = res.metadata?.duration || null;
 
                     setTimeout(() => {
-                        $(`#track-${taskId}`).fadeOut(); 
+                        $(`#track-${taskId}`).fadeOut();
                         updateCardToDone(taskId, audio, srt, json);
                     }, 500);
-                    
+
                     // 🔥 [MỚI] Đồng bộ sang Modal
                     syncDetailedHistoryCard(taskId, 'done', audio, srt, json, duration);
+
+                    // 🔥 [PROJECT] Lưu voice vào dự án hiện tại
+                    $(document).trigger('tts:taskDone', [taskId, {
+                        task_id: taskId,
+                        text_input: res.text_input || res.text || historyDataMap[taskId]?.text_input || '',
+                        provider: res.provider || historyDataMap[taskId]?.provider || currentProvider,
+                        voice_name: res.voice_name || historyDataMap[taskId]?.voice_name || '',
+                        audio_url: audio,
+                        url_srt: srt,
+                        created_at: res.created_at || new Date().toISOString(),
+                        credit_cost: res.credit_cost || historyDataMap[taskId]?.credit_cost || 0
+                    }]);
                 }
                 
                 // TRƯỜNG HỢP: LỖI
@@ -8408,12 +8420,12 @@ function resetCurrentSettings() {
 function getProviderLogo(provider) {
     // Chẩn hóa chữ thường để so sánh
     let p = (provider || 'elevenlabs').toLowerCase();
-    
+
     if (p === 'minimax') {
-        return 'https://ai33.pro/minimax.png?v=3';
+        return 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png';
     }
-    // Mặc định là ElevenLabs
-    return 'https://ai33.pro/11max.png?v=3';
+    // Mặc định là ElevenLabs - dùng URL ổn định
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/ElevenLabs_logo.svg/512px-ElevenLabs_logo.svg.png';
 }
 
 // Biến cờ để chặn filterVoices chạy lung tung khi đang tìm ID
@@ -8734,3 +8746,433 @@ function downloadViaProxy(url, filename, textContent) {
         }
     }, 5000);
 }
+
+// ========================================================================
+// =================== PROJECT MANAGEMENT SYSTEM ===================
+// ========================================================================
+
+let currentProjectId = null;
+let projectsData = [];
+
+// Khởi tạo Projects khi load trang
+$(document).ready(function() {
+    loadProjects();
+
+    // Đóng dropdown khi click ra ngoài
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.project-selector-wrapper').length) {
+            $('#projectDropdown').hide();
+            $('#projectDropdownIcon').removeClass('bi-chevron-up').addClass('bi-chevron-down');
+        }
+    });
+});
+
+// Toggle Project Dropdown
+function toggleProjectDropdown() {
+    let $dropdown = $('#projectDropdown');
+    let $icon = $('#projectDropdownIcon');
+
+    if ($dropdown.is(':visible')) {
+        $dropdown.hide();
+        $icon.removeClass('bi-chevron-up').addClass('bi-chevron-down');
+    } else {
+        $dropdown.show();
+        $icon.removeClass('bi-chevron-down').addClass('bi-chevron-up');
+        renderProjectList();
+    }
+}
+
+// Load Projects từ localStorage
+function loadProjects() {
+    let saved = localStorage.getItem('tts_projects');
+    if (saved) {
+        try {
+            projectsData = JSON.parse(saved);
+        } catch(e) {
+            projectsData = [];
+        }
+    }
+
+    // Load current project
+    let lastProjectId = localStorage.getItem('tts_current_project');
+    if (lastProjectId) {
+        let proj = projectsData.find(p => p.id === lastProjectId);
+        if (proj) {
+            currentProjectId = proj.id;
+            $('#currentProjectName').text(proj.name);
+        }
+    }
+
+    renderProjectList();
+}
+
+// Save Projects vào localStorage
+function saveProjects() {
+    localStorage.setItem('tts_projects', JSON.stringify(projectsData));
+}
+
+// Render danh sách Projects
+function renderProjectList() {
+    let $list = $('#projectList');
+
+    if (projectsData.length === 0) {
+        $list.html(`
+            <div style="padding: 20px; text-align: center; color: #666; font-size: 13px;">
+                <i class="bi bi-inbox" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
+                Chưa có dự án nào
+            </div>
+        `);
+        return;
+    }
+
+    let html = '';
+
+    // Sắp xếp theo thời gian mới nhất
+    let sorted = [...projectsData].sort((a, b) => b.createdAt - a.createdAt);
+
+    sorted.forEach(proj => {
+        let voiceCount = (proj.voices || []).length;
+        let isActive = proj.id === currentProjectId;
+
+        html += `
+            <div class="project-item ${isActive ? 'active' : ''}"
+                 onclick="selectProject('${proj.id}')"
+                 style="
+                    padding: 12px 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    cursor: pointer;
+                    border-bottom: 1px solid #252525;
+                    transition: background 0.2s;
+                    ${isActive ? 'background: rgba(168, 85, 247, 0.1); border-left: 3px solid #a855f7;' : ''}
+                 "
+                 onmouseover="this.style.background='${isActive ? 'rgba(168, 85, 247, 0.15)' : '#252525'}'"
+                 onmouseout="this.style.background='${isActive ? 'rgba(168, 85, 247, 0.1)' : 'transparent'}'">
+
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                    <i class="bi bi-folder2${isActive ? '-open' : ''}" style="color: ${isActive ? '#a855f7' : '#666'}; font-size: 16px;"></i>
+                    <div style="min-width: 0; flex: 1;">
+                        <div style="font-weight: 500; color: #fff; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${proj.name}
+                        </div>
+                        <div style="font-size: 11px; color: #888;">
+                            ${voiceCount} voice${voiceCount !== 1 ? 's' : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 6px;">
+                    <button onclick="event.stopPropagation(); openProjectVoices('${proj.id}')"
+                            title="Xem voices"
+                            style="background: transparent; border: none; color: #888; cursor: pointer; padding: 4px;">
+                        <i class="bi bi-music-note-list"></i>
+                    </button>
+                    <button onclick="event.stopPropagation(); deleteProject('${proj.id}')"
+                            title="Xóa dự án"
+                            style="background: transparent; border: none; color: #888; cursor: pointer; padding: 4px;">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    $list.html(html);
+}
+
+// Mở modal tạo dự án mới
+function openNewProjectModal() {
+    $('#projectDropdown').hide();
+    $('#newProjectModal').css('display', 'flex').addClass('show');
+    $('#newProjectNameInput').val('').focus();
+}
+
+// Đóng modal tạo dự án
+function closeNewProjectModal() {
+    $('#newProjectModal').removeClass('show');
+    setTimeout(() => $('#newProjectModal').css('display', 'none'), 300);
+}
+
+// Tạo dự án mới
+function createNewProject() {
+    let name = $('#newProjectNameInput').val().trim();
+
+    if (!name) {
+        showToast('Vui lòng nhập tên dự án!');
+        $('#newProjectNameInput').focus();
+        return;
+    }
+
+    // Kiểm tra trùng tên
+    if (projectsData.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+        showToast('Tên dự án đã tồn tại!');
+        return;
+    }
+
+    let newProject = {
+        id: 'proj_' + Date.now(),
+        name: name,
+        createdAt: Date.now(),
+        voices: []
+    };
+
+    projectsData.push(newProject);
+    saveProjects();
+
+    // Tự động chọn dự án mới
+    selectProject(newProject.id);
+
+    closeNewProjectModal();
+    showToast('Đã tạo dự án: ' + name);
+}
+
+// Chọn dự án
+function selectProject(projectId) {
+    let proj = projectsData.find(p => p.id === projectId);
+
+    if (proj) {
+        currentProjectId = projectId;
+        localStorage.setItem('tts_current_project', projectId);
+
+        $('#currentProjectName').text(proj.name);
+        $('#projectDropdown').hide();
+        $('#projectDropdownIcon').removeClass('bi-chevron-up').addClass('bi-chevron-down');
+
+        renderProjectList();
+        showToast('Đã chọn dự án: ' + proj.name);
+    }
+}
+
+// Xóa dự án
+function deleteProject(projectId) {
+    let proj = projectsData.find(p => p.id === projectId);
+    if (!proj) return;
+
+    if (!confirm(`Bạn có chắc muốn xóa dự án "${proj.name}"?\nTất cả voice trong dự án sẽ bị xóa.`)) {
+        return;
+    }
+
+    projectsData = projectsData.filter(p => p.id !== projectId);
+    saveProjects();
+
+    // Nếu xóa dự án đang chọn
+    if (currentProjectId === projectId) {
+        currentProjectId = null;
+        localStorage.removeItem('tts_current_project');
+        $('#currentProjectName').text('Chưa có dự án');
+    }
+
+    renderProjectList();
+    showToast('Đã xóa dự án');
+}
+
+// Lưu voice vào dự án hiện tại
+function saveVoiceToProject(voiceData) {
+    if (!currentProjectId) {
+        console.log('⚠️ No project selected, voice not saved');
+        return;
+    }
+
+    let proj = projectsData.find(p => p.id === currentProjectId);
+    if (!proj) return;
+
+    // Kiểm tra trùng task_id
+    if (proj.voices.some(v => v.task_id === voiceData.task_id)) {
+        console.log('⚠️ Voice already exists in project');
+        return;
+    }
+
+    proj.voices.push({
+        task_id: voiceData.task_id || voiceData.id,
+        text: voiceData.text_input || voiceData.text || '',
+        provider: voiceData.provider || currentProvider,
+        voice_name: voiceData.voice_name || '',
+        audio_url: voiceData.audio_url || voiceData.url_audio || '',
+        srt_url: voiceData.url_srt || voiceData.srt_url || '',
+        created_at: voiceData.created_at || new Date().toISOString(),
+        credit_cost: voiceData.credit_cost || 0
+    });
+
+    saveProjects();
+    console.log('✅ Voice saved to project:', proj.name);
+}
+
+// Mở modal xem voices trong dự án
+function openProjectVoices(projectId) {
+    let proj = projectsData.find(p => p.id === projectId);
+    if (!proj) return;
+
+    $('#projectDropdown').hide();
+    $('#projectVoicesTitle').text(proj.name);
+    $('#projectVoicesCount').text(proj.voices.length + ' voice' + (proj.voices.length !== 1 ? 's' : ''));
+
+    renderProjectVoices(proj);
+    $('#projectVoicesModal').css('display', 'flex').addClass('show');
+}
+
+// Đóng modal voices
+function closeProjectVoicesModal() {
+    $('#projectVoicesModal').removeClass('show');
+    setTimeout(() => $('#projectVoicesModal').css('display', 'none'), 300);
+}
+
+// Render danh sách voices trong dự án
+function renderProjectVoices(proj) {
+    let $list = $('#projectVoicesList');
+
+    if (!proj.voices || proj.voices.length === 0) {
+        $list.html(`
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <i class="bi bi-music-note-list" style="font-size: 48px; display: block; margin-bottom: 12px;"></i>
+                Chưa có voice nào trong dự án này
+            </div>
+        `);
+        return;
+    }
+
+    // Sắp xếp theo thời gian mới nhất
+    let voices = [...proj.voices].sort((a, b) => {
+        let timeA = new Date(a.created_at).getTime() || 0;
+        let timeB = new Date(b.created_at).getTime() || 0;
+        return timeB - timeA;
+    });
+
+    let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+
+    voices.forEach((voice, index) => {
+        let providerLogo = getProviderLogo(voice.provider);
+        let textPreview = (voice.text || '').substring(0, 100) + (voice.text && voice.text.length > 100 ? '...' : '');
+
+        html += `
+            <div class="project-voice-card" style="
+                background: #111;
+                border: 1px solid #333;
+                border-radius: 10px;
+                padding: 14px;
+                transition: all 0.2s;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <img src="${providerLogo}" style="width: 18px; height: 18px; border-radius: 4px;">
+                        <span style="font-size: 12px; color: #888;">${voice.voice_name || 'Unknown'}</span>
+                    </div>
+                    <span style="font-size: 11px; color: #666;">${voice.created_at ? new Date(voice.created_at).toLocaleString('vi-VN') : ''}</span>
+                </div>
+
+                <p style="font-size: 13px; color: #ccc; margin: 0 0 12px 0; line-height: 1.5;">
+                    ${textPreview || '(Không có nội dung)'}
+                </p>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    ${voice.audio_url ? `
+                        <audio controls style="height: 32px; max-width: 300px;">
+                            <source src="${voice.audio_url}" type="audio/mpeg">
+                        </audio>
+                    ` : '<span style="color: #666; font-size: 12px;">Không có audio</span>'}
+
+                    <div style="display: flex; gap: 8px;">
+                        ${voice.audio_url ? `
+                            <a href="${voice.audio_url}" download
+                               style="background: #1f1f1f; border: 1px solid #444; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                                <i class="bi bi-download"></i> Audio
+                            </a>
+                        ` : ''}
+                        ${voice.srt_url ? `
+                            <a href="${voice.srt_url}" download
+                               style="background: #1f1f1f; border: 1px solid #444; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                                <i class="bi bi-file-text"></i> SRT
+                            </a>
+                        ` : ''}
+                        <button onclick="removeVoiceFromProject('${proj.id}', '${voice.task_id}')"
+                                style="background: transparent; border: 1px solid #444; color: #888; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    $list.html(html);
+}
+
+// Xóa voice khỏi dự án
+function removeVoiceFromProject(projectId, taskId) {
+    let proj = projectsData.find(p => p.id === projectId);
+    if (!proj) return;
+
+    proj.voices = proj.voices.filter(v => v.task_id !== taskId);
+    saveProjects();
+
+    renderProjectVoices(proj);
+    $('#projectVoicesCount').text(proj.voices.length + ' voice' + (proj.voices.length !== 1 ? 's' : ''));
+    showToast('Đã xóa voice khỏi dự án');
+}
+
+// Tải tất cả voices trong dự án
+async function downloadAllProjectVoices() {
+    let proj = projectsData.find(p => p.id === currentProjectId);
+    if (!proj) {
+        // Lấy project từ modal nếu đang mở
+        let title = $('#projectVoicesTitle').text();
+        proj = projectsData.find(p => p.name === title);
+    }
+
+    if (!proj || !proj.voices || proj.voices.length === 0) {
+        showToast('Không có voice để tải');
+        return;
+    }
+
+    showToast('Đang chuẩn bị tải ' + proj.voices.length + ' voice...');
+
+    // Tải từng file
+    for (let voice of proj.voices) {
+        if (voice.audio_url) {
+            let filename = (voice.text || 'voice').substring(0, 30).replace(/[^a-zA-Z0-9\u00C0-\u1EF9]/g, '_') + '.mp3';
+
+            // Tạo link download
+            let a = document.createElement('a');
+            a.href = voice.audio_url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // Delay giữa các file
+            await new Promise(r => setTimeout(r, 500));
+        }
+    }
+
+    showToast('Đã bắt đầu tải ' + proj.voices.length + ' voice');
+}
+
+// ========================================================================
+// 🔥 HOOK: Tự động lưu voice khi TTS hoàn thành
+// ========================================================================
+
+// Override updateTaskStatus để hook vào khi task done
+let originalUpdateTaskStatus = typeof updateTaskStatus === 'function' ? updateTaskStatus : null;
+
+function hookTaskCompletion(taskId, status, data) {
+    // Lưu voice vào project khi task hoàn thành
+    if (status === 'done' && data) {
+        saveVoiceToProject({
+            task_id: taskId,
+            text_input: data.text_input || data.text,
+            provider: data.provider,
+            voice_name: data.voice_name,
+            audio_url: data.audio_url || data.url_audio,
+            url_srt: data.url_srt || data.srt_url,
+            created_at: data.created_at,
+            credit_cost: data.credit_cost
+        });
+    }
+}
+
+// Đảm bảo hook được gọi khi có task hoàn thành
+$(document).on('tts:taskDone', function(e, taskId, data) {
+    hookTaskCompletion(taskId, 'done', data);
+});

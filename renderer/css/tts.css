@@ -5527,8 +5527,63 @@ input.vm-search-input:focus,
         font-size: 11px;
         padding: 6px 8px;
     }
-    
+
     .hc-time, .hc-cost {
         font-size: 10px;
     }
+}
+
+/* ==========================================
+   🗂️ PROJECT MANAGEMENT STYLES
+   ========================================== */
+
+/* Project Selector Button Hover */
+#projectSelectorBtn:hover {
+    background: #252525 !important;
+    border-color: #444 !important;
+}
+
+/* Project Modal Box Animation */
+.project-modal-box,
+.project-voices-modal-box {
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-modal-overlay.show .project-modal-box,
+.custom-modal-overlay.show .project-voices-modal-box {
+    transform: scale(1);
+}
+
+/* Project Item Hover Animation */
+.project-item:hover i.bi-trash,
+.project-item:hover i.bi-music-note-list {
+    color: #fff !important;
+}
+
+/* Project Voice Card Hover */
+.project-voice-card:hover {
+    border-color: #444 !important;
+    background: #161616 !important;
+}
+
+/* Audio Player Styling in Project Modal */
+.project-voice-card audio {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+.project-voice-card audio::-webkit-media-controls-panel {
+    background: #1a1a1a;
+}
+
+/* Download All Button Hover */
+#btnDownloadAllVoices:hover {
+    background: #2a2a2a !important;
+    border-color: #555 !important;
+}
+
+/* New Project Input Focus */
+#newProjectNameInput:focus {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
 }
