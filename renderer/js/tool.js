@@ -745,13 +745,11 @@ class ProToolManager {
         
         const optSilentChar = document.getElementById('optSilentChar')?.checked;
         const optRemoveSpecial = document.getElementById('optRemoveSpecial')?.checked;
-        const threadCount = parseInt(document.getElementById('threadCount')?.value) || 3;
         
-        // Process tasks with thread pool
+        // Process tasks sequentially to avoid rate limit
         const processQueue = [...pendingTasks];
-        const activeThreads = [];
         
-        const processTask = async (task) => {
+        const processTask = async (task, retryCount = 0) => {
             console.log('🔄 Processing task:', task.id, task.content?.substring(0, 50));
             task.status = 'processing';
             this.updateTaskDisplay();
@@ -793,9 +791,27 @@ class ProToolManager {
                     await this.pollTaskStatus(task);
                     console.log('✅ Task final status:', task.status);
                 } else {
-                    task.status = 'failed';
-                    task.error = result.error || 'Unknown error';
-                    console.error('❌ Task failed:', task.error);
+                    // Check for rate limit error
+                    const isRateLimit = result.error?.includes('giới hạn') || 
+                                       result.error?.includes('rate limit') ||
+                                       result.error?.includes('10 yêu cầu');
+                    
+                    if (isRateLimit && retryCount < 3) {
+                        const waitTime = 60 + (retryCount * 10); // 60s, 70s, 80s
+                        console.log(`⏳ Rate limit hit! Waiting ${waitTime}s before retry... (attempt ${retryCount + 1}/3)`);
+                        task.error = `Đợi ${waitTime}s (rate limit)...`;
+                        this.updateTaskDisplay();
+                        
+                        await new Promise(r => setTimeout(r, waitTime * 1000));
+                        
+                        if (this.isProcessing) {
+                            return processTask(task, retryCount + 1);
+                        }
+                    } else {
+                        task.status = 'failed';
+                        task.error = result.error || 'Unknown error';
+                        console.error('❌ Task failed:', task.error);
+                    }
                 }
             } catch (error) {
                 console.error('❌ Task exception:', error);
@@ -806,23 +822,26 @@ class ProToolManager {
             this.updateTaskDisplay();
         };
         
-        // Process with limited concurrency
-        while (processQueue.length > 0 && this.isProcessing) {
-            while (activeThreads.length < threadCount && processQueue.length > 0) {
-                const task = processQueue.shift();
-                const thread = processTask(task).then(() => {
-                    const idx = activeThreads.indexOf(thread);
-                    if (idx > -1) activeThreads.splice(idx, 1);
-                });
-                activeThreads.push(thread);
-            }
-            
-            await Promise.race(activeThreads.length > 0 ? activeThreads : [Promise.resolve()]);
-            await new Promise(r => setTimeout(r, 100));
-        }
+        // Process sequentially with delay to avoid rate limit (10 req/min)
+        // Delay giữa mỗi request = 7 giây để an toàn
+        const REQUEST_DELAY = 7000;
         
-        // Wait for all remaining threads
-        await Promise.all(activeThreads);
+        console.log(`📊 Processing ${processQueue.length} tasks with ${REQUEST_DELAY/1000}s delay between requests`);
+        
+        for (let i = 0; i < processQueue.length && this.isProcessing; i++) {
+            const task = processQueue[i];
+            
+            // Hiển thị progress
+            document.getElementById('statusText').textContent = `Đang xử lý ${i + 1}/${processQueue.length}...`;
+            
+            await processTask(task);
+            
+            // Delay trước task tiếp theo (trừ task cuối)
+            if (i < processQueue.length - 1 && this.isProcessing) {
+                console.log(`⏱️ Waiting ${REQUEST_DELAY/1000}s before next request...`);
+                await new Promise(r => setTimeout(r, REQUEST_DELAY));
+            }
+        }
         
         this.finishProcessing();
     }
