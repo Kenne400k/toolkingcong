@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="dark" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Voice Library - KingCong</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #a855f7;
+            --bg-main: #0a0a0a;
+            --bg-secondary: #121212;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text-dim: #888;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 i { color: var(--primary); }
+
+        .info-box {
+            background: #111;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+
+        .info-box code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #fff;
+        }
+
+        .voice-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #0a0a0a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .voice-table th {
+            background: #111;
+            text-align: left;
+            padding: 12px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .voice-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .voice-table tr:hover td { background: #0f0f0f; }
+
+        .voice-table input {
+            width: 100%;
+            padding: 8px 10px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .voice-table input:focus { border-color: #333; }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid #1a1a1a;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .btn:hover { background: #111; border-color: #333; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: #fff; color: #000; border: none; }
+        .btn-primary:hover { background: #e5e5e5; }
+        .btn-danger { color: #f55; }
+        .btn-danger:hover { background: rgba(255, 85, 85, 0.1); border-color: #f55; }
+        .btn-sm { padding: 6px 10px; font-size: 11px; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .actions-left { display: flex; gap: 8px; }
+        .actions-right { margin-left: auto; display: flex; gap: 8px; }
+
+        .table-container {
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1><i class="bi bi-collection"></i> Voice Library</h1>
+        <span style="font-size: 12px; color: #555;">Quản lý giọng nói cho hội thoại đa người</span>
+    </div>
+
+    <div class="info-box">
+        <strong>Hướng dẫn:</strong> Thêm các Voice ID vào thư viện để sử dụng cho hội thoại nhiều người.<br>
+        Sử dụng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu mỗi dòng text để chỉ định giọng tương ứng.
+    </div>
+
+    <div class="table-container">
+        <table class="voice-table" id="voiceTable">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">ID</th>
+                    <th>Voice ID (ElevenLabs)</th>
+                    <th>Tên hiển thị</th>
+                    <th style="width: 60px;"></th>
+                </tr>
+            </thead>
+            <tbody id="voiceTableBody">
+                <!-- Rows will be added dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <div class="actions-left">
+            <button class="btn" onclick="addVoiceRow()">
+                <i class="bi bi-plus"></i> Thêm Voice
+            </button>
+            <button class="btn btn-danger" onclick="clearAll()">
+                <i class="bi bi-trash"></i> Xóa tất cả
+            </button>
+        </div>
+        <div class="actions-right">
+            <button class="btn" onclick="window.close()">Hủy</button>
+            <button class="btn btn-primary" onclick="saveAndClose()">
+                <i class="bi bi-check"></i> Lưu
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let voices = [];
+
+        // Load voices from localStorage on init
+        function init() {
+            const saved = localStorage.getItem('voiceLibrary');
+            if (saved) {
+                try {
+                    voices = JSON.parse(saved);
+                } catch(e) {
+                    voices = [];
+                }
+            }
+
+            // Ensure at least one empty row
+            if (voices.length === 0) {
+                voices = [{ id: 1, voiceId: '', name: '' }];
+            }
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('voiceTableBody');
+            tbody.innerHTML = voices.map((voice, index) => `
+                <tr data-index="${index}">
+                    <td style="color: #666; text-align: center;">${index + 1}</td>
+                    <td>
+                        <input type="text"
+                               value="${escapeHtml(voice.voiceId || '')}"
+                               placeholder="Voice ID..."
+                               onchange="updateVoice(${index}, 'voiceId', this.value)">
+                    </td>
+                    <td>
+                        <input type="text"
+                               value="${escapeHtml(voice.name || '')}"
+                               placeholder="Tên hiển thị..."
+                               onchange="updateVoice(${index}, 'name', this.value)">
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-sm btn-danger" onclick="removeVoice(${index})" title="Xóa">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function addVoiceRow() {
+            voices.push({ id: voices.length + 1, voiceId: '', name: '' });
+            renderTable();
+
+            // Focus on the new row's first input
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('#voiceTableBody tr:last-child input');
+                if (inputs[0]) inputs[0].focus();
+            }, 50);
+        }
+
+        function updateVoice(index, field, value) {
+            if (voices[index]) {
+                voices[index][field] = value;
+            }
+        }
+
+        function removeVoice(index) {
+            if (voices.length <= 1) {
+                voices = [{ id: 1, voiceId: '', name: '' }];
+            } else {
+                voices.splice(index, 1);
+            }
+            renderTable();
+        }
+
+        function clearAll() {
+            if (confirm('Xóa tất cả voices trong thư viện?')) {
+                voices = [{ id: 1, voiceId: '', name: '' }];
+                renderTable();
+            }
+        }
+
+        function saveAndClose() {
+            // Filter out empty rows
+            const validVoices = voices.filter(v => v.voiceId && v.voiceId.trim());
+
+            // Save to localStorage
+            localStorage.setItem('voiceLibrary', JSON.stringify(validVoices));
+
+            // Notify parent window
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({ type: 'voiceLibraryUpdated', voices: validVoices }, '*');
+            }
+
+            // Also use IPC if available
+            if (window.electronAPI) {
+                window.electronAPI.sendVoiceLibrary(validVoices);
+            }
+
+            window.close();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>

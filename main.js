@@ -445,12 +445,19 @@ function loadSession() {
 // Open output folder
 ipcMain.handle('open-output-folder', async () => {
   const outputPath = path.join(__dirname, 'output');
-  
-  // Create output folder if not exists
+
+  // Create output folder and subfolders if not exist
+  const subfolders = ['11labs', 'Minimax', 'Join', 'Backup'];
   if (!fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath, { recursive: true });
   }
-  
+  subfolders.forEach(folder => {
+    const subPath = path.join(outputPath, folder);
+    if (!fs.existsSync(subPath)) {
+      fs.mkdirSync(subPath, { recursive: true });
+    }
+  });
+
   shell.openPath(outputPath);
   return { success: true, path: outputPath };
 });
@@ -573,50 +580,147 @@ ipcMain.handle('download-file', async (event, { url, fileName, subfolder }) => {
 ipcMain.handle('load-tool-page', async () => {
   mainWindow.loadFile('renderer/tool.html');
   const session = loadSession();
-  
+
   mainWindow.webContents.once('did-finish-load', () => {
     mainWindow.webContents.executeJavaScript(`
       window.__SESSION__ = ${JSON.stringify(session)};
     `);
   });
-  
+
+  return { success: true };
+});
+
+// Open Voice Library window
+let voiceLibraryWindow = null;
+
+ipcMain.handle('open-voice-library', async () => {
+  // If window already exists, focus it
+  if (voiceLibraryWindow && !voiceLibraryWindow.isDestroyed()) {
+    voiceLibraryWindow.focus();
+    return { success: true };
+  }
+
+  voiceLibraryWindow = new BrowserWindow({
+    width: 600,
+    height: 500,
+    title: 'Voice Library',
+    parent: mainWindow,
+    modal: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    },
+    backgroundColor: '#0a0a0a'
+  });
+
+  voiceLibraryWindow.loadFile('renderer/voice-library.html');
+
+  voiceLibraryWindow.on('closed', () => {
+    voiceLibraryWindow = null;
+  });
+
+  return { success: true };
+});
+
+// Receive voice library data from window
+ipcMain.handle('save-voice-library', async (event, voices) => {
+  // Send to main window
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('voice-library-updated', voices);
+  }
   return { success: true };
 });
 
 // Join audio files locally (using ffmpeg if available)
-ipcMain.handle('join-audio-local', async (event, { files, delay, outputName }) => {
+ipcMain.handle('join-audio-local', async (event, { files, delay, outputName, createSrt, taskData }) => {
   const { exec } = require('child_process');
   const util = require('util');
   const execPromise = util.promisify(exec);
-  
-  const outputDir = path.join(__dirname, 'output');
-  
+
+  // Save to Join subfolder
+  const outputDir = path.join(__dirname, 'output', 'Join');
+
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
-  
+
   try {
-    // Create file list for ffmpeg
+    // Create silent audio file if delay > 0
+    let silentFilePath = null;
+    if (delay && delay > 0) {
+      silentFilePath = path.join(outputDir, `silent_${delay}s.mp3`);
+      if (!fs.existsSync(silentFilePath)) {
+        try {
+          // Generate silent audio using ffmpeg
+          const silentCmd = `ffmpeg -f lavfi -i anullsrc=r=44100:cl=stereo -t ${delay} -q:a 9 -acodec libmp3lame "${silentFilePath}" -y`;
+          await execPromise(silentCmd);
+          console.log(`✅ Created silent file: ${silentFilePath}`);
+        } catch (e) {
+          console.warn('Could not create silent file:', e.message);
+          silentFilePath = null;
+        }
+      }
+    }
+
+    // Create file list for ffmpeg with delay between files
     const fileListPath = path.join(outputDir, `${outputName}_filelist.txt`);
-    const fileListContent = files.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n');
-    fs.writeFileSync(fileListPath, fileListContent);
-    
+    let fileListLines = [];
+
+    files.forEach((f, index) => {
+      fileListLines.push(`file '${f.replace(/'/g, "'\\''")}'`);
+      // Add silent audio between files (not after last file)
+      if (silentFilePath && index < files.length - 1) {
+        fileListLines.push(`file '${silentFilePath.replace(/'/g, "'\\''")}'`);
+      }
+    });
+
+    fs.writeFileSync(fileListPath, fileListLines.join('\n'));
+    console.log('📝 File list created:', fileListPath);
+
     const outputPath = path.join(outputDir, `${outputName}.mp3`);
-    
+
     // Try using ffmpeg
     try {
       const ffmpegCmd = `ffmpeg -f concat -safe 0 -i "${fileListPath}" -c copy "${outputPath}" -y`;
       await execPromise(ffmpegCmd);
-      
-      return { 
-        success: true, 
+      console.log(`✅ Joined to: ${outputPath}`);
+
+      // Create SRT file if requested
+      let srtPath = null;
+      if (createSrt && taskData && taskData.length > 0) {
+        srtPath = path.join(outputDir, `${outputName}.srt`);
+        let srtContent = '';
+        let currentTime = 0;
+
+        taskData.forEach((task, index) => {
+          const duration = task.duration || 3; // Default 3 seconds if no duration
+          const startTime = formatSrtTime(currentTime);
+          currentTime += duration;
+          if (delay && delay > 0 && index < taskData.length - 1) {
+            currentTime += delay;
+          }
+          const endTime = formatSrtTime(currentTime);
+
+          srtContent += `${index + 1}\n`;
+          srtContent += `${startTime} --> ${endTime}\n`;
+          srtContent += `${task.content || task.text || ''}\n\n`;
+        });
+
+        fs.writeFileSync(srtPath, srtContent, 'utf8');
+        console.log(`✅ SRT created: ${srtPath}`);
+      }
+
+      return {
+        success: true,
         filePath: outputPath,
+        srtPath,
         message: `Joined ${files.length} files successfully`
       };
     } catch (ffmpegError) {
       console.warn('ffmpeg not available or failed:', ffmpegError.message);
-      
-      // Create file list anyway for manual use
+
       return {
         success: false,
         fileListPath,
@@ -628,6 +732,15 @@ ipcMain.handle('join-audio-local', async (event, { files, delay, outputName }) =
     return { success: false, error: error.message };
   }
 });
+
+// Helper function to format time for SRT
+function formatSrtTime(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 1000);
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(ms).padStart(3, '0')}`;
+}
 
 // =================== APP LIFECYCLE ===================
 app.whenReady().then(() => {

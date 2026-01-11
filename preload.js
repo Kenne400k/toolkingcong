@@ -41,5 +41,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
   saveFile: (options) => ipcRenderer.invoke('save-file', options),
   downloadFile: (options) => ipcRenderer.invoke('download-file', options),
-  joinAudioLocal: (options) => ipcRenderer.invoke('join-audio-local', options)
+  joinAudioLocal: (options) => ipcRenderer.invoke('join-audio-local', options),
+
+  // 🔥 Voice Library
+  openVoiceLibrary: () => ipcRenderer.invoke('open-voice-library'),
+  sendVoiceLibrary: (voices) => ipcRenderer.invoke('save-voice-library', voices),
+  onVoiceLibraryUpdated: (callback) => ipcRenderer.on('voice-library-updated', (event, voices) => callback(voices))
 });

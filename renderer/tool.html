@@ -728,7 +728,12 @@
                     
                     <!-- Voice Settings -->
                     <div class="tool-section">
-                        <div class="section-title">Voice Settings</div>
+                        <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Voice Settings</span>
+                            <button class="btn btn-sm" onclick="resetVoiceSettings()" title="Reset về mặc định">
+                                <i class="bi bi-arrow-counterclockwise"></i> Reset
+                            </button>
+                        </div>
                         <div class="slider-group">
                             <div class="slider-header">
                                 <span>Speed</span>
@@ -758,71 +763,98 @@
                             <input type="range" id="voiceStyle" min="0" max="1" step="0.05" value="0" oninput="updateSlider('style')">
                         </div>
                         <label class="checkbox-row">
-                            <input type="checkbox" id="speakerBoost">
+                            <input type="checkbox" id="speakerBoost" checked>
                             Speaker Boost
                         </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="optAutoSRT">
+                            <span>Auto SRT</span>
+                            <i class="bi bi-info-circle info-tip" data-tip="Tự động tạo file phụ đề .srt"></i>
+                        </label>
+
+                        <!-- Advanced Settings Toggle -->
+                        <button class="btn btn-sm" style="width: 100%; margin-top: 8px;" onclick="toggleAdvancedSettings()">
+                            <i class="bi bi-gear"></i> Advanced Settings
+                            <i class="bi bi-chevron-down" id="advSettingsIcon"></i>
+                        </button>
+
+                        <!-- Advanced Settings Panel (hidden by default) -->
+                        <div id="advancedSettingsPanel" style="display: none; margin-top: 10px; padding: 10px; background: #0a0a0a; border-radius: 6px; border: 1px solid #1a1a1a;">
+                            <!-- Delay between segments -->
+                            <div style="margin-bottom: 10px;">
+                                <label class="checkbox-row" style="padding: 6px 0;">
+                                    <input type="checkbox" id="optDelayJoin">
+                                    <span>Delay between segments</span>
+                                </label>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-left: 24px;">
+                                    <input type="number" class="form-input" id="delayJoinTime" value="0.5" step="0.1" min="0" max="10" style="width: 70px; padding: 4px 6px; font-size: 11px;">
+                                    <span style="font-size: 11px; color: #666;">(s) khi ghép file</span>
+                                </div>
+                            </div>
+
+                            <!-- Silent by Character -->
+                            <div style="border: 1px solid #1a1a1a; border-radius: 6px; padding: 10px;">
+                                <label class="checkbox-row" style="padding: 4px 0; margin-bottom: 8px;">
+                                    <input type="checkbox" id="optSilentChar">
+                                    <span>Silent by Character</span>
+                                </label>
+                                <!-- Row 1: ,; -> 0.3s -->
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-left: 24px;">
+                                    <span style="font-size: 11px; color: #888; width: 60px;">Ký tự:</span>
+                                    <input type="text" class="form-input" id="silentChars1" value=",;" style="width: 50px; padding: 4px 6px; font-size: 11px;">
+                                    <span style="font-size: 11px; color: #888;">→</span>
+                                    <input type="number" class="form-input" id="silentTime1" value="0.3" step="0.1" min="0" max="5" style="width: 55px; padding: 4px 6px; font-size: 11px;">
+                                    <span style="font-size: 11px; color: #666;">(s)</span>
+                                </div>
+                                <!-- Row 2: .:?! -> 0.5s -->
+                                <div style="display: flex; align-items: center; gap: 6px; margin-left: 24px;">
+                                    <span style="font-size: 11px; color: #888; width: 60px;">Ký tự:</span>
+                                    <input type="text" class="form-input" id="silentChars2" value=".:?!" style="width: 50px; padding: 4px 6px; font-size: 11px;">
+                                    <span style="font-size: 11px; color: #888;">→</span>
+                                    <input type="number" class="form-input" id="silentTime2" value="0.5" step="0.1" min="0" max="5" style="width: 55px; padding: 4px 6px; font-size: 11px;">
+                                    <span style="font-size: 11px; color: #666;">(s)</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
+
                     <!-- Options -->
                     <div class="tool-section">
                         <div class="section-title">Options</div>
                         <div class="checkbox-list">
-                            <label class="checkbox-row">
-                                <input type="checkbox" id="optLoop">
-                                <span>Loop</span>
-                                <i class="bi bi-info-circle info-tip" data-tip="Chia văn bản thành đoạn nhỏ (10.000 ký tự)"></i>
-                            </label>
-                            <label class="checkbox-row">
-                                <input type="checkbox" id="optAutoSplit">
-                                <span>Auto Split</span>
-                                <i class="bi bi-info-circle info-tip" data-tip="Chia theo dấu câu: 。、,:.!?"></i>
-                            </label>
+                            <!-- Split by Characters + Max Chars cùng hàng -->
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
+                                <label class="checkbox-row" style="padding: 0; flex-shrink: 0; margin: 0;">
+                                    <input type="checkbox" id="optLoop">
+                                    <span>Split by Characters</span>
+                                </label>
+                                <input type="number" class="form-input" id="maxChars" value="10000" style="width: 80px; padding: 6px 8px; font-size: 12px;">
+                            </div>
+                            <!-- Auto Split với input ký tự -->
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
+                                <label class="checkbox-row" style="padding: 0; flex-shrink: 0; margin: 0;">
+                                    <input type="checkbox" id="optAutoSplit">
+                                    <span>Auto Split</span>
+                                </label>
+                                <input type="text" class="form-input" id="autoSplitChars" value="。、,:.!?" style="flex: 1; padding: 6px 8px; font-size: 12px;" placeholder="Ký tự tách...">
+                            </div>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="opt1Line1File">
                                 <span>1 Line = 1 File</span>
                                 <i class="bi bi-info-circle info-tip" data-tip="Mỗi dòng = 1 file audio riêng"></i>
                             </label>
-                            <label class="checkbox-row">
-                                <input type="checkbox" id="optSilentChar">
-                                <span>Silent Char</span>
-                                <i class="bi bi-info-circle info-tip" data-tip=",; → 0.3s pause | .:?! → 0.5s pause"></i>
-                            </label>
-                            <label class="checkbox-row">
-                                <input type="checkbox" id="optRemoveSpecial">
-                                <span>Remove Special</span>
-                                <i class="bi bi-info-circle info-tip" data-tip="Xóa: @#$%^&*=+|\~`[]{}"></i>
-                            </label>
-                            <label class="checkbox-row">
-                                <input type="checkbox" id="optAutoSRT">
-                                <span>Auto SRT</span>
-                                <i class="bi bi-info-circle info-tip" data-tip="Tự động tạo file phụ đề .srt"></i>
-                            </label>
                         </div>
                     </div>
-                    
+
                     <!-- Advanced -->
                     <div class="tool-section">
                         <div class="section-title">Advanced</div>
-                        <div class="form-group">
-                            <label class="form-label">Max chars</label>
-                            <input type="number" class="form-input" id="maxChars" value="10000">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Delay (s)</label>
-                            <input type="number" class="form-input" id="delayBetween" value="1" step="0.1">
-                        </div>
                         <div class="form-group">
                             <label class="form-label">Threads</label>
                             <input type="number" class="form-input" id="threadCount" value="3" min="1" max="20">
                         </div>
                     </div>
                     
-                    <!-- Actions -->
-                    <div class="tool-section" style="border-bottom: none;">
-                        <button class="btn btn-block" onclick="openBackup()">
-                            <i class="bi bi-clock-history"></i> Backup / History
-                        </button>
-                    </div>
                 </div>
                 
                 <!-- Tool Content -->
@@ -861,16 +893,16 @@
                         <div class="toolbar-divider"></div>
                         
                         <div class="toolbar-group">
-                            <button class="toolbar-btn has-tooltip" onclick="joinFiles()">
-                                <i class="bi bi-link"></i> Join
-                                <span class="tooltip">Nối MP3 với delay</span>
+                            <button class="toolbar-btn has-tooltip" onclick="joinMp3AndSrt()">
+                                <i class="bi bi-link"></i> Join Mp3 & SRT
+                                <span class="tooltip">Nối MP3 + tạo SRT</span>
                             </button>
-                            <button class="toolbar-btn has-tooltip" onclick="createSRT()">
-                                <i class="bi bi-badge-cc"></i> SRT
-                                <span class="tooltip">Tạo file phụ đề</span>
+                            <button class="toolbar-btn has-tooltip" onclick="openBackup()">
+                                <i class="bi bi-clock-history"></i> Backup
+                                <span class="tooltip">Lịch sử / Backup</span>
                             </button>
                         </div>
-                        
+
                         <div style="margin-left: auto; display: flex; gap: 4px;">
                             <button class="toolbar-btn has-tooltip" onclick="clearTasks()">
                                 <i class="bi bi-trash"></i>
@@ -893,8 +925,9 @@
                                 <tr>
                                     <th style="width: 36px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
                                     <th style="width: 40px;">#</th>
+                                    <th style="width: 100px;">Output Name</th>
                                     <th>Content</th>
-                                    <th style="width: 100px;">Voice</th>
+                                    <th style="width: 120px;">Voice ID</th>
                                     <th style="width: 80px;">Status</th>
                                     <th style="width: 70px;"></th>
                                 </tr>
