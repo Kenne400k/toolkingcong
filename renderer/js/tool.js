@@ -635,7 +635,7 @@ class ProToolManager {
         // Render tasks
         taskTableBody.innerHTML = this.tasks.map((task, index) => `
             <tr data-id="${task.id}">
-                <td><input type="checkbox" class="task-checkbox" data-id="${task.id}"></td>
+                <td><input type="checkbox" class="task-checkbox" data-id="${task.id}" onchange="proTool.onTaskCheckChange()"></td>
                 <td style="color: #444;">${index + 1}</td>
                 <td>
                     <div class="task-content">${this.escapeHtml(task.content.substring(0, 100))}</div>
@@ -647,13 +647,86 @@ class ProToolManager {
                 </td>
                 <td><span class="status ${task.status}">${this.getStatusText(task.status)}</span></td>
                 <td>
-                    ${task.resultUrl ? `<button class="btn btn-sm" onclick="proTool.downloadTask('${task.id}')"><i class="bi bi-download"></i></button>` : ''}
-                    <button class="btn btn-sm" onclick="proTool.removeTask('${task.id}')"><i class="bi bi-x"></i></button>
+                    ${task.resultUrl ? `<button class="btn btn-sm" onclick="proTool.downloadTask('${task.id}')" title="Tải xuống"><i class="bi bi-download"></i></button>` : ''}
+                    <button class="btn btn-sm" onclick="proTool.removeTask('${task.id}')" title="Xóa"><i class="bi bi-x"></i></button>
                 </td>
             </tr>
         `).join('');
         
         this.updateProgress();
+        this.updateSelectionActions();
+    }
+    
+    // Khi checkbox thay đổi
+    onTaskCheckChange() {
+        this.updateSelectionActions();
+    }
+    
+    // Lấy các tasks đã chọn
+    getSelectedTasks() {
+        const checkboxes = document.querySelectorAll('.task-checkbox:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
+        return this.tasks.filter(t => selectedIds.includes(t.id));
+    }
+    
+    // Update hiển thị action bar khi có selection
+    updateSelectionActions() {
+        const selectedTasks = this.getSelectedTasks();
+        const selectionBar = document.getElementById('selectionActions');
+        
+        if (!selectionBar) return;
+        
+        if (selectedTasks.length > 0) {
+            const doneCount = selectedTasks.filter(t => t.status === 'done' && t.resultUrl).length;
+            
+            selectionBar.innerHTML = `
+                <span style="color: #888; margin-right: 10px;">Đã chọn: ${selectedTasks.length}</span>
+                ${doneCount > 0 ? `
+                    <button class="btn btn-sm" onclick="proTool.downloadSelected()" title="Tải tất cả">
+                        <i class="bi bi-download"></i> Tải (${doneCount})
+                    </button>
+                ` : ''}
+                <button class="btn btn-sm" onclick="proTool.deleteSelected()" title="Xóa đã chọn">
+                    <i class="bi bi-trash"></i> Xóa
+                </button>
+            `;
+            selectionBar.style.display = 'flex';
+        } else {
+            selectionBar.style.display = 'none';
+        }
+    }
+    
+    // Download tất cả tasks đã chọn
+    async downloadSelected() {
+        const selectedTasks = this.getSelectedTasks();
+        const doneTasks = selectedTasks.filter(t => t.status === 'done' && t.resultUrl);
+        
+        if (doneTasks.length === 0) {
+            this.showNotification('Không có file hoàn thành để tải!', 'warning');
+            return;
+        }
+        
+        this.showNotification(`Đang tải ${doneTasks.length} file...`, 'info');
+        
+        for (const task of doneTasks) {
+            await this.downloadFromUrl(task.resultUrl, (task.fileName || 'audio') + '.mp3');
+            await new Promise(r => setTimeout(r, 500)); // Delay giữa các file
+        }
+        
+        this.showNotification(`Đã tải ${doneTasks.length} file!`, 'success');
+    }
+    
+    // Xóa tất cả tasks đã chọn
+    deleteSelected() {
+        const selectedTasks = this.getSelectedTasks();
+        if (selectedTasks.length === 0) return;
+        
+        if (confirm(`Xóa ${selectedTasks.length} tasks đã chọn?`)) {
+            const selectedIds = selectedTasks.map(t => t.id);
+            this.tasks = this.tasks.filter(t => !selectedIds.includes(t.id));
+            this.updateTaskDisplay();
+            this.showNotification(`Đã xóa ${selectedTasks.length} tasks`, 'success');
+        }
     }
     
     getStatusIcon(status) {
@@ -1440,6 +1513,7 @@ function toggleSelectAll() {
     const selectAll = document.getElementById('selectAll');
     const checkboxes = document.querySelectorAll('.task-checkbox');
     checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    proTool.updateSelectionActions();
 }
 
 function startProcessing() {

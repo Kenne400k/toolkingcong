@@ -267,6 +267,10 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
     form.append('user_id', sessionData.user_id);
     form.append('username', sessionData.username);
     
+    // 🔥 Thêm source để backend biết request từ Electron Tool
+    // Backend check: if ($_POST['source'] === 'electron-tool') → rate limit 20/min
+    form.append('source', 'electron-tool');
+    
     // Thêm data tùy chỉnh
     if (requestData) {
       Object.keys(requestData).forEach(key => {
@@ -301,6 +305,11 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
     if (cookieHeader) {
       headers['Cookie'] = cookieHeader;
     }
+    
+    // 🔥 Thêm header để backend biết đây là request từ Electron Tool
+    // Backend có thể check header này để áp dụng rate limit 20/min thay vì 10/min
+    headers['X-Client'] = 'kingcong-electron-tool';
+    headers['X-Tool-Version'] = '1.0.0';
 
     console.log(`📡 API Request: ${API_ENDPOINT}`);
 
