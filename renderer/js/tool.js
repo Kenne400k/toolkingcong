@@ -1017,6 +1017,10 @@ class ProToolManager {
                     task.resultUrl = response.result_url || response.audio_url || response.url;
                     task.duration = response.duration || '-';
                     task.progress = 100;
+
+                    // Auto download to output folder
+                    await this.autoDownloadTask(task);
+
                     return;
                 } else if (taskStatus === 'failed' || taskStatus === 'error') {
                     console.log('❌ Task failed:', task.taskId, response.message);
@@ -1441,6 +1445,189 @@ class ProToolManager {
             console.error('Failed to open output folder:', error);
         }
     }
+
+    // ==================== AUTO DOWNLOAD ====================
+
+    async autoDownloadTask(task) {
+        if (!task.resultUrl) {
+            console.log('⚠️ No resultUrl for task:', task.id);
+            return;
+        }
+
+        try {
+            const projectName = document.getElementById('projectName')?.value?.trim() || 'default';
+            const fileName = `${task.fileName || task.id}.mp3`;
+
+            console.log(`📥 Auto downloading: ${fileName} to ${projectName}/`);
+
+            const result = await window.electronAPI.downloadFile({
+                url: task.resultUrl,
+                fileName: fileName,
+                subfolder: projectName
+            });
+
+            if (result && result.success) {
+                task.localPath = result.filePath;
+                console.log(`✅ Downloaded to: ${result.filePath}`);
+                this.showNotification(`Downloaded: ${fileName}`, 'success');
+            } else {
+                console.error('❌ Download failed:', result?.error);
+            }
+        } catch (error) {
+            console.error('❌ Auto download error:', error);
+        }
+    }
+
+    // ==================== PROJECT MANAGEMENT ====================
+
+    loadProjects() {
+        const saved = localStorage.getItem('proToolProjects');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return [];
+            }
+        }
+        return [];
+    }
+
+    saveProjectsToStorage(projects) {
+        localStorage.setItem('proToolProjects', JSON.stringify(projects));
+    }
+
+    generateProjectId() {
+        return `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    saveProject() {
+        const name = document.getElementById('projectName')?.value?.trim();
+
+        if (!name) {
+            this.showNotification('Vui lòng nhập tên dự án!', 'warning');
+            return;
+        }
+
+        const doneTasks = this.tasks.filter(t => t.status === 'done');
+
+        if (doneTasks.length === 0) {
+            this.showNotification('Không có task hoàn thành để lưu!', 'warning');
+            return;
+        }
+
+        const projects = this.loadProjects();
+
+        // Check if project with same name exists
+        const existingIndex = projects.findIndex(p => p.name === name);
+
+        const project = {
+            id: existingIndex >= 0 ? projects[existingIndex].id : this.generateProjectId(),
+            name: name,
+            createdAt: existingIndex >= 0 ? projects[existingIndex].createdAt : new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            tasks: doneTasks.map(t => ({
+                id: t.id,
+                fileName: t.fileName,
+                content: t.content?.substring(0, 200),
+                voiceId: t.voiceId,
+                voiceName: t.voiceName,
+                resultUrl: t.resultUrl,
+                localPath: t.localPath,
+                duration: t.duration,
+                status: t.status
+            }))
+        };
+
+        if (existingIndex >= 0) {
+            projects[existingIndex] = project;
+        } else {
+            projects.unshift(project);
+        }
+
+        this.saveProjectsToStorage(projects);
+        this.showNotification(`Đã lưu project "${name}" (${doneTasks.length} files)`, 'success');
+    }
+
+    loadProject(projectId) {
+        const projects = this.loadProjects();
+        const project = projects.find(p => p.id === projectId);
+
+        if (!project) {
+            this.showNotification('Không tìm thấy project!', 'error');
+            return;
+        }
+
+        // Set project name
+        document.getElementById('projectName').value = project.name;
+
+        // Load tasks
+        this.tasks = project.tasks.map(t => ({
+            ...t,
+            status: t.status || 'done'
+        }));
+
+        this.updateTaskDisplay();
+        this.closeProjectsModal();
+        this.showNotification(`Đã load project "${project.name}"`, 'success');
+    }
+
+    deleteProject(projectId) {
+        if (!confirm('Xóa project này?')) return;
+
+        const projects = this.loadProjects();
+        const filtered = projects.filter(p => p.id !== projectId);
+        this.saveProjectsToStorage(filtered);
+
+        this.renderProjectsModal();
+        this.showNotification('Đã xóa project', 'success');
+    }
+
+    openProjectsModal() {
+        document.getElementById('projectsModal').classList.add('show');
+        this.renderProjectsModal();
+    }
+
+    closeProjectsModal() {
+        document.getElementById('projectsModal').classList.remove('show');
+    }
+
+    renderProjectsModal() {
+        const modalBody = document.getElementById('projectsModalBody');
+        const projects = this.loadProjects();
+
+        if (projects.length === 0) {
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #555;">
+                    <i class="bi bi-folder2" style="font-size: 48px; opacity: 0.3;"></i>
+                    <p style="margin-top: 12px;">Chưa có project nào được lưu</p>
+                </div>
+            `;
+            return;
+        }
+
+        modalBody.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${projects.map(project => `
+                    <div style="display: flex; align-items: center; padding: 14px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 14px; font-weight: 500; color: #fff;">${this.escapeHtml(project.name)}</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                                ${project.tasks?.length || 0} files • ${new Date(project.updatedAt).toLocaleDateString('vi-VN')}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                            <button class="btn btn-sm" onclick="proTool.loadProject('${project.id}')" title="Load">
+                                <i class="bi bi-folder2-open"></i>
+                            </button>
+                            <button class="btn btn-sm" style="color: #f55;" onclick="proTool.deleteProject('${project.id}')" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
 }
 
 // ==================== GLOBAL FUNCTIONS ====================
@@ -1585,6 +1772,19 @@ function loadVoicesFromServer() {
 
 function closeVoicesModal() {
     proTool.closeVoicesModal();
+}
+
+// Project Management
+function saveProject() {
+    proTool.saveProject();
+}
+
+function openProjectsModal() {
+    proTool.openProjectsModal();
+}
+
+function closeProjectsModal() {
+    proTool.closeProjectsModal();
 }
 
 // Add CSS animation

@@ -662,6 +662,22 @@
                 <!-- Tool Sidebar -->
                 <div class="tool-sidebar">
                     
+                    <!-- Project -->
+                    <div class="tool-section">
+                        <div class="section-title">Project</div>
+                        <div class="form-group">
+                            <input type="text" class="form-input" id="projectName" placeholder="Tên dự án...">
+                        </div>
+                        <div class="btn-group" style="margin-top: 8px;">
+                            <button class="btn" onclick="saveProject()">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                            <button class="btn" onclick="openProjectsModal()">
+                                <i class="bi bi-folder2-open"></i> Open
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Provider -->
                     <div class="tool-section">
                         <div class="section-title">Provider</div>
@@ -967,9 +983,25 @@
         </div>
     </div>
     
+    <!-- Projects Modal -->
+    <div class="modal" id="projectsModal">
+        <div class="modal-box" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="bi bi-folder2"></i> Saved Projects</h3>
+                <button class="modal-close" onclick="closeProjectsModal()">×</button>
+            </div>
+            <div class="modal-body" id="projectsModalBody">
+                <div style="text-align: center; padding: 40px; color: #555;">No projects saved</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeProjectsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating tooltip -->
     <div id="floatingTip"></div>
-    
+
     <script src="js/api-handler.js"></script>
     <script src="js/shared-ui.js"></script>
     <script src="js/tool.js"></script>

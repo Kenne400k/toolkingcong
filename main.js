@@ -536,25 +536,35 @@ ipcMain.handle('save-file', async (event, { fileName, content, dir }) => {
   }
 });
 
-// Download file from URL
-ipcMain.handle('download-file', async (event, { url, fileName }) => {
+// Download file from URL (supports subfolder for project organization)
+ipcMain.handle('download-file', async (event, { url, fileName, subfolder }) => {
   const fetch = require('node-fetch');
-  
+
   try {
-    const outputDir = path.join(__dirname, 'output');
-    
+    // Build output directory path with optional subfolder
+    let outputDir = path.join(__dirname, 'output');
+
+    if (subfolder) {
+      // Sanitize subfolder name (remove invalid characters)
+      const safeFolderName = subfolder.replace(/[<>:"/\\|?*]/g, '_').trim();
+      outputDir = path.join(outputDir, safeFolderName);
+    }
+
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
-    
+
     const response = await fetch(url);
     const buffer = await response.buffer();
-    
+
     const filePath = path.join(outputDir, fileName);
     fs.writeFileSync(filePath, buffer);
-    
+
+    console.log(`✅ Downloaded: ${filePath}`);
+
     return { success: true, filePath };
   } catch (error) {
+    console.error('❌ Download error:', error);
     return { success: false, error: error.message };
   }
 });
