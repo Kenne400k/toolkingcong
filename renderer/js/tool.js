@@ -1595,7 +1595,28 @@ class ProToolManager {
     async refreshBackup() {
         await this.loadBackupHistory();
     }
-    
+
+    async deleteAllBackupTasks() {
+        try {
+            const response = await window.electronAPI.apiRequest(
+                'https://kingcongstudio.com/ajaxs/tts3.php',
+                {
+                    action: 'delete_all_tasks'
+                }
+            );
+
+            if (response.success || response.status === 'success') {
+                this.showNotification('Đã xóa tất cả tasks!', 'success');
+                await this.loadBackupHistory();
+            } else {
+                this.showNotification(response.message || 'Lỗi xóa tasks', 'error');
+            }
+        } catch (error) {
+            console.error('Delete all tasks error:', error);
+            this.showNotification('Lỗi xóa tasks: ' + error.message, 'error');
+        }
+    }
+
     // ==================== UTILITIES ====================
     
     async downloadTask(taskId) {
@@ -2182,15 +2203,15 @@ function openOutputFolder() {
 function selectProvider(provider) {
     proTool.provider = provider;
     document.getElementById('providerSelect').value = provider;
-    
+
     // Update dropdown UI
     const dropdown = document.getElementById('providerDropdown');
     dropdown.classList.remove('open');
-    
+
     // Update selected display - dùng đúng URL logo như TTS
     const providerImg = document.getElementById('providerImg');
     const providerName = document.getElementById('providerName');
-    
+
     if (provider === 'elevenlabs') {
         providerImg.src = 'https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99';
         providerName.textContent = 'ElevenLabs';
@@ -2198,7 +2219,7 @@ function selectProvider(provider) {
         providerImg.src = 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png';
         providerName.textContent = 'Minimax';
     }
-    
+
     // Update active state
     document.querySelectorAll('.provider-option').forEach(opt => {
         opt.classList.remove('active');
@@ -2206,7 +2227,13 @@ function selectProvider(provider) {
             opt.classList.add('active');
         }
     });
-    
+
+    // Show/hide Voice Clone button (only for Minimax)
+    const voiceCloneSection = document.getElementById('voiceCloneSection');
+    if (voiceCloneSection) {
+        voiceCloneSection.style.display = provider === 'minimax' ? 'block' : 'none';
+    }
+
     proTool.updateModelOptions();
 }
 
@@ -2229,6 +2256,181 @@ function openProjectsModal() {
 
 function closeProjectsModal() {
     proTool.closeProjectsModal();
+}
+
+// ==================== ADD TO LIBRARY ====================
+function addToLibrary() {
+    const voiceId = document.getElementById('selectedVoiceId')?.value?.trim();
+    const model = document.getElementById('modelSelect')?.value;
+    const provider = document.getElementById('providerSelect')?.value || 'elevenlabs';
+
+    // Pre-fill modal
+    document.getElementById('libVoiceId').value = voiceId || '';
+    document.getElementById('libVoiceName').value = '';
+    document.getElementById('libProvider').value = provider;
+    document.getElementById('libModel').value = model || '';
+    document.getElementById('libSpeed').value = document.getElementById('voiceSpeed')?.value || 1;
+    document.getElementById('libStability').value = document.getElementById('voiceStability')?.value || 0.5;
+    document.getElementById('libSimilarity').value = document.getElementById('voiceSimilarity')?.value || 0.75;
+    document.getElementById('libStyle').value = document.getElementById('voiceStyle')?.value || 0;
+
+    document.getElementById('addToLibraryModal').classList.add('show');
+}
+
+function closeAddToLibraryModal() {
+    document.getElementById('addToLibraryModal').classList.remove('show');
+}
+
+function saveToLibrary() {
+    const voiceId = document.getElementById('libVoiceId')?.value?.trim();
+    const voiceName = document.getElementById('libVoiceName')?.value?.trim();
+    const provider = document.getElementById('libProvider')?.value;
+    const model = document.getElementById('libModel')?.value;
+
+    if (!voiceId) {
+        proTool.showNotification('Vui lòng nhập Voice ID!', 'warning');
+        return;
+    }
+
+    const voiceData = {
+        id: Date.now(),
+        voiceId: voiceId,
+        name: voiceName || voiceId,
+        provider: provider,
+        model: model,
+        settings: {
+            speed: parseFloat(document.getElementById('libSpeed')?.value) || 1,
+            stability: parseFloat(document.getElementById('libStability')?.value) || 0.5,
+            similarity: parseFloat(document.getElementById('libSimilarity')?.value) || 0.75,
+            style: parseFloat(document.getElementById('libStyle')?.value) || 0
+        }
+    };
+
+    // Load existing library
+    let library = [];
+    try {
+        library = JSON.parse(localStorage.getItem('voiceLibraryAdvanced') || '[]');
+    } catch (e) {
+        library = [];
+    }
+
+    // Check if voiceId already exists
+    const existingIndex = library.findIndex(v => v.voiceId === voiceId && v.provider === provider);
+    if (existingIndex >= 0) {
+        library[existingIndex] = voiceData;
+    } else {
+        library.push(voiceData);
+    }
+
+    localStorage.setItem('voiceLibraryAdvanced', JSON.stringify(library));
+
+    closeAddToLibraryModal();
+    proTool.showNotification(`Đã lưu "${voiceName || voiceId}" vào thư viện!`, 'success');
+}
+
+// ==================== VOICE CLONE (MINIMAX) ====================
+let cloneAudioFilePath = null;
+
+function openVoiceCloneModal() {
+    cloneAudioFilePath = null;
+    document.getElementById('cloneVoiceName').value = '';
+    document.getElementById('cloneAudioPath').value = '';
+    document.getElementById('cloneStatus').style.display = 'none';
+    document.getElementById('btnStartClone').disabled = false;
+    document.getElementById('voiceCloneModal').classList.add('show');
+}
+
+function closeVoiceCloneModal() {
+    document.getElementById('voiceCloneModal').classList.remove('show');
+}
+
+async function selectCloneAudioFile() {
+    try {
+        const result = await window.electronAPI.selectAudioFiles();
+        if (result.success && result.filePaths && result.filePaths.length > 0) {
+            cloneAudioFilePath = result.filePaths[0];
+            document.getElementById('cloneAudioPath').value = cloneAudioFilePath;
+        }
+    } catch (error) {
+        console.error('Select audio file error:', error);
+        proTool.showNotification('Lỗi chọn file!', 'error');
+    }
+}
+
+async function startVoiceClone() {
+    const voiceName = document.getElementById('cloneVoiceName')?.value?.trim();
+    const language = document.getElementById('cloneLanguage')?.value;
+    const previewText = document.getElementById('clonePreviewText')?.value?.trim();
+
+    if (!voiceName) {
+        proTool.showNotification('Vui lòng nhập tên giọng nói!', 'warning');
+        return;
+    }
+
+    if (!cloneAudioFilePath) {
+        proTool.showNotification('Vui lòng chọn file audio!', 'warning');
+        return;
+    }
+
+    // Show status
+    document.getElementById('cloneStatus').style.display = 'block';
+    document.getElementById('cloneStatusText').textContent = 'Đang clone giọng nói...';
+    document.getElementById('btnStartClone').disabled = true;
+
+    try {
+        // Read audio file as base64
+        const audioData = await window.electronAPI.readFileAsBase64(cloneAudioFilePath);
+
+        if (!audioData || !audioData.success) {
+            throw new Error('Không thể đọc file audio');
+        }
+
+        // Call clone API
+        const response = await window.electronAPI.apiRequest(
+            'https://kingcongstudio.com/ajaxs/tts3.php',
+            {
+                action: 'clone_voice',
+                provider: 'minimax',
+                voice_name: voiceName,
+                language: language,
+                preview_text: previewText || 'Hello world',
+                audio_data: audioData.base64,
+                audio_filename: audioData.fileName
+            }
+        );
+
+        if (response.success || response.status === 'success') {
+            const clonedVoiceId = response.cloned_voice_id || response.voice_id;
+
+            document.getElementById('cloneStatusText').textContent = `Clone thành công! Voice ID: ${clonedVoiceId}`;
+
+            // Set voice ID to input
+            document.getElementById('selectedVoiceId').value = clonedVoiceId;
+
+            proTool.showNotification(`Clone thành công: ${voiceName}`, 'success');
+
+            setTimeout(() => {
+                closeVoiceCloneModal();
+            }, 2000);
+        } else {
+            throw new Error(response.message || 'Clone thất bại');
+        }
+    } catch (error) {
+        console.error('Voice clone error:', error);
+        document.getElementById('cloneStatusText').textContent = `Lỗi: ${error.message}`;
+        proTool.showNotification(`Lỗi clone: ${error.message}`, 'error');
+    } finally {
+        document.getElementById('btnStartClone').disabled = false;
+    }
+}
+
+// ==================== BACKUP FUNCTIONS ====================
+function deleteAllBackupTasks() {
+    if (!confirm('Xóa tất cả tasks trong backup? Hành động này không thể hoàn tác!')) {
+        return;
+    }
+
+    proTool.deleteAllBackupTasks();
 }
 
 // Add CSS animation

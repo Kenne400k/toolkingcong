@@ -529,6 +529,10 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
         }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
         
         /* =================== MODALS =================== */
         .modal {
@@ -704,6 +708,17 @@
                     <!-- Voice -->
                     <div class="tool-section">
                         <div class="section-title">Voice</div>
+                        <!-- Voice ID first -->
+                        <div class="form-group">
+                            <label class="form-label">Voice ID</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID..." style="flex: 1;">
+                                <button class="btn btn-sm" onclick="addToLibrary()" title="Add to Library">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Model second -->
                         <div class="form-group">
                             <label class="form-label">Model</label>
                             <select class="form-select" id="modelSelect">
@@ -712,16 +727,18 @@
                                 <option value="eleven_flash_v2">Flash V2</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Voice ID</label>
-                            <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID...">
-                        </div>
                         <div class="btn-group" style="margin-top: 8px;">
                             <button class="btn" onclick="openVoiceLibrary()">
                                 <i class="bi bi-collection"></i> Library
                             </button>
                             <button class="btn" onclick="loadVoicesFromServer()">
                                 <i class="bi bi-cloud-download"></i> Load
+                            </button>
+                        </div>
+                        <!-- Voice Clone button - only for Minimax -->
+                        <div id="voiceCloneSection" style="display: none; margin-top: 8px;">
+                            <button class="btn btn-block" onclick="openVoiceCloneModal()">
+                                <i class="bi bi-mic"></i> Voice Clone
                             </button>
                         </div>
                     </div>
@@ -1001,17 +1018,156 @@
     
     <!-- Backup Modal -->
     <div class="modal" id="backupModal">
-        <div class="modal-box" style="max-width: 800px;">
+        <div class="modal-box" style="max-width: 1000px; max-height: 85vh;">
             <div class="modal-header">
                 <h3><i class="bi bi-clock-history"></i> Backup / History</h3>
                 <button class="modal-close" onclick="closeBackup()">×</button>
             </div>
-            <div class="modal-body" id="backupBody">
+            <div class="modal-body" id="backupBody" style="padding: 0;">
                 <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
             </div>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" onclick="refreshBackup()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                    <button class="btn" onclick="deleteAllBackupTasks()" style="color: #f55;"><i class="bi bi-trash"></i> Delete All</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" onclick="openOutputFolder()"><i class="bi bi-folder2-open"></i> Open Folder</button>
+                    <button class="btn" onclick="closeBackup()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Clone Modal (Minimax only) -->
+    <div class="modal" id="voiceCloneModal">
+        <div class="modal-box" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="bi bi-mic"></i> Voice Clone (Minimax)</h3>
+                <button class="modal-close" onclick="closeVoiceCloneModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-text">
+                    Upload file audio (MP3, WAV) để clone giọng nói. File cần có giọng nói rõ ràng, ít tạp âm.
+                </div>
+
+                <!-- Voice Name -->
+                <div class="form-group">
+                    <label class="form-label">Voice Name</label>
+                    <input type="text" class="form-input" id="cloneVoiceName" placeholder="Tên giọng nói...">
+                </div>
+
+                <!-- Language -->
+                <div class="form-group">
+                    <label class="form-label">Language</label>
+                    <select class="form-select" id="cloneLanguage">
+                        <option value="Vietnamese">Vietnamese</option>
+                        <option value="English">English</option>
+                        <option value="Chinese (Mandarin)">Chinese (Mandarin)</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Korean">Korean</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Portuguese">Portuguese</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Thai">Thai</option>
+                        <option value="Indonesian">Indonesian</option>
+                        <option value="Arabic">Arabic</option>
+                    </select>
+                </div>
+
+                <!-- Audio File -->
+                <div class="form-group">
+                    <label class="form-label">Audio File</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" class="form-input" id="cloneAudioPath" placeholder="Chọn file audio..." readonly style="flex: 1;">
+                        <button class="btn" onclick="selectCloneAudioFile()">
+                            <i class="bi bi-folder2-open"></i> Browse
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Preview Text -->
+                <div class="form-group">
+                    <label class="form-label">Preview Text (để test sau khi clone)</label>
+                    <textarea class="form-input" id="clonePreviewText" rows="3" placeholder="Nhập text để preview giọng sau khi clone...">Xin chào, tôi rất vui được hỗ trợ bạn với các dịch vụ giọng nói của chúng tôi.</textarea>
+                </div>
+
+                <!-- Clone Status -->
+                <div id="cloneStatus" style="display: none; padding: 12px; background: #0a0a0a; border-radius: 6px; margin-top: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="spinner" style="width: 20px; height: 20px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <span id="cloneStatusText">Đang clone...</span>
+                    </div>
+                </div>
+            </div>
             <div class="modal-footer">
-                <button class="btn" onclick="refreshBackup()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-                <button class="btn" onclick="closeBackup()">Close</button>
+                <button class="btn" onclick="closeVoiceCloneModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="startVoiceClone()" id="btnStartClone">
+                    <i class="bi bi-mic"></i> Clone Voice
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to Library Modal -->
+    <div class="modal" id="addToLibraryModal">
+        <div class="modal-box" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="bi bi-plus-circle"></i> Add to Library</h3>
+                <button class="modal-close" onclick="closeAddToLibraryModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Voice ID</label>
+                    <input type="text" class="form-input" id="libVoiceId" placeholder="Voice ID...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Voice Name</label>
+                    <input type="text" class="form-input" id="libVoiceName" placeholder="Tên để nhận diện...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Provider</label>
+                    <select class="form-select" id="libProvider">
+                        <option value="elevenlabs">ElevenLabs</option>
+                        <option value="minimax">Minimax</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Model</label>
+                    <input type="text" class="form-input" id="libModel" placeholder="Model ID...">
+                </div>
+
+                <!-- Voice Settings -->
+                <div style="margin-top: 12px; padding: 12px; background: #0a0a0a; border-radius: 6px;">
+                    <div style="font-size: 11px; color: #666; margin-bottom: 10px;">VOICE SETTINGS</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div class="form-group" style="margin: 0;">
+                            <label class="form-label">Speed</label>
+                            <input type="number" class="form-input" id="libSpeed" value="1" step="0.1" min="0.5" max="2">
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label class="form-label">Stability</label>
+                            <input type="number" class="form-input" id="libStability" value="0.5" step="0.05" min="0" max="1">
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label class="form-label">Similarity</label>
+                            <input type="number" class="form-input" id="libSimilarity" value="0.75" step="0.05" min="0" max="1">
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label class="form-label">Style</label>
+                            <input type="number" class="form-input" id="libStyle" value="0" step="0.05" min="0" max="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAddToLibraryModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveToLibrary()">
+                    <i class="bi bi-save"></i> Save
+                </button>
             </div>
         </div>
     </div>

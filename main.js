@@ -525,6 +525,32 @@ ipcMain.handle('read-file', async (event, filePath) => {
   }
 });
 
+// Read file as Base64 (for Voice Clone)
+ipcMain.handle('read-file-base64', async (event, filePath) => {
+  try {
+    const buffer = fs.readFileSync(filePath);
+    const base64 = buffer.toString('base64');
+    const fileName = path.basename(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+
+    // Determine MIME type
+    let mimeType = 'audio/mpeg';
+    if (ext === '.wav') mimeType = 'audio/wav';
+    else if (ext === '.ogg') mimeType = 'audio/ogg';
+    else if (ext === '.m4a') mimeType = 'audio/m4a';
+
+    return {
+      success: true,
+      base64: `data:${mimeType};base64,${base64}`,
+      fileName: fileName,
+      filePath: filePath
+    };
+  } catch (error) {
+    console.error('Read file as base64 error:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 // Save file
 ipcMain.handle('save-file', async (event, { fileName, content, dir }) => {
   try {
