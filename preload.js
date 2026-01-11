@@ -47,5 +47,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 🔥 Voice Library
   openVoiceLibrary: () => ipcRenderer.invoke('open-voice-library'),
   sendVoiceLibrary: (voices) => ipcRenderer.invoke('save-voice-library', voices),
-  onVoiceLibraryUpdated: (callback) => ipcRenderer.on('voice-library-updated', (event, voices) => callback(voices))
+  onVoiceLibraryUpdated: (callback) => ipcRenderer.on('voice-library-updated', (event, voices) => callback(voices)),
+
+  // 🔥 Backup Window
+  openBackupWindow: () => ipcRenderer.invoke('open-backup-window'),
+
+  // 🔥 Voices Window
+  openVoicesWindow: (provider) => ipcRenderer.invoke('open-voices-window', provider),
+  selectVoiceFromWindow: (voiceId) => ipcRenderer.invoke('select-voice-from-window', voiceId),
+  onVoiceSelected: (callback) => ipcRenderer.on('voice-selected', (event, voiceId) => callback(voiceId)),
+
+  // 🔥 Cloned Voices Window
+  openClonedVoicesWindow: () => ipcRenderer.invoke('open-cloned-voices-window')
 });

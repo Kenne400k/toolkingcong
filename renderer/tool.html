@@ -737,9 +737,14 @@
                         </div>
                         <!-- Voice Clone button - only for Minimax -->
                         <div id="voiceCloneSection" style="display: none; margin-top: 8px;">
-                            <button class="btn btn-block" onclick="openVoiceCloneModal()">
-                                <i class="bi bi-mic"></i> Voice Clone
-                            </button>
+                            <div class="btn-group">
+                                <button class="btn" onclick="openVoiceCloneModal()">
+                                    <i class="bi bi-mic"></i> Clone
+                                </button>
+                                <button class="btn" onclick="openClonedVoicesModal()">
+                                    <i class="bi bi-collection-play"></i> My Clones
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -751,38 +756,68 @@
                                 <i class="bi bi-arrow-counterclockwise"></i> Reset
                             </button>
                         </div>
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <span>Speed</span>
-                                <span class="slider-value" id="speedValue">1.0</span>
+
+                        <!-- ElevenLabs Settings -->
+                        <div id="elevenlabsSettings">
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Speed</span>
+                                    <span class="slider-value" id="speedValue">1.0</span>
+                                </div>
+                                <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1" oninput="updateSlider('speed')">
                             </div>
-                            <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1" oninput="updateSlider('speed')">
-                        </div>
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <span>Stability</span>
-                                <span class="slider-value" id="stabilityValue">0.5</span>
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Stability</span>
+                                    <span class="slider-value" id="stabilityValue">0.5</span>
+                                </div>
+                                <input type="range" id="voiceStability" min="0" max="1" step="0.05" value="0.5" oninput="updateSlider('stability')">
                             </div>
-                            <input type="range" id="voiceStability" min="0" max="1" step="0.05" value="0.5" oninput="updateSlider('stability')">
-                        </div>
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <span>Similarity</span>
-                                <span class="slider-value" id="similarityValue">0.75</span>
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Similarity</span>
+                                    <span class="slider-value" id="similarityValue">0.75</span>
+                                </div>
+                                <input type="range" id="voiceSimilarity" min="0" max="1" step="0.05" value="0.75" oninput="updateSlider('similarity')">
                             </div>
-                            <input type="range" id="voiceSimilarity" min="0" max="1" step="0.05" value="0.75" oninput="updateSlider('similarity')">
-                        </div>
-                        <div class="slider-group">
-                            <div class="slider-header">
-                                <span>Style</span>
-                                <span class="slider-value" id="styleValue">0.0</span>
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Style</span>
+                                    <span class="slider-value" id="styleValue">0.0</span>
+                                </div>
+                                <input type="range" id="voiceStyle" min="0" max="1" step="0.05" value="0" oninput="updateSlider('style')">
                             </div>
-                            <input type="range" id="voiceStyle" min="0" max="1" step="0.05" value="0" oninput="updateSlider('style')">
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="speakerBoost" checked>
+                                Speaker Boost
+                            </label>
                         </div>
-                        <label class="checkbox-row">
-                            <input type="checkbox" id="speakerBoost" checked>
-                            Speaker Boost
-                        </label>
+
+                        <!-- Minimax Settings -->
+                        <div id="minimaxSettings" style="display: none;">
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Speed</span>
+                                    <span class="slider-value" id="mmSpeedValue">1.0</span>
+                                </div>
+                                <input type="range" id="mmVoiceSpeed" min="0.5" max="2" step="0.01" value="1" oninput="updateSlider('mmSpeed')">
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Pitch</span>
+                                    <span class="slider-value" id="mmPitchValue">0</span>
+                                </div>
+                                <input type="range" id="mmVoicePitch" min="-12" max="12" step="1" value="0" oninput="updateSlider('mmPitch')">
+                            </div>
+                            <div class="slider-group">
+                                <div class="slider-header">
+                                    <span>Volume</span>
+                                    <span class="slider-value" id="mmVolValue">1.0</span>
+                                </div>
+                                <input type="range" id="mmVoiceVol" min="0.01" max="10" step="0.01" value="1" oninput="updateSlider('mmVol')">
+                            </div>
+                        </div>
+
                         <label class="checkbox-row">
                             <input type="checkbox" id="optAutoSRT">
                             <span>Auto SRT</span>
@@ -800,11 +835,11 @@
                             <!-- Delay between segments -->
                             <div style="margin-bottom: 10px;">
                                 <label class="checkbox-row" style="padding: 6px 0;">
-                                    <input type="checkbox" id="optDelayJoin">
+                                    <input type="checkbox" id="optDelayJoin" checked>
                                     <span>Delay between segments</span>
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-left: 24px;">
-                                    <input type="number" class="form-input" id="delayJoinTime" value="0.5" step="0.1" min="0" max="10" style="width: 70px; padding: 4px 6px; font-size: 11px;">
+                                    <input type="number" class="form-input" id="delayJoinTime" value="1.0" step="0.1" min="0" max="10" style="width: 70px; padding: 4px 6px; font-size: 11px;">
                                     <span style="font-size: 11px; color: #666;">(s) khi ghép file</span>
                                 </div>
                             </div>
@@ -867,8 +902,8 @@
                     <div class="tool-section">
                         <div class="section-title">Advanced</div>
                         <div class="form-group">
-                            <label class="form-label">Threads</label>
-                            <input type="number" class="form-input" id="threadCount" value="3" min="1" max="20">
+                            <label class="form-label">Threads (1-10)</label>
+                            <input type="number" class="form-input" id="threadCount" value="3" min="1" max="10">
                         </div>
                     </div>
                     
@@ -1184,6 +1219,23 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeProjectsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloned Voices Modal (Minimax) -->
+    <div class="modal" id="clonedVoicesModal">
+        <div class="modal-box" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3><i class="bi bi-collection-play"></i> My Cloned Voices (Minimax)</h3>
+                <button class="modal-close" onclick="closeClonedVoicesModal()">×</button>
+            </div>
+            <div class="modal-body" id="clonedVoicesBody">
+                <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="openVoiceCloneModal()"><i class="bi bi-plus"></i> Clone New Voice</button>
+                <button class="btn" onclick="closeClonedVoicesModal()">Close</button>
             </div>
         </div>
     </div>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html class="dark" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Backup / History - KingCong</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #a855f7;
+            --bg-main: #0a0a0a;
+            --bg-secondary: #121212;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text-dim: #888;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 i { color: var(--primary); }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid #1a1a1a;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .btn:hover { background: #111; border-color: #333; }
+        .btn:active { transform: scale(0.98); }
+        .btn-danger { color: #f55; }
+        .btn-danger:hover { background: rgba(255, 85, 85, 0.1); border-color: #f55; }
+        .btn-sm { padding: 6px 10px; font-size: 11px; }
+
+        .table-container {
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #0a0a0a;
+        }
+
+        .task-table th {
+            background: #111;
+            text-align: left;
+            padding: 12px 14px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+
+        .task-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1a1a1a;
+            font-size: 12px;
+        }
+
+        .task-table tr:hover td { background: #0f0f0f; }
+
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .status.pending { background: #1a1a00; color: #aa0; }
+        .status.processing { background: #001a1a; color: #0aa; }
+        .status.done, .status.completed { background: #001a00; color: #0a0; }
+        .status.failed, .status.error { background: #1a0000; color: #a00; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: #555;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            opacity: 0.3;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #555;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #333;
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            justify-content: space-between;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1><i class="bi bi-clock-history"></i> Backup / History</h1>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn" onclick="loadHistory()">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container" id="tableContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading...
+        </div>
+    </div>
+
+    <div class="actions">
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-danger" onclick="deleteAllTasks()">
+                <i class="bi bi-trash"></i> Delete All
+            </button>
+            <button class="btn" onclick="openOutputFolder()">
+                <i class="bi bi-folder2-open"></i> Open Folder
+            </button>
+        </div>
+        <button class="btn" onclick="window.close()">Close</button>
+    </div>
+
+    <script>
+        async function loadHistory() {
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading...
+                </div>
+            `;
+
+            try {
+                const response = await window.electronAPI.apiRequest(
+                    'https://kingcongstudio.com/ajaxs/tts3.php',
+                    { action: 'history', page: 1 }
+                );
+
+                console.log('History response:', response);
+
+                if (response.success && response.tasks && response.tasks.length > 0) {
+                    renderHistory(response.tasks);
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <h4>No history found</h4>
+                            <p style="font-size: 12px; margin-top: 8px;">Your TTS tasks will appear here</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Load history error:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <h4>Error loading history</h4>
+                        <p style="font-size: 12px; margin-top: 8px; color: #f55;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderHistory(tasks) {
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = `
+                <table class="task-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Content</th>
+                            <th style="width: 140px;">Project</th>
+                            <th style="width: 80px;">Status</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 70px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tasks.map(task => {
+                            const taskId = task.id || task.task_id || '';
+                            const projectVal = task.project || task.project_name || '';
+                            const resultUrl = task.result_url || '';
+                            return `
+                            <tr data-task-id="${escapeHtml(taskId)}">
+                                <td style="color: #444; font-size: 10px;">${escapeHtml(taskId.substring(0, 8))}</td>
+                                <td style="max-width: 350px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    ${escapeHtml((task.text || task.input_text || '').substring(0, 60))}
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           value="${escapeHtml(projectVal)}"
+                                           placeholder="Project..."
+                                           style="width: 100%; padding: 4px 6px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 4px; color: #fff; font-size: 11px; outline: none;"
+                                           onchange="updateTaskProject('${escapeHtml(taskId)}', this.value)"
+                                           onfocus="this.style.borderColor='#333'"
+                                           onblur="this.style.borderColor='#1a1a1a'">
+                                </td>
+                                <td><span class="status ${(task.status || '').toLowerCase()}">${task.status || '-'}</span></td>
+                                <td style="color: #555; font-size: 11px;">${task.created_at || task.date || '-'}</td>
+                                <td>
+                                    ${resultUrl ? `
+                                        <button class="btn btn-sm" onclick="downloadTask('${escapeHtml(resultUrl)}', '${escapeHtml(taskId.substring(0, 8))}.mp3')" title="Download">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                    ` : ''}
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function updateTaskProject(taskId, projectName) {
+            try {
+                const response = await window.electronAPI.apiRequest(
+                    'https://kingcongstudio.com/ajaxs/tts3.php',
+                    {
+                        action: 'update_task_project',
+                        task_id: taskId,
+                        project: projectName
+                    }
+                );
+
+                if (response.success || response.status === 'success') {
+                    showNotification('Project updated', 'success');
+                } else {
+                    showNotification('Saved locally', 'info');
+                }
+            } catch (error) {
+                console.error('Update project error:', error);
+                showNotification('Saved locally', 'info');
+            }
+        }
+
+        async function downloadTask(url, filename) {
+            try {
+                const result = await window.electronAPI.downloadFile({
+                    url: url,
+                    fileName: filename,
+                    subfolder: 'Backup'
+                });
+
+                if (result && result.success) {
+                    showNotification(`Downloaded: ${filename}`, 'success');
+                } else {
+                    // Fallback to browser download
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+            }
+        }
+
+        async function deleteAllTasks() {
+            if (!confirm('Delete all tasks in backup? This cannot be undone!')) {
+                return;
+            }
+
+            try {
+                const response = await window.electronAPI.apiRequest(
+                    'https://kingcongstudio.com/ajaxs/tts3.php',
+                    { action: 'delete_all_tasks' }
+                );
+
+                if (response.success || response.status === 'success') {
+                    showNotification('All tasks deleted', 'success');
+                    loadHistory();
+                } else {
+                    showNotification(response.message || 'Error deleting tasks', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                showNotification('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function openOutputFolder() {
+            await window.electronAPI.openOutputFolder();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-size: 14px;
+                z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+
+            const colors = {
+                success: '#4ade80',
+                error: '#ef4444',
+                warning: '#fbbf24',
+                info: '#667eea'
+            };
+
+            toast.style.background = colors[type] || colors.info;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Initialize
+        loadHistory();
+    </script>
+</body>
+</html>

@@ -659,6 +659,119 @@ ipcMain.handle('save-voice-library', async (event, voices) => {
   return { success: true };
 });
 
+// Open Backup window
+let backupWindow = null;
+
+ipcMain.handle('open-backup-window', async () => {
+  // If window already exists, focus it
+  if (backupWindow && !backupWindow.isDestroyed()) {
+    backupWindow.focus();
+    return { success: true };
+  }
+
+  backupWindow = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    title: 'Backup / History',
+    parent: mainWindow,
+    modal: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    },
+    backgroundColor: '#0a0a0a'
+  });
+
+  backupWindow.loadFile('renderer/backup-window.html');
+
+  backupWindow.on('closed', () => {
+    backupWindow = null;
+  });
+
+  return { success: true };
+});
+
+// Open Voices window
+let voicesWindow = null;
+
+ipcMain.handle('open-voices-window', async (event, provider) => {
+  // If window already exists, focus it
+  if (voicesWindow && !voicesWindow.isDestroyed()) {
+    voicesWindow.focus();
+    return { success: true };
+  }
+
+  voicesWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    title: `Voices - ${provider || 'All'}`,
+    parent: mainWindow,
+    modal: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    },
+    backgroundColor: '#0a0a0a'
+  });
+
+  // Pass provider as query param
+  voicesWindow.loadFile('renderer/voices-window.html', {
+    query: { provider: provider || 'elevenlabs' }
+  });
+
+  voicesWindow.on('closed', () => {
+    voicesWindow = null;
+  });
+
+  return { success: true };
+});
+
+// Open Cloned Voices window
+let clonedVoicesWindow = null;
+
+ipcMain.handle('open-cloned-voices-window', async () => {
+  // If window already exists, focus it
+  if (clonedVoicesWindow && !clonedVoicesWindow.isDestroyed()) {
+    clonedVoicesWindow.focus();
+    return { success: true };
+  }
+
+  clonedVoicesWindow = new BrowserWindow({
+    width: 700,
+    height: 600,
+    title: 'My Cloned Voices (Minimax)',
+    parent: mainWindow,
+    modal: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    },
+    backgroundColor: '#0a0a0a'
+  });
+
+  clonedVoicesWindow.loadFile('renderer/cloned-voices-window.html');
+
+  clonedVoicesWindow.on('closed', () => {
+    clonedVoicesWindow = null;
+  });
+
+  return { success: true };
+});
+
+// Send selected voice back to main window
+ipcMain.handle('select-voice-from-window', async (event, voiceId) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('voice-selected', voiceId);
+  }
+  return { success: true };
+});
+
 // Join audio files locally (using ffmpeg if available)
 ipcMain.handle('join-audio-local', async (event, { files, delay, outputName, createSrt, taskData }) => {
   const { exec } = require('child_process');

@@ -8734,3 +8734,114 @@ function downloadViaProxy(url, filename, textContent) {
         }
     }, 5000);
 }
+
+// ==================== VOICE CLONE (MINIMAX) ====================
+let cloneAudioFilePath = null;
+
+function openVoiceCloneModal() {
+    document.getElementById('voiceCloneModal').style.display = 'flex';
+    document.getElementById('cloneVoiceName').value = '';
+    document.getElementById('cloneAudioPath').value = '';
+    document.getElementById('cloneStatus').style.display = 'none';
+    cloneAudioFilePath = null;
+}
+
+function closeVoiceCloneModal() {
+    document.getElementById('voiceCloneModal').style.display = 'none';
+}
+
+async function selectCloneAudioFile() {
+    try {
+        const result = await window.electronAPI.selectFiles({
+            filters: [
+                { name: 'Audio Files', extensions: ['mp3', 'wav', 'm4a'] }
+            ]
+        });
+
+        if (result.success && result.filePaths && result.filePaths.length > 0) {
+            cloneAudioFilePath = result.filePaths[0];
+            const fileName = cloneAudioFilePath.split(/[/\\]/).pop();
+            document.getElementById('cloneAudioPath').value = fileName;
+        }
+    } catch (error) {
+        console.error('Select audio error:', error);
+        showToast('Error selecting file', 'error');
+    }
+}
+
+async function startVoiceCloneTTS() {
+    const voiceName = document.getElementById('cloneVoiceName').value.trim();
+    const language = document.getElementById('cloneLanguage').value;
+    const previewText = document.getElementById('clonePreviewText').value.trim();
+
+    if (!voiceName) {
+        showToast('Please enter voice name', 'warning');
+        return;
+    }
+
+    if (!cloneAudioFilePath) {
+        showToast('Please select audio file', 'warning');
+        return;
+    }
+
+    // Show status
+    document.getElementById('cloneStatus').style.display = 'block';
+    document.getElementById('cloneStatusText').textContent = 'Cloning voice...';
+    document.getElementById('btnStartClone').disabled = true;
+
+    try {
+        // Read audio file as base64
+        const fileResult = await window.electronAPI.readFileAsBase64(cloneAudioFilePath);
+
+        if (!fileResult || !fileResult.success) {
+            throw new Error('Cannot read audio file');
+        }
+
+        const audioFileName = cloneAudioFilePath.split(/[/\\]/).pop();
+
+        // Call API
+        const response = await window.electronAPI.apiRequest(
+            'https://kingcongstudio.com/ajaxs/tts3.php',
+            {
+                action: 'clone_voice',
+                provider: 'minimax',
+                voice_name: voiceName,
+                language: language,
+                preview_text: previewText,
+                audio_data: fileResult.data,
+                audio_filename: audioFileName
+            }
+        );
+
+        console.log('Clone response:', response);
+
+        if (response.success || response.status === 'success') {
+            const clonedVoiceId = response.cloned_voice_id || response.voice_id;
+
+            document.getElementById('cloneStatusText').textContent = 'Voice cloned successfully!';
+            document.getElementById('cloneStatus').style.background = 'rgba(74, 222, 128, 0.1)';
+
+            showToast(`Voice "${voiceName}" cloned!`, 'success');
+
+            // Auto-select cloned voice
+            if (clonedVoiceId) {
+                $('#voiceIdVal').val(clonedVoiceId);
+                $('#selectedVoiceName').text(voiceName);
+            }
+
+            // Close modal after delay
+            setTimeout(() => {
+                closeVoiceCloneModal();
+            }, 2000);
+        } else {
+            throw new Error(response.message || response.error || 'Clone failed');
+        }
+    } catch (error) {
+        console.error('Voice clone error:', error);
+        document.getElementById('cloneStatusText').textContent = `Error: ${error.message}`;
+        document.getElementById('cloneStatus').style.background = 'rgba(239, 68, 68, 0.1)';
+        showToast(`Clone error: ${error.message}`, 'error');
+    } finally {
+        document.getElementById('btnStartClone').disabled = false;
+    }
+}

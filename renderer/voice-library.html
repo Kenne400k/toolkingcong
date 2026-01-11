@@ -79,8 +79,8 @@
         .voice-table th {
             background: #111;
             text-align: left;
-            padding: 12px 14px;
-            font-size: 11px;
+            padding: 12px 10px;
+            font-size: 10px;
             font-weight: 600;
             color: #555;
             text-transform: uppercase;
@@ -89,24 +89,25 @@
         }
 
         .voice-table td {
-            padding: 10px 14px;
+            padding: 10px;
             border-bottom: 1px solid #1a1a1a;
+            font-size: 12px;
         }
 
         .voice-table tr:hover td { background: #0f0f0f; }
 
-        .voice-table input {
+        .voice-table input, .voice-table select {
             width: 100%;
-            padding: 8px 10px;
+            padding: 6px 8px;
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
             border-radius: 4px;
             color: #fff;
-            font-size: 12px;
+            font-size: 11px;
             outline: none;
         }
 
-        .voice-table input:focus { border-color: #333; }
+        .voice-table input:focus, .voice-table select:focus { border-color: #333; }
 
         .btn {
             padding: 8px 14px;
@@ -127,9 +128,11 @@
         .btn:active { transform: scale(0.98); }
         .btn-primary { background: #fff; color: #000; border: none; }
         .btn-primary:hover { background: #e5e5e5; }
+        .btn-success { background: #10b981; color: #fff; border: none; }
+        .btn-success:hover { background: #059669; }
         .btn-danger { color: #f55; }
         .btn-danger:hover { background: rgba(255, 85, 85, 0.1); border-color: #f55; }
-        .btn-sm { padding: 6px 10px; font-size: 11px; }
+        .btn-sm { padding: 5px 8px; font-size: 10px; }
 
         .actions {
             display: flex;
@@ -143,10 +146,29 @@
         .actions-right { margin-left: auto; display: flex; gap: 8px; }
 
         .table-container {
-            max-height: calc(100vh - 250px);
+            max-height: calc(100vh - 280px);
             overflow-y: auto;
             border: 1px solid var(--border);
             border-radius: 8px;
+        }
+
+        .provider-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        .provider-badge.elevenlabs { background: #1a1a4a; color: #667eea; }
+        .provider-badge.minimax { background: #1a3a1a; color: #10b981; }
+
+        .settings-preview {
+            font-size: 10px;
+            color: #666;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -154,22 +176,26 @@
 <body>
     <div class="header">
         <h1><i class="bi bi-collection"></i> Voice Library</h1>
-        <span style="font-size: 12px; color: #555;">Quản lý giọng nói cho hội thoại đa người</span>
+        <span style="font-size: 12px; color: #555;">Quản lý giọng nói với các thông số tùy chỉnh</span>
     </div>
 
     <div class="info-box">
-        <strong>Hướng dẫn:</strong> Thêm các Voice ID vào thư viện để sử dụng cho hội thoại nhiều người.<br>
+        <strong>Hướng dẫn:</strong> Lưu các Voice ID cùng với thông số settings để sử dụng lại.<br>
         Sử dụng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu mỗi dòng text để chỉ định giọng tương ứng.
+        Nhấn <strong>Sử dụng</strong> để áp dụng voice và settings vào Pro Tool.
     </div>
 
     <div class="table-container">
         <table class="voice-table" id="voiceTable">
             <thead>
                 <tr>
-                    <th style="width: 50px;">ID</th>
-                    <th>Voice ID (ElevenLabs)</th>
-                    <th>Tên hiển thị</th>
-                    <th style="width: 60px;"></th>
+                    <th style="width: 35px;">#</th>
+                    <th style="width: 80px;">Provider</th>
+                    <th style="width: 180px;">Voice ID</th>
+                    <th style="width: 120px;">Tên</th>
+                    <th style="width: 100px;">Project</th>
+                    <th>Settings</th>
+                    <th style="width: 120px;">Actions</th>
                 </tr>
             </thead>
             <tbody id="voiceTableBody">
@@ -188,7 +214,7 @@
             </button>
         </div>
         <div class="actions-right">
-            <button class="btn" onclick="window.close()">Hủy</button>
+            <button class="btn" onclick="window.close()">Đóng</button>
             <button class="btn btn-primary" onclick="saveAndClose()">
                 <i class="bi bi-check"></i> Lưu
             </button>
@@ -211,17 +237,49 @@
 
             // Ensure at least one empty row
             if (voices.length === 0) {
-                voices = [{ id: 1, voiceId: '', name: '' }];
+                voices = [createEmptyVoice()];
             }
 
             renderTable();
         }
 
+        function createEmptyVoice() {
+            return {
+                id: Date.now(),
+                voiceId: '',
+                name: '',
+                provider: 'elevenlabs',
+                project: '',
+                settings: {
+                    speed: 1.0,
+                    stability: 0.5,
+                    similarity: 0.75,
+                    style: 0,
+                    speakerBoost: true,
+                    // Minimax settings
+                    pitch: 0,
+                    volume: 1.0
+                }
+            };
+        }
+
         function renderTable() {
             const tbody = document.getElementById('voiceTableBody');
-            tbody.innerHTML = voices.map((voice, index) => `
+            tbody.innerHTML = voices.map((voice, index) => {
+                const isElevenlabs = voice.provider === 'elevenlabs';
+                const settingsText = isElevenlabs
+                    ? `Speed: ${voice.settings?.speed || 1}, Stab: ${voice.settings?.stability || 0.5}, Sim: ${voice.settings?.similarity || 0.75}`
+                    : `Speed: ${voice.settings?.speed || 1}, Pitch: ${voice.settings?.pitch || 0}, Vol: ${voice.settings?.volume || 1}`;
+
+                return `
                 <tr data-index="${index}">
                     <td style="color: #666; text-align: center;">${index + 1}</td>
+                    <td>
+                        <select onchange="updateVoice(${index}, 'provider', this.value)">
+                            <option value="elevenlabs" ${voice.provider === 'elevenlabs' ? 'selected' : ''}>ElevenLabs</option>
+                            <option value="minimax" ${voice.provider === 'minimax' ? 'selected' : ''}>Minimax</option>
+                        </select>
+                    </td>
                     <td>
                         <input type="text"
                                value="${escapeHtml(voice.voiceId || '')}"
@@ -231,20 +289,32 @@
                     <td>
                         <input type="text"
                                value="${escapeHtml(voice.name || '')}"
-                               placeholder="Tên hiển thị..."
+                               placeholder="Tên..."
                                onchange="updateVoice(${index}, 'name', this.value)">
                     </td>
+                    <td>
+                        <input type="text"
+                               value="${escapeHtml(voice.project || '')}"
+                               placeholder="Project..."
+                               onchange="updateVoice(${index}, 'project', this.value)">
+                    </td>
+                    <td>
+                        <div class="settings-preview" title="${settingsText}">${settingsText}</div>
+                    </td>
                     <td style="text-align: center;">
+                        <button class="btn btn-sm btn-success" onclick="useVoice(${index})" title="Sử dụng">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
                         <button class="btn btn-sm btn-danger" onclick="removeVoice(${index})" title="Xóa">
                             <i class="bi bi-x"></i>
                         </button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         function addVoiceRow() {
-            voices.push({ id: voices.length + 1, voiceId: '', name: '' });
+            voices.push(createEmptyVoice());
             renderTable();
 
             // Focus on the new row's first input
@@ -262,16 +332,42 @@
 
         function removeVoice(index) {
             if (voices.length <= 1) {
-                voices = [{ id: 1, voiceId: '', name: '' }];
+                voices = [createEmptyVoice()];
             } else {
                 voices.splice(index, 1);
             }
             renderTable();
         }
 
+        function useVoice(index) {
+            const voice = voices[index];
+            if (!voice || !voice.voiceId) {
+                alert('Voice ID is empty!');
+                return;
+            }
+
+            // Send voice data to parent window
+            const voiceData = {
+                type: 'useVoiceFromLibrary',
+                voice: voice
+            };
+
+            // Notify parent via postMessage
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage(voiceData, '*');
+            }
+
+            // Also use IPC if available
+            if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
+                window.electronAPI.sendVoiceLibrary({ action: 'use', voice: voice });
+            }
+
+            alert(`Using voice: ${voice.name || voice.voiceId}`);
+        }
+
         function clearAll() {
             if (confirm('Xóa tất cả voices trong thư viện?')) {
-                voices = [{ id: 1, voiceId: '', name: '' }];
+                voices = [createEmptyVoice()];
                 renderTable();
             }
         }

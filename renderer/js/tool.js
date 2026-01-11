@@ -199,11 +199,13 @@ class ProToolManager {
     
     init() {
         this.setupFileInputs();
+        this.setupModelSelect();
         this.loadVoiceLibrary();
         this.loadSettings();
         this.setupAutoSave();
         this.setupVoiceLibraryListener();
         this.loadResourcesOnInit(); // Load models & voices từ server
+        this.updateVoiceSettingsUI(); // Initialize provider-specific settings
         console.log('✅ ProToolManager initialized');
     }
 
@@ -218,6 +220,15 @@ class ProToolManager {
             });
         }
 
+        // Listen for voice selection from child windows
+        if (window.electronAPI && window.electronAPI.onVoiceSelected) {
+            window.electronAPI.onVoiceSelected((voiceId) => {
+                console.log('🎤 Voice selected from window:', voiceId);
+                document.getElementById('selectedVoiceId').value = voiceId;
+                this.showNotification(`Selected: ${voiceId}`, 'success');
+            });
+        }
+
         // Also listen for postMessage from popup window
         window.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'voiceLibraryUpdated') {
@@ -226,7 +237,62 @@ class ProToolManager {
                 localStorage.setItem('voiceLibrary', JSON.stringify(event.data.voices));
                 this.showNotification(`Đã lưu ${event.data.voices.length} voices`, 'success');
             }
+
+            // Listen for voice selection via postMessage
+            if (event.data && event.data.type === 'voiceSelected') {
+                console.log('🎤 Voice selected via postMessage:', event.data.voiceId);
+                document.getElementById('selectedVoiceId').value = event.data.voiceId;
+                this.showNotification(`Selected: ${event.data.voiceId}`, 'success');
+            }
+
+            // Listen for use voice from library
+            if (event.data && event.data.type === 'useVoiceFromLibrary') {
+                console.log('🎤 Use voice from library:', event.data.voice);
+                this.applyVoiceFromLibrary(event.data.voice);
+            }
         });
+    }
+
+    // Apply voice and settings from library
+    applyVoiceFromLibrary(voice) {
+        if (!voice) return;
+
+        // Set voice ID
+        document.getElementById('selectedVoiceId').value = voice.voiceId || '';
+
+        // Switch provider if needed
+        if (voice.provider && voice.provider !== this.provider) {
+            this.provider = voice.provider;
+            document.getElementById('providerSelect').value = voice.provider;
+            this.updateModelOptions();
+            this.updateVoiceSettingsUI();
+        }
+
+        // Apply settings based on provider
+        if (voice.provider === 'minimax') {
+            if (voice.settings) {
+                document.getElementById('mmVoiceSpeed').value = voice.settings.speed || 1;
+                document.getElementById('mmVoicePitch').value = voice.settings.pitch || 0;
+                document.getElementById('mmVoiceVol').value = voice.settings.volume || 1;
+                updateSlider('mmSpeed');
+                updateSlider('mmPitch');
+                updateSlider('mmVol');
+            }
+        } else {
+            if (voice.settings) {
+                document.getElementById('voiceSpeed').value = voice.settings.speed || 1;
+                document.getElementById('voiceStability').value = voice.settings.stability || 0.5;
+                document.getElementById('voiceSimilarity').value = voice.settings.similarity || 0.75;
+                document.getElementById('voiceStyle').value = voice.settings.style || 0;
+                document.getElementById('speakerBoost').checked = voice.settings.speakerBoost !== false;
+                updateSlider('speed');
+                updateSlider('stability');
+                updateSlider('similarity');
+                updateSlider('style');
+            }
+        }
+
+        this.showNotification(`Applied: ${voice.name || voice.voiceId}`, 'success');
     }
 
     setupFileInputs() {
@@ -235,9 +301,32 @@ class ProToolManager {
         providerSelect?.addEventListener('change', (e) => {
             this.provider = e.target.value;
             this.updateModelOptions();
+            this.updateVoiceSettingsUI();
             this.saveSettings();
         });
 
+        // Initialize voice settings UI on load
+        this.updateVoiceSettingsUI();
+    }
+
+    // Switch voice settings UI based on provider
+    updateVoiceSettingsUI() {
+        const elevenlabsSettings = document.getElementById('elevenlabsSettings');
+        const minimaxSettings = document.getElementById('minimaxSettings');
+        const voiceCloneSection = document.getElementById('voiceCloneSection');
+
+        if (this.provider === 'minimax') {
+            if (elevenlabsSettings) elevenlabsSettings.style.display = 'none';
+            if (minimaxSettings) minimaxSettings.style.display = 'block';
+            if (voiceCloneSection) voiceCloneSection.style.display = 'block';
+        } else {
+            if (elevenlabsSettings) elevenlabsSettings.style.display = 'block';
+            if (minimaxSettings) minimaxSettings.style.display = 'none';
+            if (voiceCloneSection) voiceCloneSection.style.display = 'none';
+        }
+    }
+
+    setupModelSelect() {
         // Model select
         const modelSelect = document.getElementById('modelSelect');
         modelSelect?.addEventListener('change', (e) => {
@@ -462,11 +551,18 @@ class ProToolManager {
         }
     }
     
-    // Load voices from server - giống tts.js
+    // Load voices from server - mở cửa sổ riêng
     async loadVoicesFromServer() {
+        // Open in separate window
+        if (window.electronAPI && window.electronAPI.openVoicesWindow) {
+            window.electronAPI.openVoicesWindow(this.provider);
+            return;
+        }
+
+        // Fallback to modal
         const modalBody = document.getElementById('voicesModalBody');
         document.getElementById('voicesModal').classList.add('show');
-        
+
         // Nếu đã có voices trong cache thì dùng luôn
         const cachedVoices = this.loadedVoices?.[this.provider];
         if (cachedVoices && cachedVoices.length > 0) {
@@ -474,30 +570,30 @@ class ProToolManager {
             this.renderVoicesModal(cachedVoices);
             return;
         }
-        
+
         modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Loading voices...</div>`;
-        
+
         try {
             const res = await window.electronAPI.getResources();
             console.log('✅ getResources response:', res);
-            
+
             if (res && res.status === 'success' && res.data) {
                 // Lưu tất cả voices
                 this.loadedVoices = {
                     elevenlabs: res.data.elevenlabs?.voices || [],
                     minimax: res.data.minimax?.voices || []
                 };
-                
+
                 // Lưu models luôn
                 this.loadedModels = {
                     elevenlabs: res.data.elevenlabs?.models || [],
                     minimax: res.data.minimax?.models || []
                 };
                 this.updateModelOptions();
-                
+
                 const voices = this.loadedVoices[this.provider] || [];
                 console.log(`✅ Found ${voices.length} voices for ${this.provider}`);
-                
+
                 if (voices.length > 0) {
                     this.renderVoicesModal(voices);
                 } else {
@@ -1033,45 +1129,53 @@ class ProToolManager {
     }
     
     // ==================== PROCESSING ====================
-    
+
     async startProcessing() {
         console.log('🚀 Starting processing...');
         console.log('📊 Provider:', this.provider, '| Model:', this.model);
-        
+
         if (this.isProcessing) {
             console.log('⚠️ Already processing');
             return;
         }
-        
+
         const pendingTasks = this.tasks.filter(t => t.status === 'pending');
         console.log('📋 Pending tasks:', pendingTasks.length);
-        
+
         if (pendingTasks.length === 0) {
             this.showNotification('Không có tác vụ nào để xử lý!', 'warning');
             return;
         }
-        
+
         const selectedVoiceId = document.getElementById('selectedVoiceId')?.value;
         console.log('🎤 Selected Voice ID:', selectedVoiceId);
-        
+
         const tasksWithoutVoice = pendingTasks.filter(t => !t.voiceId);
         console.log('📋 Tasks without voiceId:', tasksWithoutVoice.length);
-        
+
         if (!selectedVoiceId && tasksWithoutVoice.length > 0) {
             console.log('❌ No voice ID selected for tasks that need it');
             this.showNotification('Vui lòng chọn Voice ID!', 'warning');
             return;
         }
-        
+
         this.isProcessing = true;
         document.getElementById('btnStart').disabled = true;
         document.getElementById('btnStop').disabled = false;
         document.getElementById('statusText').textContent = 'Đang xử lý...';
-        
+
         const optSilentChar = document.getElementById('optSilentChar')?.checked;
 
-        // Process tasks sequentially to avoid rate limit
+        // Get thread count from UI (max 10)
+        const threadCount = Math.min(Math.max(parseInt(document.getElementById('threadCount')?.value) || 3, 1), 10);
+        console.log(`📊 Using ${threadCount} parallel threads`);
+
+        // Process tasks with parallel threads
         const processQueue = [...pendingTasks];
+        let currentIndex = 0;
+        let activeCount = 0;
+        let completedCount = 0;
+        const totalTasks = processQueue.length;
 
         const processTask = async (task, retryCount = 0) => {
             console.log('🔄 Processing task:', task.id, task.content?.substring(0, 50));
@@ -1088,40 +1192,40 @@ class ProToolManager {
                     content = this.applySilentCharacter(content);
                     console.log('🔧 After silentChar:', content?.length);
                 }
-                
+
                 const voiceIdToUse = task.voiceId || selectedVoiceId;
                 console.log('🎤 Voice ID to use:', voiceIdToUse);
-                
+
                 if (!voiceIdToUse) {
                     throw new Error('No Voice ID specified');
                 }
-                
+
                 // Make API call
                 const result = await this.createTTSTask(content, voiceIdToUse);
                 console.log('📋 Create task result:', result);
-                
+
                 if (result.success) {
                     task.taskId = result.taskId;
                     task.status = 'processing';
                     console.log('⏳ Polling status for task:', result.taskId);
-                    
+
                     // Poll for completion
                     await this.pollTaskStatus(task);
                     console.log('✅ Task final status:', task.status);
                 } else {
                     // Check for rate limit error
-                    const isRateLimit = result.error?.includes('giới hạn') || 
+                    const isRateLimit = result.error?.includes('giới hạn') ||
                                        result.error?.includes('rate limit') ||
                                        result.error?.includes('10 yêu cầu');
-                    
+
                     if (isRateLimit && retryCount < 3) {
                         const waitTime = 60 + (retryCount * 10); // 60s, 70s, 80s
                         console.log(`⏳ Rate limit hit! Waiting ${waitTime}s before retry... (attempt ${retryCount + 1}/3)`);
                         task.error = `Đợi ${waitTime}s (rate limit)...`;
                         this.updateTaskDisplay();
-                        
+
                         await new Promise(r => setTimeout(r, waitTime * 1000));
-                        
+
                         if (this.isProcessing) {
                             return processTask(task, retryCount + 1);
                         }
@@ -1136,45 +1240,73 @@ class ProToolManager {
                 task.status = 'failed';
                 task.error = error.message;
             }
-            
+
             this.updateTaskDisplay();
         };
-        
-        // Process sequentially with delay to avoid rate limit (10 req/min)
-        // Delay giữa mỗi request = 7 giây để an toàn
-        const REQUEST_DELAY = 7000;
-        
-        console.log(`📊 Processing ${processQueue.length} tasks with ${REQUEST_DELAY/1000}s delay between requests`);
-        
-        for (let i = 0; i < processQueue.length && this.isProcessing; i++) {
-            const task = processQueue[i];
-            
-            // Hiển thị progress
-            document.getElementById('statusText').textContent = `Đang xử lý ${i + 1}/${processQueue.length}...`;
-            
-            await processTask(task);
-            
-            // Delay trước task tiếp theo (trừ task cuối)
-            if (i < processQueue.length - 1 && this.isProcessing) {
-                console.log(`⏱️ Waiting ${REQUEST_DELAY/1000}s before next request...`);
-                await new Promise(r => setTimeout(r, REQUEST_DELAY));
+
+        // Parallel processing with thread limit using semaphore pattern
+        console.log(`📊 Processing ${totalTasks} tasks with ${threadCount} parallel threads`);
+
+        const runWorker = async () => {
+            while (this.isProcessing) {
+                // Get next task
+                if (currentIndex >= processQueue.length) {
+                    break;
+                }
+
+                const taskIndex = currentIndex++;
+                const task = processQueue[taskIndex];
+
+                activeCount++;
+
+                // Update status
+                document.getElementById('statusText').textContent =
+                    `Đang xử lý... (${completedCount}/${totalTasks} done, ${activeCount} active)`;
+
+                await processTask(task);
+
+                activeCount--;
+                completedCount++;
+
+                // Update status after completion
+                document.getElementById('statusText').textContent =
+                    `Đang xử lý... (${completedCount}/${totalTasks} done, ${activeCount} active)`;
             }
+        };
+
+        // Start workers based on thread count
+        const workers = [];
+        for (let i = 0; i < threadCount; i++) {
+            workers.push(runWorker());
         }
-        
+
+        // Wait for all workers to complete
+        await Promise.all(workers);
+
         this.finishProcessing();
     }
     
     async createTTSTask(content, voiceId) {
         try {
             const optAutoSRT = document.getElementById('optAutoSRT')?.checked;
-            
-            // Get voice settings (giống bên tts.js)
-            const speed = parseFloat(document.getElementById('voiceSpeed')?.value) || 1;
-            const stability = parseFloat(document.getElementById('voiceStability')?.value) || 0.5;
-            const similarity = parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75;
-            const style = parseFloat(document.getElementById('voiceStyle')?.value) || 0;
-            const speakerBoost = document.getElementById('speakerBoost')?.checked || false;
-            
+
+            // Get voice settings based on provider
+            let speed, stability, similarity, style, speakerBoost, pitch, vol;
+
+            if (this.provider === 'minimax') {
+                // Minimax settings
+                speed = parseFloat(document.getElementById('mmVoiceSpeed')?.value) || 1;
+                pitch = parseInt(document.getElementById('mmVoicePitch')?.value) || 0;
+                vol = parseFloat(document.getElementById('mmVoiceVol')?.value) || 1;
+            } else {
+                // ElevenLabs settings
+                speed = parseFloat(document.getElementById('voiceSpeed')?.value) || 1;
+                stability = parseFloat(document.getElementById('voiceStability')?.value) || 0.5;
+                similarity = parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75;
+                style = parseFloat(document.getElementById('voiceStyle')?.value) || 0;
+                speakerBoost = document.getElementById('speakerBoost')?.checked || false;
+            }
+
             // Build params giống bên TTS tab
             const params = {
                 action: 'create_speech', // ✅ Giống TTS tab
@@ -1185,12 +1317,12 @@ class ProToolManager {
                 with_transcript: optAutoSRT,
                 model_id: this.model // ✅ Giống TTS tab (model_id không phải model)
             };
-            
+
             // Thêm params theo provider (giống TTS tab)
             if (this.provider === 'minimax') {
-                params.vol = 1;
+                params.vol = vol;
                 params.speed = speed;
-                params.pitch = 0;
+                params.pitch = pitch;
             } else {
                 // ElevenLabs
                 params.speed = speed;
@@ -1511,8 +1643,15 @@ class ProToolManager {
     }
     
     // ==================== BACKUP/HISTORY ====================
-    
+
     async openBackup() {
+        // Open in separate window
+        if (window.electronAPI && window.electronAPI.openBackupWindow) {
+            window.electronAPI.openBackupWindow();
+            return;
+        }
+
+        // Fallback to modal
         document.getElementById('backupModal').classList.add('show');
         await this.loadBackupHistory();
     }
@@ -2424,6 +2563,133 @@ async function startVoiceClone() {
     }
 }
 
+// ==================== CLONED VOICES LIST (MINIMAX) ====================
+async function openClonedVoicesModal() {
+    // Open in separate window
+    if (window.electronAPI && window.electronAPI.openClonedVoicesWindow) {
+        window.electronAPI.openClonedVoicesWindow();
+        return;
+    }
+
+    // Fallback to modal
+    document.getElementById('clonedVoicesModal').classList.add('show');
+    document.getElementById('clonedVoicesBody').innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #555;">
+            <div class="spinner" style="width: 24px; height: 24px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px;"></div>
+            Loading...
+        </div>
+    `;
+
+    try {
+        const response = await window.electronAPI.apiRequest(
+            'https://kingcongstudio.com/ajaxs/tts3.php',
+            {
+                action: 'get_cloned_voices',
+                provider: 'minimax'
+            }
+        );
+
+        console.log('📦 Cloned voices response:', response);
+
+        if (response.success || response.status === 'success') {
+            const voices = response.voices || response.cloned_voices || [];
+            renderClonedVoicesModal(voices);
+        } else {
+            document.getElementById('clonedVoicesBody').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #f55;">
+                    ${response.message || 'Không thể tải danh sách voice'}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Load cloned voices error:', error);
+        document.getElementById('clonedVoicesBody').innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #f55;">
+                Lỗi: ${error.message}
+            </div>
+        `;
+    }
+}
+
+function renderClonedVoicesModal(voices) {
+    const body = document.getElementById('clonedVoicesBody');
+
+    if (!voices || voices.length === 0) {
+        body.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #555;">
+                <i class="bi bi-mic" style="font-size: 48px; opacity: 0.3;"></i>
+                <p style="margin-top: 12px;">Chưa có voice nào được clone</p>
+                <p style="font-size: 11px; color: #444; margin-top: 8px;">Dùng nút "Voice Clone" để tạo giọng nói mới</p>
+            </div>
+        `;
+        return;
+    }
+
+    body.innerHTML = `
+        <div style="margin-bottom: 12px; font-size: 12px; color: #666;">${voices.length} cloned voices</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${voices.map(voice => `
+                <div style="display: flex; align-items: center; padding: 12px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px;">
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 14px; font-weight: 500; color: #fff;">${voice.name || voice.voice_name || 'Unnamed'}</div>
+                        <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                            ID: ${voice.voice_id || voice.id || '-'}
+                        </div>
+                        ${voice.language ? `<div style="font-size: 10px; color: #888; margin-top: 2px;">${voice.language}</div>` : ''}
+                        ${voice.created_at ? `<div style="font-size: 10px; color: #444; margin-top: 2px;">${voice.created_at}</div>` : ''}
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                        <button class="btn btn-sm" onclick="selectClonedVoice('${voice.voice_id || voice.id}')" title="Sử dụng voice này">
+                            <i class="bi bi-check-lg"></i> Chọn
+                        </button>
+                        <button class="btn btn-sm" style="color: #f55;" onclick="deleteClonedVoice('${voice.voice_id || voice.id}', '${voice.name || voice.voice_name || 'Voice'}')" title="Xóa voice">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function closeClonedVoicesModal() {
+    document.getElementById('clonedVoicesModal').classList.remove('show');
+}
+
+function selectClonedVoice(voiceId) {
+    document.getElementById('selectedVoiceId').value = voiceId;
+    proTool.showNotification(`Selected voice: ${voiceId}`, 'success');
+    closeClonedVoicesModal();
+}
+
+async function deleteClonedVoice(voiceId, voiceName) {
+    if (!confirm(`Xóa voice "${voiceName}"? Hành động này không thể hoàn tác!`)) {
+        return;
+    }
+
+    try {
+        const response = await window.electronAPI.apiRequest(
+            'https://kingcongstudio.com/ajaxs/tts3.php',
+            {
+                action: 'delete_cloned_voice',
+                provider: 'minimax',
+                voice_id: voiceId
+            }
+        );
+
+        if (response.success || response.status === 'success') {
+            proTool.showNotification(`Đã xóa voice "${voiceName}"`, 'success');
+            // Reload list
+            openClonedVoicesModal();
+        } else {
+            proTool.showNotification(response.message || 'Không thể xóa voice', 'error');
+        }
+    } catch (error) {
+        console.error('Delete cloned voice error:', error);
+        proTool.showNotification(`Lỗi: ${error.message}`, 'error');
+    }
+}
+
 // ==================== BACKUP FUNCTIONS ====================
 function deleteAllBackupTasks() {
     if (!confirm('Xóa tất cả tasks trong backup? Hành động này không thể hoàn tác!')) {
@@ -2446,3 +2712,56 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ==================== SLIDER UPDATE FUNCTIONS ====================
+function updateSlider(type) {
+    switch (type) {
+        case 'speed':
+            document.getElementById('speedValue').textContent = document.getElementById('voiceSpeed').value;
+            break;
+        case 'stability':
+            document.getElementById('stabilityValue').textContent = document.getElementById('voiceStability').value;
+            break;
+        case 'similarity':
+            document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value;
+            break;
+        case 'style':
+            document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value;
+            break;
+        // Minimax sliders
+        case 'mmSpeed':
+            document.getElementById('mmSpeedValue').textContent = parseFloat(document.getElementById('mmVoiceSpeed').value).toFixed(2);
+            break;
+        case 'mmPitch':
+            document.getElementById('mmPitchValue').textContent = document.getElementById('mmVoicePitch').value;
+            break;
+        case 'mmVol':
+            document.getElementById('mmVolValue').textContent = parseFloat(document.getElementById('mmVoiceVol').value).toFixed(2);
+            break;
+    }
+}
+
+function resetVoiceSettings() {
+    const provider = proTool?.provider || 'elevenlabs';
+
+    if (provider === 'minimax') {
+        document.getElementById('mmVoiceSpeed').value = 1;
+        document.getElementById('mmVoicePitch').value = 0;
+        document.getElementById('mmVoiceVol').value = 1;
+        updateSlider('mmSpeed');
+        updateSlider('mmPitch');
+        updateSlider('mmVol');
+    } else {
+        document.getElementById('voiceSpeed').value = 1;
+        document.getElementById('voiceStability').value = 0.5;
+        document.getElementById('voiceSimilarity').value = 0.75;
+        document.getElementById('voiceStyle').value = 0;
+        document.getElementById('speakerBoost').checked = true;
+        updateSlider('speed');
+        updateSlider('stability');
+        updateSlider('similarity');
+        updateSlider('style');
+    }
+
+    proTool?.showNotification?.('Reset voice settings', 'success');
+}

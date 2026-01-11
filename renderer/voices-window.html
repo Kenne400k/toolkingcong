@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="dark" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Voices - KingCong</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #a855f7;
+            --bg-main: #0a0a0a;
+            --bg-secondary: #121212;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text-dim: #888;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 i { color: var(--primary); }
+
+        .search-box {
+            width: 100%;
+            padding: 10px 14px;
+            background: #111;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .search-box:focus { border-color: #444; }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid #1a1a1a;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .btn:hover { background: #111; border-color: #333; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: #fff; color: #000; border: none; }
+        .btn-primary:hover { background: #e5e5e5; }
+        .btn-sm { padding: 6px 10px; font-size: 11px; }
+
+        .voice-list {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .voice-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .voice-item:hover {
+            background: #111;
+            border-color: #333;
+        }
+
+        .voice-item .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .voice-item .name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .voice-item .id {
+            font-size: 10px;
+            color: #555;
+            margin-top: 3px;
+        }
+
+        .voice-item .labels {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: #555;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            opacity: 0.3;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #555;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #333;
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .count-info {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1><i class="bi bi-cloud-download"></i> <span id="titleProvider">Server Voices</span></h1>
+    </div>
+
+    <input type="text" class="search-box" id="searchInput" placeholder="Search voices..." oninput="filterVoices(this.value)">
+
+    <div id="countInfo" class="count-info"></div>
+
+    <div class="voice-list" id="voiceList">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading voices...
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn" onclick="window.close()">Close</button>
+    </div>
+
+    <script>
+        let allVoices = [];
+        let currentProvider = 'elevenlabs';
+
+        // Get provider from URL query
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        async function loadVoices() {
+            currentProvider = getQueryParam('provider') || 'elevenlabs';
+            document.getElementById('titleProvider').textContent = currentProvider === 'elevenlabs' ? 'ElevenLabs Voices' : 'Minimax Voices';
+
+            const container = document.getElementById('voiceList');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading voices...
+                </div>
+            `;
+
+            try {
+                const res = await window.electronAPI.getResources();
+                console.log('Resources loaded:', res);
+
+                if (res && res.status === 'success' && res.data) {
+                    allVoices = res.data[currentProvider]?.voices || [];
+                    console.log(`Found ${allVoices.length} voices for ${currentProvider}`);
+
+                    if (allVoices.length > 0) {
+                        renderVoices(allVoices);
+                    } else {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="bi bi-mic"></i>
+                                <h4>No voices found</h4>
+                                <p style="font-size: 12px; margin-top: 8px;">No voices available for ${currentProvider}</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <h4>Error loading voices</h4>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Load voices error:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <h4>Error</h4>
+                        <p style="font-size: 12px; margin-top: 8px; color: #f55;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderVoices(voices) {
+            const container = document.getElementById('voiceList');
+            document.getElementById('countInfo').textContent = `${voices.length} voices`;
+
+            container.innerHTML = voices.map(voice => `
+                <div class="voice-item" onclick="selectVoice('${voice.voice_id || voice.id}', '${escapeHtml(voice.name)}')">
+                    <div class="info">
+                        <div class="name">${escapeHtml(voice.name)}</div>
+                        <div class="id">${voice.voice_id || voice.id}</div>
+                        ${voice.labels ? `<div class="labels">${Object.values(voice.labels).join(' - ')}</div>` : ''}
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voice.voice_id || voice.id}', '${escapeHtml(voice.name)}')">
+                        Select
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function filterVoices(query) {
+            query = query.toLowerCase();
+            const filtered = allVoices.filter(v => {
+                const name = (v.name || '').toLowerCase();
+                const id = (v.voice_id || v.id || '').toLowerCase();
+                const labels = v.labels ? Object.values(v.labels).join(' ').toLowerCase() : '';
+                return name.includes(query) || id.includes(query) || labels.includes(query);
+            });
+            renderVoices(filtered);
+        }
+
+        async function selectVoice(voiceId, voiceName) {
+            // Send to main window via IPC
+            if (window.electronAPI && window.electronAPI.selectVoiceFromWindow) {
+                await window.electronAPI.selectVoiceFromWindow(voiceId);
+            }
+
+            // Also notify via postMessage if opener exists
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({ type: 'voiceSelected', voiceId: voiceId }, '*');
+            }
+
+            showNotification(`Selected: ${voiceName}`, 'success');
+
+            // Close after short delay
+            setTimeout(() => window.close(), 500);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-size: 14px;
+                z-index: 9999;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+
+            const colors = {
+                success: '#4ade80',
+                error: '#ef4444',
+                info: '#667eea'
+            };
+
+            toast.style.background = colors[type] || colors.info;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Initialize
+        loadVoices();
+    </script>
+</body>
+</html>
