@@ -1,7 +1,7 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "changelog": [
-    "Add start.vbs to run app without showing terminal on Windows"
+    "Sync all files to fix CSS issues"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
