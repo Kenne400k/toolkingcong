@@ -20,7 +20,7 @@
             --text-dim: #888;
         }
 
-        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 
@@ -28,24 +28,24 @@
             background: var(--bg-main);
             color: var(--text);
             font-family: 'Inter', -apple-system, sans-serif;
-            padding: 20px;
+            padding: 16px;
         }
 
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
         }
 
         .header h1 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .header h1 i { color: var(--primary); }
@@ -53,72 +53,94 @@
         .info-box {
             background: #111;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            font-size: 12px;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 11px;
             color: var(--text-dim);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .info-box code {
             background: #1a1a1a;
-            padding: 2px 6px;
+            padding: 2px 5px;
             border-radius: 3px;
             color: #fff;
         }
 
+        .table-container {
+            max-height: calc(100vh - 220px);
+            overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
         .voice-table {
-            width: 100%;
+            width: max-content;
+            min-width: 100%;
             border-collapse: collapse;
             background: #0a0a0a;
-            border-radius: 8px;
-            overflow: hidden;
         }
 
         .voice-table th {
             background: #111;
             text-align: left;
-            padding: 12px 10px;
-            font-size: 10px;
+            padding: 10px 8px;
+            font-size: 9px;
             font-weight: 600;
             color: #555;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .voice-table td {
-            padding: 10px;
+            padding: 8px 6px;
             border-bottom: 1px solid #1a1a1a;
-            font-size: 12px;
+            font-size: 11px;
+            white-space: nowrap;
         }
 
         .voice-table tr:hover td { background: #0f0f0f; }
 
         .voice-table input, .voice-table select {
-            width: 100%;
-            padding: 6px 8px;
+            padding: 5px 6px;
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
             border-radius: 4px;
             color: #fff;
-            font-size: 11px;
+            font-size: 10px;
             outline: none;
         }
 
-        .voice-table input:focus, .voice-table select:focus { border-color: #333; }
+        .voice-table input:focus, .voice-table select:focus { border-color: #444; }
+        .voice-table input:disabled, .voice-table select:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #050505;
+        }
+
+        .input-voiceid { width: 200px; }
+        .input-name { width: 100px; }
+        .input-project { width: 80px; }
+        .input-model { width: 130px; }
+        .input-num { width: 55px; text-align: center; }
+        .input-provider { width: 90px; }
 
         .btn {
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-size: 12px;
+            padding: 7px 12px;
+            border-radius: 5px;
+            font-size: 11px;
             font-weight: 500;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             border: 1px solid #1a1a1a;
             background: #0a0a0a;
             color: #fff;
@@ -132,43 +154,36 @@
         .btn-success:hover { background: #059669; }
         .btn-danger { color: #f55; }
         .btn-danger:hover { background: rgba(255, 85, 85, 0.1); border-color: #f55; }
-        .btn-sm { padding: 5px 8px; font-size: 10px; }
+        .btn-sm { padding: 4px 7px; font-size: 10px; }
 
         .actions {
             display: flex;
             gap: 10px;
-            margin-top: 16px;
-            padding-top: 16px;
+            margin-top: 14px;
+            padding-top: 14px;
             border-top: 1px solid var(--border);
         }
 
         .actions-left { display: flex; gap: 8px; }
         .actions-right { margin-left: auto; display: flex; gap: 8px; }
 
-        .table-container {
-            max-height: calc(100vh - 280px);
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+        .checkbox-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .provider-badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
+        .checkbox-cell input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+
+        .v3-notice {
             font-size: 9px;
-            font-weight: 600;
-        }
-        .provider-badge.elevenlabs { background: #1a1a4a; color: #667eea; }
-        .provider-badge.minimax { background: #1a3a1a; color: #10b981; }
-
-        .settings-preview {
-            font-size: 10px;
-            color: #666;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            color: #f59e0b;
+            display: block;
+            margin-top: 2px;
         }
     </style>
 </head>
@@ -176,26 +191,30 @@
 <body>
     <div class="header">
         <h1><i class="bi bi-collection"></i> Voice Library</h1>
-        <span style="font-size: 12px; color: #555;">Quản lý giọng nói với các thông số tùy chỉnh</span>
+        <span style="font-size: 11px; color: #555;">Quản lý giọng nói</span>
     </div>
 
     <div class="info-box">
-        <strong>Hướng dẫn:</strong> Lưu các Voice ID cùng với thông số settings để sử dụng lại.<br>
-        Sử dụng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu mỗi dòng text để chỉ định giọng tương ứng.
-        Nhấn <strong>Sử dụng</strong> để áp dụng voice và settings vào Pro Tool.
+        <strong>Hướng dẫn:</strong> Lưu Voice ID cùng settings. Dùng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu dòng để chỉ định giọng.
+        <span style="color: #f59e0b;">Model V3 chỉ hỗ trợ Stability.</span>
     </div>
 
     <div class="table-container">
         <table class="voice-table" id="voiceTable">
             <thead>
                 <tr>
-                    <th style="width: 35px;">#</th>
-                    <th style="width: 80px;">Provider</th>
-                    <th style="width: 180px;">Voice ID</th>
-                    <th style="width: 120px;">Tên</th>
-                    <th style="width: 100px;">Project</th>
-                    <th>Settings</th>
-                    <th style="width: 120px;">Actions</th>
+                    <th>#</th>
+                    <th>Provider</th>
+                    <th>Voice ID</th>
+                    <th>Name</th>
+                    <th>Project</th>
+                    <th>Model</th>
+                    <th>Speed</th>
+                    <th>Stability</th>
+                    <th>Similarity</th>
+                    <th>Style</th>
+                    <th>Boost</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="voiceTableBody">
@@ -224,6 +243,25 @@
     <script>
         let voices = [];
 
+        const ELEVENLABS_MODELS = [
+            { id: 'eleven_multilingual_v2', name: 'Multilingual V2' },
+            { id: 'eleven_turbo_v2_5', name: 'Turbo V2.5' },
+            { id: 'eleven_flash_v2', name: 'Flash V2' },
+            { id: 'eleven_flash_v2_5', name: 'Flash V2.5' },
+            { id: 'eleven_v3', name: 'Eleven V3 (Alpha)' }
+        ];
+
+        const MINIMAX_MODELS = [
+            { id: 'speech-02-hd', name: 'Speech HD 2.6' },
+            { id: 'speech-02-turbo', name: 'Speech Turbo 2.6' },
+            { id: 'speech-01-hd', name: 'Speech HD 2.5' },
+            { id: 'speech-01-turbo', name: 'Speech Turbo 2.5' }
+        ];
+
+        function isModelV3(model) {
+            return model === 'eleven_v3';
+        }
+
         // Load voices from localStorage on init
         function init() {
             const saved = localStorage.getItem('voiceLibrary');
@@ -250,6 +288,7 @@
                 name: '',
                 provider: 'elevenlabs',
                 project: '',
+                model: 'eleven_multilingual_v2',
                 settings: {
                     speed: 1.0,
                     stability: 0.5,
@@ -267,39 +306,83 @@
             const tbody = document.getElementById('voiceTableBody');
             tbody.innerHTML = voices.map((voice, index) => {
                 const isElevenlabs = voice.provider === 'elevenlabs';
-                const settingsText = isElevenlabs
-                    ? `Speed: ${voice.settings?.speed || 1}, Stab: ${voice.settings?.stability || 0.5}, Sim: ${voice.settings?.similarity || 0.75}`
-                    : `Speed: ${voice.settings?.speed || 1}, Pitch: ${voice.settings?.pitch || 0}, Vol: ${voice.settings?.volume || 1}`;
+                const isV3 = isModelV3(voice.model);
+                const models = isElevenlabs ? ELEVENLABS_MODELS : MINIMAX_MODELS;
+
+                // Get current values
+                const speed = voice.settings?.speed ?? 1.0;
+                const stability = voice.settings?.stability ?? 0.5;
+                const similarity = voice.settings?.similarity ?? 0.75;
+                const style = voice.settings?.style ?? 0;
+                const speakerBoost = voice.settings?.speakerBoost !== false;
 
                 return `
                 <tr data-index="${index}">
-                    <td style="color: #666; text-align: center;">${index + 1}</td>
+                    <td style="color: #666; text-align: center; width: 30px;">${index + 1}</td>
                     <td>
-                        <select onchange="updateVoice(${index}, 'provider', this.value)">
+                        <select class="input-provider" onchange="updateProvider(${index}, this.value)">
                             <option value="elevenlabs" ${voice.provider === 'elevenlabs' ? 'selected' : ''}>ElevenLabs</option>
                             <option value="minimax" ${voice.provider === 'minimax' ? 'selected' : ''}>Minimax</option>
                         </select>
                     </td>
                     <td>
-                        <input type="text"
+                        <input type="text" class="input-voiceid"
                                value="${escapeHtml(voice.voiceId || '')}"
                                placeholder="Voice ID..."
                                onchange="updateVoice(${index}, 'voiceId', this.value)">
                     </td>
                     <td>
-                        <input type="text"
+                        <input type="text" class="input-name"
                                value="${escapeHtml(voice.name || '')}"
                                placeholder="Tên..."
                                onchange="updateVoice(${index}, 'name', this.value)">
                     </td>
                     <td>
-                        <input type="text"
+                        <input type="text" class="input-project"
                                value="${escapeHtml(voice.project || '')}"
                                placeholder="Project..."
                                onchange="updateVoice(${index}, 'project', this.value)">
                     </td>
                     <td>
-                        <div class="settings-preview" title="${settingsText}">${settingsText}</div>
+                        <select class="input-model" onchange="updateModel(${index}, this.value)" ${!isElevenlabs ? 'style="display:none;"' : ''}>
+                            ${ELEVENLABS_MODELS.map(m => `<option value="${m.id}" ${voice.model === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        </select>
+                        <select class="input-model" onchange="updateModel(${index}, this.value)" ${isElevenlabs ? 'style="display:none;"' : ''}>
+                            ${MINIMAX_MODELS.map(m => `<option value="${m.id}" ${voice.model === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="input-num"
+                               value="${speed}"
+                               step="0.1" min="0.5" max="2"
+                               ${isV3 ? 'disabled title="V3 không hỗ trợ Speed"' : ''}
+                               onchange="updateSetting(${index}, 'speed', parseFloat(this.value))">
+                    </td>
+                    <td>
+                        <input type="number" class="input-num"
+                               value="${stability}"
+                               step="0.05" min="0" max="1"
+                               onchange="updateSetting(${index}, 'stability', parseFloat(this.value))">
+                    </td>
+                    <td>
+                        <input type="number" class="input-num"
+                               value="${similarity}"
+                               step="0.05" min="0" max="1"
+                               ${isV3 ? 'disabled title="V3 không hỗ trợ Similarity"' : ''}
+                               onchange="updateSetting(${index}, 'similarity', parseFloat(this.value))">
+                    </td>
+                    <td>
+                        <input type="number" class="input-num"
+                               value="${style}"
+                               step="0.05" min="0" max="1"
+                               ${isV3 ? 'disabled title="V3 không hỗ trợ Style"' : ''}
+                               onchange="updateSetting(${index}, 'style', parseFloat(this.value))">
+                    </td>
+                    <td class="checkbox-cell">
+                        <input type="checkbox"
+                               ${speakerBoost ? 'checked' : ''}
+                               ${isV3 ? 'disabled title="V3 không hỗ trợ Speaker Boost"' : ''}
+                               onchange="updateSetting(${index}, 'speakerBoost', this.checked)">
                     </td>
                     <td style="text-align: center;">
                         <button class="btn btn-sm btn-success" onclick="useVoice(${index})" title="Sử dụng">
@@ -317,9 +400,9 @@
             voices.push(createEmptyVoice());
             renderTable();
 
-            // Focus on the new row's first input
+            // Focus on the new row's Voice ID input
             setTimeout(() => {
-                const inputs = document.querySelectorAll('#voiceTableBody tr:last-child input');
+                const inputs = document.querySelectorAll('#voiceTableBody tr:last-child input.input-voiceid');
                 if (inputs[0]) inputs[0].focus();
             }, 50);
         }
@@ -327,6 +410,35 @@
         function updateVoice(index, field, value) {
             if (voices[index]) {
                 voices[index][field] = value;
+            }
+        }
+
+        function updateProvider(index, value) {
+            if (voices[index]) {
+                voices[index].provider = value;
+                // Reset model when switching provider
+                if (value === 'elevenlabs') {
+                    voices[index].model = 'eleven_multilingual_v2';
+                } else {
+                    voices[index].model = 'speech-02-hd';
+                }
+                renderTable();
+            }
+        }
+
+        function updateModel(index, value) {
+            if (voices[index]) {
+                voices[index].model = value;
+                renderTable(); // Re-render to update disabled states
+            }
+        }
+
+        function updateSetting(index, field, value) {
+            if (voices[index]) {
+                if (!voices[index].settings) {
+                    voices[index].settings = {};
+                }
+                voices[index].settings[field] = value;
             }
         }
 
@@ -362,7 +474,7 @@
                 window.electronAPI.sendVoiceLibrary({ action: 'use', voice: voice });
             }
 
-            alert(`Using voice: ${voice.name || voice.voiceId}`);
+            alert(`Đang sử dụng: ${voice.name || voice.voiceId}`);
         }
 
         function clearAll() {

@@ -796,7 +796,7 @@ ipcMain.handle('open-voice-library', async () => {
   }
 
   voiceLibraryWindow = new BrowserWindow({
-    width: 600,
+    width: 1100,
     height: 500,
     title: 'Voice Library',
     parent: mainWindow,

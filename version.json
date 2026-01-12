@@ -1,9 +1,9 @@
 {
-  "version": "1.6.8",
+  "version": "1.6.9",
   "changelog": [
-    "Resume incomplete work: auto-detect completed files when importing",
-    "Skip already completed files when running Start",
-    "Shows completed count when importing files"
+    "Voice Library: Wider table to show full Voice ID",
+    "Voice Library: Add Model, Speed, Stability, Similarity, Style, Speaker Boost columns",
+    "Voice Library: V3 model only allows Stability editing"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
