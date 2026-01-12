@@ -1,6 +1,7 @@
 {
-  "version": "1.3.6",
+  "version": "1.3.9",
   "changelog": [
+    "Rollback to stable version",
     "Add ElevenLabs Library to Pro Tool",
     "Fix infinite update loop issue",
     "Read version from local version.json",
