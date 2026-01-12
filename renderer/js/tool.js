@@ -974,8 +974,11 @@ class ProToolManager {
                            style="padding: 4px 6px; font-size: 11px; width: 90px;">
                 </td>
                 <td>
-                    <div class="task-content">${this.escapeHtml((task.content || '').substring(0, 80))}</div>
-                    <div class="task-filename" style="font-size: 10px; color: #555;">${task.fileName || ''}</div>
+                    <textarea class="form-input task-content-input"
+                              data-id="${task.id}"
+                              onchange="proTool.updateTaskField('${task.id}', 'content', this.value)"
+                              style="padding: 4px 6px; font-size: 11px; width: 100%; min-height: 32px; max-height: 80px; resize: vertical;"
+                    >${this.escapeHtml(task.content || '')}</textarea>
                 </td>
                 <td>
                     <input type="text" class="form-input"
