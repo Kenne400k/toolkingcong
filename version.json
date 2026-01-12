@@ -1,7 +1,7 @@
 {
   "version": "1.8.1",
   "changelog": [
-    "Fix folder upload in TTS - now supports .srt files",
+    "Fix folder upload in TTS",
     "Improved folder input event handling",
     "Add debug logs for troubleshooting"
   ],

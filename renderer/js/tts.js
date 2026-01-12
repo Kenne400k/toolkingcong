@@ -7490,16 +7490,16 @@ $(document).ready(function() {
                 console.log(`  ${i+1}. ${f.name} (${(f.size/1024).toFixed(1)}KB)`);
             });
 
-            // Lọc file hợp lệ (.txt, .srt, .zip)
+            // Lọc file hợp lệ (.txt, .zip)
             let validFiles = Array.from(files).filter(f => {
                 let name = f.name.toLowerCase();
-                return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
+                return (name.endsWith('.txt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
             });
 
             console.log('📁 Valid files after filter:', validFiles.length);
 
             if (validFiles.length === 0) {
-                alert('Không có file hợp lệ trong thư mục!\nChỉ chấp nhận .txt, .srt, .zip < 5MB');
+                alert('Không có file hợp lệ trong thư mục!\nChỉ chấp nhận .txt, .zip < 5MB');
                 this.value = '';
                 return;
             }
