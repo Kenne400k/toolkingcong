@@ -1,7 +1,7 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "changelog": [
-    "Add Reset All Settings button in Pro Tool"
+    "Add progress bar 0-100% for Pro Tool processing tasks"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

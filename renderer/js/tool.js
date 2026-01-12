@@ -1180,7 +1180,16 @@ class ProToolManager {
                            placeholder="Voice ID..."
                            style="padding: 4px 6px; font-size: 11px; width: 110px;">
                 </td>
-                <td><span class="status ${task.status}">${this.getStatusText(task.status)}</span></td>
+                <td>
+                    ${task.status === 'processing' ? `
+                        <div class="status-progress-wrapper">
+                            <div class="status-progress-bar">
+                                <div class="status-progress-fill" style="width: ${task.progress || 0}%"></div>
+                            </div>
+                            <span class="status-progress-text">${task.progress || 0}%</span>
+                        </div>
+                    ` : `<span class="status ${task.status}">${this.getStatusText(task.status)}</span>`}
+                </td>
                 <td>
                     ${task.resultUrl ? `<button class="btn btn-sm" onclick="proTool.downloadTask('${task.id}')" title="Tải xuống"><i class="bi bi-download"></i></button>` : ''}
                     <button class="btn btn-sm" onclick="proTool.removeTask('${task.id}')" title="Xóa"><i class="bi bi-x"></i></button>
@@ -1375,6 +1384,7 @@ class ProToolManager {
         const processTask = async (task, retryCount = 0) => {
             console.log('🔄 Processing task:', task.id, task.content?.substring(0, 50));
             task.status = 'processing';
+            task.progress = 0;
             this.updateTaskDisplay();
 
             try {
@@ -1589,6 +1599,7 @@ class ProToolManager {
                     task.resultUrl = response.result_url || response.audio_url || response.url;
                     task.duration = response.duration || '-';
                     task.progress = 100;
+                    this.updateTaskDisplay();
 
                     // Auto download to output folder
                     await this.autoDownloadTask(task);
@@ -1598,6 +1609,7 @@ class ProToolManager {
                     console.log('❌ Task failed:', task.taskId, response.message);
                     task.status = 'failed';
                     task.error = response.message || 'Task failed';
+                    this.updateTaskDisplay();
                     return;
                 }
                 
