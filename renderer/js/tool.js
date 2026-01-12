@@ -362,45 +362,57 @@ class ProToolManager {
     // Import file using Electron dialog
     async importFilesDialog() {
         console.log('📂 Import files dialog...');
+        // Set import source for download folder tracking
+        this.currentImportSource = 'ImportFile';
+
         try {
             const result = await window.electronAPI.selectFiles({
                 filters: [
                     { name: 'Text Files', extensions: ['txt', 'srt'] }
                 ]
             });
-            
+
             console.log('📂 Select result:', result);
-            
+
             if (!result.success || result.canceled) {
                 console.log('📂 Canceled or failed');
+                this.currentImportSource = null;
                 return;
             }
-            
+
             for (const filePath of result.filePaths) {
                 console.log('📂 Reading file:', filePath);
                 const fileResult = await window.electronAPI.readFile(filePath);
                 console.log('📂 File result:', { success: fileResult.success, fileName: fileResult.fileName, contentLength: fileResult.content?.length });
-                
+
                 if (fileResult.success) {
                     await this.processImportedText(fileResult.content, fileResult.fileName);
                 }
             }
-            
+
             console.log('📂 Total tasks after import:', this.tasks.length);
             this.updateTaskDisplay();
+            this.currentImportSource = null;
         } catch (error) {
             console.error('❌ Import file error:', error);
             this.showNotification('Lỗi khi import file', 'error');
+            this.currentImportSource = null;
         }
     }
-    
+
     // Import folder using Electron dialog
     async importFolderDialog() {
+        // Set import source for download folder tracking
+        this.currentImportSource = 'ImportFolder';
+
         try {
             const result = await window.electronAPI.selectFolder();
-            
-            if (!result.success || result.canceled) return;
-            
+
+            if (!result.success || result.canceled) {
+                this.currentImportSource = null;
+                return;
+            }
+
             for (const filePath of result.files) {
                 const fileResult = await window.electronAPI.readFile(filePath);
                 if (fileResult.success) {
@@ -409,16 +421,19 @@ class ProToolManager {
                         content: fileResult.content,
                         fileName: fileResult.fileName,
                         voiceId: document.getElementById('selectedVoiceId')?.value || '',
-                        status: 'pending'
+                        status: 'pending',
+                        importSource: 'ImportFolder'
                     });
                 }
             }
-            
+
             this.updateTaskDisplay();
             this.showNotification(`Đã import ${result.files.length} file`, 'success');
+            this.currentImportSource = null;
         } catch (error) {
             console.error('Import folder error:', error);
             this.showNotification('Lỗi khi import folder', 'error');
+            this.currentImportSource = null;
         }
     }
     
@@ -1134,13 +1149,18 @@ class ProToolManager {
     
     addTask(task) {
         task.createdAt = new Date().toISOString();
+        // Auto-add importSource if not set and currentImportSource is available
+        if (!task.importSource && this.currentImportSource) {
+            task.importSource = this.currentImportSource;
+        }
         this.tasks.push(task);
         console.log('➕ Added task:', {
             id: task.id,
             fileName: task.fileName,
             contentLength: task.content?.length,
             voiceId: task.voiceId,
-            status: task.status
+            status: task.status,
+            importSource: task.importSource
         });
     }
     
@@ -2211,8 +2231,8 @@ class ProToolManager {
             const outputName = task.outputName || task.fileName || task.id;
             const fileName = `${outputName}.mp3`;
 
-            // Determine subfolder based on provider
-            const subfolder = this.provider === 'elevenlabs' ? '11labs' : 'Minimax';
+            // Determine subfolder based on import source (ImportFile, ImportFolder, or Backup)
+            const subfolder = task.importSource || 'ImportFile';
 
             console.log(`📥 Auto downloading: ${fileName} to ${subfolder}/`);
 
