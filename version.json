@@ -1,8 +1,8 @@
 {
-  "version": "1.6.5",
+  "version": "1.6.6",
   "changelog": [
-    "Fix: Voice Library not saving when clicking + button",
-    "Fixed localStorage key mismatch between addToLibrary and Voice Library window"
+    "Simplify output folders: Backup, ImportFile, ImportFolder, Join",
+    "All TTS downloads now go to output/Backup instead of 11labs/Minimax"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

@@ -1771,7 +1771,7 @@ class ProToolManager {
                     const result = await window.electronAPI.downloadFile({
                         url: task.resultUrl,
                         fileName: fileName,
-                        subfolder: this.provider === 'elevenlabs' ? '11labs' : 'Minimax'
+                        subfolder: 'Backup'
                     });
 
                     if (result.success) {

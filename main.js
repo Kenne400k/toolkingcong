@@ -616,7 +616,7 @@ ipcMain.handle('open-output-folder', async () => {
   const outputPath = path.join(__dirname, 'output');
 
   // Create output folder and subfolders if not exist
-  const subfolders = ['11labs', 'Minimax', 'Join', 'Backup'];
+  const subfolders = ['Backup', 'ImportFile', 'ImportFolder', 'Join'];
   if (!fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath, { recursive: true });
   }
