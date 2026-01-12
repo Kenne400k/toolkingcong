@@ -196,6 +196,8 @@ async updateUserInfo() {
                 
                 if (page === 'tts') {
                     this.navigateToTTS();
+                } else if (page === 'tool') {
+                    this.navigateToTool();
                 } else if (page === 'history') {
                     this.loadHistoryPage();
                 } else if (page === 'dashboard') {
@@ -400,6 +402,15 @@ async updateUserInfo() {
         } catch (error) {
             console.error('❌ Navigation error:', error);
             this.showError('Failed to load TTS page');
+        }
+    }
+
+    async navigateToTool() {
+        try {
+            await window.electronAPI.loadToolPage();
+        } catch (error) {
+            console.error('❌ Navigation error:', error);
+            this.showError('Failed to load Tool page');
         }
     }
 
