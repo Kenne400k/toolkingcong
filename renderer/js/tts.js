@@ -7465,46 +7465,73 @@ $('#fileInput').on('change', function(e) {
     // 🔥 [QUAN TRỌNG] GỌI HÀM CHUNG (Sẽ tự động phân loại 1 file hay nhiều file)
     processUploadFiles(validFiles);
 });
-$('#folderInput').on('change', function(e) {
-    let files = e.target.files;
-    if (!files || files.length === 0) return;
-    
-    // Lọc file hợp lệ
-    let validFiles = Array.from(files).filter(f => {
-        let name = f.name.toLowerCase();
-        return (name.endsWith('.txt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
-    });
-    
-    if (validFiles.length === 0) {
-        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .zip < 5MB');
-        $(this).val('');
-        return;
+
+// 🔥 FOLDER INPUT - Đảm bảo event được gắn sau khi DOM ready
+$(document).ready(function() {
+    console.log('📁 Setting up folder input handler...');
+
+    const folderInput = document.getElementById('folderInput');
+    if (folderInput) {
+        console.log('✅ Found #folderInput element');
+
+        // Dùng native addEventListener để đảm bảo hoạt động
+        folderInput.addEventListener('change', function(e) {
+            let files = e.target.files;
+            console.log('📁 Folder input changed, files:', files ? files.length : 0);
+
+            if (!files || files.length === 0) {
+                console.log('❌ No files selected');
+                return;
+            }
+
+            // Log tất cả file trong folder
+            console.log('📁 All files in folder:');
+            Array.from(files).forEach((f, i) => {
+                console.log(`  ${i+1}. ${f.name} (${(f.size/1024).toFixed(1)}KB)`);
+            });
+
+            // Lọc file hợp lệ (.txt, .srt, .zip)
+            let validFiles = Array.from(files).filter(f => {
+                let name = f.name.toLowerCase();
+                return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
+            });
+
+            console.log('📁 Valid files after filter:', validFiles.length);
+
+            if (validFiles.length === 0) {
+                alert('Không có file hợp lệ trong thư mục!\nChỉ chấp nhận .txt, .srt, .zip < 5MB');
+                this.value = '';
+                return;
+            }
+
+            // 🔥 KIỂM TRA GIỌNG TRƯỚC
+            if (!$('#voiceIdVal').val()) {
+                pendingUploadFiles = validFiles;
+                this.value = '';
+
+                showModernConfirm(
+                    'Chưa chọn giọng nói',
+                    'Vui lòng chọn giọng nói trước khi tải folder lên.',
+                    function() { openVoiceModal(); },
+                    { type: 'warning', confirmText: 'Chọn giọng', cancelText: 'Hủy' }
+                );
+                return;
+            }
+
+            // 🔥 NẾU CÓ 10+ FILES → HIỆN POPUP XÁC NHẬN
+            if (validFiles.length >= 10) {
+                showFolderConfirmPopup(validFiles, this);
+                return;
+            }
+
+            // Dưới 10 files → Xử lý bình thường
+            console.log('📁 Folder upload: Opening Bulk Modal with', validFiles.length, 'files');
+            this.value = '';
+            processUploadFiles(validFiles);
+        });
+    } else {
+        console.log('❌ #folderInput element not found!');
     }
-    
-    // 🔥 KIỂM TRA GIỌNG TRƯỚC
-    if (!$('#voiceIdVal').val()) {
-        pendingUploadFiles = validFiles;
-        $(this).val('');
-        
-        showModernConfirm(
-            'Chưa chọn giọng nói',
-            'Vui lòng chọn giọng nói trước khi tải folder lên.',
-            function() { openVoiceModal(); },
-            { type: 'warning', confirmText: 'Chọn giọng', cancelText: 'Hủy' }
-        );
-        return;
-    }
-    
-    // 🔥 NẾU CÓ 10+ FILES → HIỆN POPUP XÁC NHẬN
-    if (validFiles.length >= 10) {
-        showFolderConfirmPopup(validFiles, $(this));
-        return;
-    }
-    
-    // Dưới 10 files → Xử lý bình thường
-    console.log('📁 Folder upload: Opening Bulk Modal with', validFiles.length, 'files');
-    $(this).val('');
-    processUploadFiles(validFiles);
 });
 function setupBulkDropZone() {
     const dropZone = document.getElementById('bulkDropZone');

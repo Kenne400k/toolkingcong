@@ -1,10 +1,9 @@
 {
-  "version": "1.8.0",
+  "version": "1.8.1",
   "changelog": [
-    "Add Voice Cloning tab - Clone any voice using Minimax",
-    "New dedicated page for voice cloning with full UI",
-    "Support upload MP3, select language & gender",
-    "View and manage cloned voices library"
+    "Fix folder upload in TTS - now supports .srt files",
+    "Improved folder input event handling",
+    "Add debug logs for troubleshooting"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
