@@ -499,32 +499,14 @@ class ProToolManager {
     }
     
     updateModelOptions() {
-        const modelSelect = document.getElementById('modelSelect');
-        if (!modelSelect) return;
-        
-        // Nếu đã load models từ server thì dùng
-        const models = this.loadedModels?.[this.provider] || [];
-        
-        if (models.length > 0) {
-            modelSelect.innerHTML = models.map(m => 
-                `<option value="${m.id}">${m.name}${m.cost_factor < 1 ? ` (${Math.round((1-m.cost_factor)*100)}% rẻ hơn)` : ''}</option>`
-            ).join('');
+        // Get model based on current provider
+        if (this.provider === 'elevenlabs') {
+            const modelSelect = document.getElementById('modelSelect');
+            this.model = modelSelect?.value || 'eleven_multilingual_v2';
         } else {
-            // Fallback nếu chưa load
-            if (this.provider === 'elevenlabs') {
-                modelSelect.innerHTML = `
-                    <option value="eleven_multilingual_v2">Multilingual V2</option>
-                    <option value="eleven_turbo_v2_5">Turbo V2.5</option>
-                    <option value="eleven_flash_v2">Flash V2</option>
-                `;
-            } else {
-                modelSelect.innerHTML = `
-                    <option value="speech-02-hd">Speech 02 HD</option>
-                    <option value="speech-02-turbo">Speech 02 Turbo</option>
-                `;
-            }
+            const minimaxModelSelect = document.getElementById('minimaxModelSelect');
+            this.model = minimaxModelSelect?.value || 'speech-02-hd';
         }
-        this.model = modelSelect.value;
     }
     
     // Load resources khi khởi động
@@ -1482,11 +1464,11 @@ class ProToolManager {
                 pitch = parseInt(document.getElementById('mmVoicePitch')?.value) || 0;
                 vol = parseFloat(document.getElementById('mmVoiceVol')?.value) || 1;
             } else {
-                // ElevenLabs settings
+                // ElevenLabs settings (slider 0-100 -> API 0-1)
                 speed = parseFloat(document.getElementById('voiceSpeed')?.value) || 1;
-                stability = parseFloat(document.getElementById('voiceStability')?.value) || 0.5;
-                similarity = parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75;
-                style = parseFloat(document.getElementById('voiceStyle')?.value) || 0;
+                stability = (parseFloat(document.getElementById('voiceStability')?.value) || 50) / 100;
+                similarity = (parseFloat(document.getElementById('voiceSimilarity')?.value) || 75) / 100;
+                style = (parseFloat(document.getElementById('voiceStyle')?.value) || 0) / 100;
                 speakerBoost = document.getElementById('speakerBoost')?.checked || false;
             }
 
@@ -2556,6 +2538,36 @@ function selectProvider(provider) {
         voiceCloneSection.style.display = provider === 'minimax' ? 'block' : 'none';
     }
 
+    // Show/hide Model groups
+    const elevenlabsModelGroup = document.getElementById('elevenlabsModelGroup');
+    const minimaxModelGroup = document.getElementById('minimaxModelGroup');
+    if (elevenlabsModelGroup) {
+        elevenlabsModelGroup.style.display = provider === 'elevenlabs' ? 'block' : 'none';
+    }
+    if (minimaxModelGroup) {
+        minimaxModelGroup.style.display = provider === 'minimax' ? 'block' : 'none';
+    }
+
+    // Show/hide Voice Settings
+    const elevenlabsSettings = document.getElementById('elevenlabsSettings');
+    const minimaxSettings = document.getElementById('minimaxSettings');
+    if (elevenlabsSettings) {
+        elevenlabsSettings.style.display = provider === 'elevenlabs' ? 'block' : 'none';
+    }
+    if (minimaxSettings) {
+        minimaxSettings.style.display = provider === 'minimax' ? 'block' : 'none';
+    }
+
+    // Reset V3 mode when switching providers
+    if (provider === 'elevenlabs') {
+        const currentModel = document.getElementById('modelSelect')?.value;
+        if (currentModel === 'eleven_v3') {
+            applyV3ModelSettings();
+        } else {
+            applyNormalModelSettings();
+        }
+    }
+
     proTool.updateModelOptions();
 }
 
@@ -2917,19 +2929,38 @@ style.textContent = `
 document.head.appendChild(style);
 
 // ==================== SLIDER UPDATE FUNCTIONS ====================
+let isV3Model = false; // Track if current model is V3
+
 function updateSlider(type) {
     switch (type) {
         case 'speed':
-            document.getElementById('speedValue').textContent = document.getElementById('voiceSpeed').value;
+            document.getElementById('speedValue').textContent = parseFloat(document.getElementById('voiceSpeed').value).toFixed(2);
             break;
         case 'stability':
-            document.getElementById('stabilityValue').textContent = document.getElementById('voiceStability').value;
+            const stabVal = parseInt(document.getElementById('voiceStability').value);
+            const stabDisplay = document.getElementById('stabilityValue');
+            if (isV3Model) {
+                // V3 mode: Creative/Natural/Robust
+                if (stabVal <= 25) {
+                    stabDisplay.textContent = 'Creative';
+                    stabDisplay.style.color = '#f0ad4e';
+                } else if (stabVal <= 75) {
+                    stabDisplay.textContent = 'Natural';
+                    stabDisplay.style.color = '#5bc0de';
+                } else {
+                    stabDisplay.textContent = 'Robust';
+                    stabDisplay.style.color = '#5cb85c';
+                }
+            } else {
+                stabDisplay.textContent = stabVal + '%';
+                stabDisplay.style.color = '#fff';
+            }
             break;
         case 'similarity':
-            document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value;
+            document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value + '%';
             break;
         case 'style':
-            document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value;
+            document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value + '%';
             break;
         // Minimax sliders
         case 'mmSpeed':
@@ -2944,6 +2975,45 @@ function updateSlider(type) {
     }
 }
 
+// Apply V3 model settings (only Stability with 3 tiers)
+function applyV3ModelSettings() {
+    isV3Model = true;
+    // Hide Speed, Similarity, Style for V3
+    document.getElementById('slider-speed').style.display = 'none';
+    document.getElementById('slider-similarity').style.display = 'none';
+    document.getElementById('slider-style').style.display = 'none';
+    document.getElementById('toggle-boost').style.display = 'none';
+
+    // Configure Stability slider for V3 (3 tiers: 0, 50, 100)
+    const stabSlider = document.getElementById('voiceStability');
+    stabSlider.setAttribute('step', '50');
+    stabSlider.value = 50;
+
+    // Show V3 labels
+    document.getElementById('stability-labels').style.display = 'flex';
+
+    updateSlider('stability');
+}
+
+// Apply normal model settings
+function applyNormalModelSettings() {
+    isV3Model = false;
+    // Show all settings
+    document.getElementById('slider-speed').style.display = 'block';
+    document.getElementById('slider-similarity').style.display = 'block';
+    document.getElementById('slider-style').style.display = 'block';
+    document.getElementById('toggle-boost').style.display = 'flex';
+
+    // Configure Stability slider back to normal
+    const stabSlider = document.getElementById('voiceStability');
+    stabSlider.setAttribute('step', '1');
+
+    // Hide V3 labels
+    document.getElementById('stability-labels').style.display = 'none';
+
+    updateSlider('stability');
+}
+
 function resetVoiceSettings() {
     const provider = proTool?.provider || 'elevenlabs';
 
@@ -2956,8 +3026,8 @@ function resetVoiceSettings() {
         updateSlider('mmVol');
     } else {
         document.getElementById('voiceSpeed').value = 1;
-        document.getElementById('voiceStability').value = 0.5;
-        document.getElementById('voiceSimilarity').value = 0.75;
+        document.getElementById('voiceStability').value = 50;
+        document.getElementById('voiceSimilarity').value = 75;
         document.getElementById('voiceStyle').value = 0;
         document.getElementById('speakerBoost').checked = true;
         updateSlider('speed');
@@ -2967,4 +3037,22 @@ function resetVoiceSettings() {
     }
 
     proTool?.showNotification?.('Reset voice settings', 'success');
+}
+
+// Model change handler for ElevenLabs
+function onModelChange() {
+    const modelId = document.getElementById('modelSelect')?.value;
+    proTool.model = modelId;
+
+    if (modelId === 'eleven_v3') {
+        applyV3ModelSettings();
+    } else {
+        applyNormalModelSettings();
+    }
+}
+
+// Model change handler for Minimax
+function onMinimaxModelChange() {
+    const modelId = document.getElementById('minimaxModelSelect')?.value;
+    proTool.model = modelId;
 }

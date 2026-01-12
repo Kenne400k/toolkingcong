@@ -702,13 +702,25 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- Model second -->
-                        <div class="form-group">
+                        <!-- Model second - ElevenLabs -->
+                        <div class="form-group" id="elevenlabsModelGroup">
                             <label class="form-label">Model</label>
-                            <select class="form-select" id="modelSelect">
+                            <select class="form-select" id="modelSelect" onchange="onModelChange()">
                                 <option value="eleven_multilingual_v2">Multilingual V2</option>
                                 <option value="eleven_turbo_v2_5">Turbo V2.5</option>
                                 <option value="eleven_flash_v2">Flash V2</option>
+                                <option value="eleven_flash_v2_5">Flash V2.5</option>
+                                <option value="eleven_v3">Eleven V3 (Alpha)</option>
+                            </select>
+                        </div>
+                        <!-- Model - Minimax -->
+                        <div class="form-group" id="minimaxModelGroup" style="display: none;">
+                            <label class="form-label">Model</label>
+                            <select class="form-select" id="minimaxModelSelect" onchange="onMinimaxModelChange()">
+                                <option value="speech-02-hd">Speech HD 2.6</option>
+                                <option value="speech-02-turbo">Speech Turbo 2.6</option>
+                                <option value="speech-01-hd">Speech HD 2.5</option>
+                                <option value="speech-01-turbo">Speech Turbo 2.5</option>
                             </select>
                         </div>
                         <div class="btn-group" style="margin-top: 8px;">
@@ -743,35 +755,40 @@
 
                         <!-- ElevenLabs Settings -->
                         <div id="elevenlabsSettings">
-                            <div class="slider-group">
+                            <div class="slider-group" id="slider-speed">
                                 <div class="slider-header">
                                     <span>Speed</span>
-                                    <span class="slider-value" id="speedValue">1.0</span>
+                                    <span class="slider-value" id="speedValue">1.00</span>
                                 </div>
-                                <input type="range" id="voiceSpeed" min="0.5" max="2" step="0.1" value="1" oninput="updateSlider('speed')">
+                                <input type="range" id="voiceSpeed" min="0.7" max="1.2" step="0.01" value="1" oninput="updateSlider('speed')">
                             </div>
-                            <div class="slider-group">
+                            <div class="slider-group" id="slider-stability">
                                 <div class="slider-header">
                                     <span>Stability</span>
-                                    <span class="slider-value" id="stabilityValue">0.5</span>
+                                    <span class="slider-value" id="stabilityValue">50%</span>
                                 </div>
-                                <input type="range" id="voiceStability" min="0" max="1" step="0.05" value="0.5" oninput="updateSlider('stability')">
+                                <input type="range" id="voiceStability" min="0" max="100" step="1" value="50" oninput="updateSlider('stability')">
+                                <div id="stability-labels" style="display:none; justify-content:space-between; font-size:11px; color:#888; margin-top:6px;">
+                                    <span style="color:#f0ad4e;">Creative</span>
+                                    <span style="color:#5bc0de;">Natural</span>
+                                    <span style="color:#5cb85c;">Robust</span>
+                                </div>
                             </div>
-                            <div class="slider-group">
+                            <div class="slider-group" id="slider-similarity">
                                 <div class="slider-header">
                                     <span>Similarity</span>
-                                    <span class="slider-value" id="similarityValue">0.75</span>
+                                    <span class="slider-value" id="similarityValue">75%</span>
                                 </div>
-                                <input type="range" id="voiceSimilarity" min="0" max="1" step="0.05" value="0.75" oninput="updateSlider('similarity')">
+                                <input type="range" id="voiceSimilarity" min="0" max="100" step="1" value="75" oninput="updateSlider('similarity')">
                             </div>
-                            <div class="slider-group">
+                            <div class="slider-group" id="slider-style">
                                 <div class="slider-header">
                                     <span>Style</span>
-                                    <span class="slider-value" id="styleValue">0.0</span>
+                                    <span class="slider-value" id="styleValue">0%</span>
                                 </div>
-                                <input type="range" id="voiceStyle" min="0" max="1" step="0.05" value="0" oninput="updateSlider('style')">
+                                <input type="range" id="voiceStyle" min="0" max="100" step="1" value="0" oninput="updateSlider('style')">
                             </div>
-                            <label class="checkbox-row">
+                            <label class="checkbox-row" id="toggle-boost">
                                 <input type="checkbox" id="speakerBoost" checked>
                                 Speaker Boost
                             </label>
