@@ -163,12 +163,24 @@ async function downloadUpdate(updateInfo) {
       splashWindow.webContents.send('update-progress', { percent: 30, status: 'Pulling updates...' });
     }
 
-    // Run git pull to update
-    const { stdout, stderr } = await execPromise('git pull origin main', {
-      cwd: __dirname
-    });
+    // Try git pull first
+    try {
+      const { stdout } = await execPromise('git pull origin main', {
+        cwd: __dirname
+      });
+      console.log('✅ Git pull output:', stdout);
+    } catch (pullError) {
+      // If pull fails (conflict/unmerged), force reset to remote
+      console.log('⚠️ Git pull failed, forcing reset to remote...');
 
-    console.log('✅ Git pull output:', stdout);
+      if (splashWindow && !splashWindow.isDestroyed()) {
+        splashWindow.webContents.send('update-progress', { percent: 50, status: 'Resolving conflicts...' });
+      }
+
+      await execPromise('git fetch origin', { cwd: __dirname });
+      await execPromise('git reset --hard origin/main', { cwd: __dirname });
+      console.log('✅ Force reset to origin/main successful');
+    }
 
     if (splashWindow && !splashWindow.isDestroyed()) {
       splashWindow.webContents.send('update-progress', { percent: 100, status: 'Update complete!' });
