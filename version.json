@@ -1,7 +1,8 @@
 {
-  "version": "1.4.5",
+  "version": "1.4.6",
   "changelog": [
-    "Fix V3 model detection for Creative/Natural/Robust"
+    "Remove History tab from Pro Tool",
+    "Fix V3 Stability showing Creative/Natural/Robust"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

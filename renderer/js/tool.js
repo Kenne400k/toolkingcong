@@ -2961,6 +2961,12 @@ document.head.appendChild(style);
 // ==================== SLIDER UPDATE FUNCTIONS ====================
 let isV3Model = false; // Track if current model is V3
 
+// Check if current model is V3
+function checkIsV3() {
+    const modelId = document.getElementById('modelSelect')?.value || '';
+    return modelId.toLowerCase().includes('v3');
+}
+
 function updateSlider(type) {
     switch (type) {
         case 'speed':
@@ -2969,7 +2975,9 @@ function updateSlider(type) {
         case 'stability':
             const stabVal = parseInt(document.getElementById('voiceStability').value);
             const stabDisplay = document.getElementById('stabilityValue');
-            if (isV3Model) {
+            // Check V3 directly from model select
+            const currentIsV3 = isV3Model || checkIsV3();
+            if (currentIsV3) {
                 // V3 mode: Creative/Natural/Robust (white text)
                 if (stabVal <= 25) {
                     stabDisplay.textContent = 'Creative';
@@ -2978,11 +2986,10 @@ function updateSlider(type) {
                 } else {
                     stabDisplay.textContent = 'Robust';
                 }
-                stabDisplay.style.color = '#fff';
             } else {
                 stabDisplay.textContent = stabVal + '%';
-                stabDisplay.style.color = '#fff';
             }
+            stabDisplay.style.color = '#fff';
             break;
         case 'similarity':
             document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value + '%';
