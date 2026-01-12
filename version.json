@@ -1,9 +1,8 @@
 {
-  "version": "1.6.9",
+  "version": "1.7.0",
   "changelog": [
-    "Voice Library: Wider table to show full Voice ID",
-    "Voice Library: Add Model, Speed, Stability, Similarity, Style, Speaker Boost columns",
-    "Voice Library: V3 model only allows Stability editing"
+    "Fix multi-voice chat: #1 #2 #3 now maps to voice position in library",
+    "#1 = Voice at row 1, #2 = Voice at row 2, #3 = Voice at row 3"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
