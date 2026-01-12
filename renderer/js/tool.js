@@ -2950,9 +2950,12 @@ async function addToLibrary() {
             speed: parseFloat(document.getElementById('voiceSpeed')?.value) || 1,
             stability: parseFloat(document.getElementById('voiceStability')?.value) || 0.5,
             similarity: parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75,
-            style: parseFloat(document.getElementById('voiceStyle')?.value) || 0
+            style: parseFloat(document.getElementById('voiceStyle')?.value) || 0,
+            speakerBoost: document.getElementById('speakerBoost')?.checked !== false
         }
     };
+
+    console.log('📚 Adding to library:', voiceData);
 
     // Load existing library
     let library = [];
@@ -2972,7 +2975,13 @@ async function addToLibrary() {
         proTool.showNotification(`Đã thêm "${voiceName}" vào thư viện!`, 'success');
     }
 
+    // Save to localStorage
     localStorage.setItem('voiceLibrary', JSON.stringify(library));
+
+    // Also update proTool.voiceLibrary in memory
+    proTool.voiceLibrary = library;
+
+    console.log('📚 Library saved:', library.length, 'voices');
 }
 
 // Old modal-based add to library (kept for reference)

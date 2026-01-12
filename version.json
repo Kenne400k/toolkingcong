@@ -1,8 +1,9 @@
 {
-  "version": "1.7.0",
+  "version": "1.7.1",
   "changelog": [
-    "Fix multi-voice chat: #1 #2 #3 now maps to voice position in library",
-    "#1 = Voice at row 1, #2 = Voice at row 2, #3 = Voice at row 3"
+    "Fix add voice to library: add speakerBoost setting",
+    "Fix add voice to library: update memory after save",
+    "Add debug logging for voice library operations"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
