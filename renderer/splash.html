@@ -299,8 +299,8 @@
             <div class="progress-text" id="progressText">0%</div>
         </div>
 
-        <!-- Update Available -->
-        <div class="update-available" id="updateAvailable">
+        <!-- Update Available (Auto-update, no buttons needed) -->
+        <div class="update-available" id="updateAvailable" style="display:none;">
             <div class="update-title">
                 <i class="bi bi-download"></i> Update Available
             </div>
@@ -309,20 +309,12 @@
                 <div class="changelog-title">What's New</div>
                 <div class="changelog-item">Bug fixes and improvements</div>
             </div>
-            <div style="margin-top: 16px;">
-                <button class="btn-update" onclick="startUpdate()">
-                    <i class="bi bi-download"></i> Update Now
-                </button>
-                <button class="btn-skip" onclick="skipUpdate()">Skip</button>
-            </div>
         </div>
 
-        <!-- Error State -->
-        <div class="error-state" id="errorState">
+        <!-- Error State (auto-continue after error) -->
+        <div class="error-state" id="errorState" style="display:none;">
             <div class="error-icon"><i class="bi bi-exclamation-circle"></i></div>
             <div class="error-text" id="errorText">Could not check for updates</div>
-            <button class="btn-retry" onclick="retryCheck()">Retry</button>
-            <button class="btn-continue" onclick="continueToApp()">Continue</button>
         </div>
 
         <!-- Version Info -->
@@ -364,7 +356,21 @@
 
                     if (result.updateAvailable) {
                         updateInfo = result;
-                        showUpdateAvailable(result);
+                        // Auto update - không cần xác nhận
+                        setStatus('downloading', 'Update available!', `Downloading v${result.version}...`);
+
+                        // Hiển thị changelog
+                        if (result.changelog && result.changelog.length > 0) {
+                            document.getElementById('statusDetail').innerHTML =
+                                `<div style="margin-top:10px; font-size:11px; color:#888;">` +
+                                result.changelog.slice(0, 3).map(c => `• ${c}`).join('<br>') +
+                                `</div>`;
+                        }
+
+                        // Tự động mở trang download sau 2 giây
+                        setTimeout(async () => {
+                            await startUpdate();
+                        }, 2000);
                     } else {
                         setStatus('success', 'You\'re up to date!', 'Launching application...');
                         setTimeout(() => continueToApp(), 1500);
@@ -376,7 +382,9 @@
                 }
             } catch (error) {
                 console.error('Update check error:', error);
-                showError('Could not check for updates: ' + error.message);
+                // Nếu lỗi kiểm tra update, vẫn tiếp tục vào app
+                setStatus('success', 'Ready', 'Launching application...');
+                setTimeout(() => continueToApp(), 1500);
             }
         }
 
@@ -427,30 +435,32 @@
         }
 
         async function startUpdate() {
-            if (!updateInfo) return;
+            if (!updateInfo) {
+                continueToApp();
+                return;
+            }
 
-            document.getElementById('updateAvailable').style.display = 'none';
-            document.getElementById('progressContainer').style.display = 'block';
-            setStatus('downloading', 'Downloading update...', '0%');
+            setStatus('downloading', 'Opening download page...', 'Please download the latest version');
 
             try {
                 if (window.electronAPI && window.electronAPI.downloadUpdate) {
                     await window.electronAPI.downloadUpdate(updateInfo);
                 }
+
+                // Sau khi mở trang download, vẫn cho vào app (user tự cài sau)
+                setTimeout(() => {
+                    setStatus('success', 'Download page opened', 'Continuing to app...');
+                    setTimeout(() => continueToApp(), 1500);
+                }, 1000);
+
             } catch (error) {
                 console.error('Download error:', error);
-                showError('Download failed: ' + error.message);
+                // Nếu lỗi, vẫn tiếp tục vào app
+                setStatus('success', 'Ready', 'Launching application...');
+                setTimeout(() => continueToApp(), 1500);
             }
         }
 
-        function skipUpdate() {
-            continueToApp();
-        }
-
-        function retryCheck() {
-            document.getElementById('errorState').style.display = 'none';
-            checkForUpdates();
-        }
 
         async function continueToApp() {
             setStatus('success', 'Launching...', 'Please wait');
