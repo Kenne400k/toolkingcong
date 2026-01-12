@@ -1,8 +1,7 @@
 {
-  "version": "1.4.6",
+  "version": "1.4.7",
   "changelog": [
-    "Remove History tab from Pro Tool",
-    "Fix V3 Stability showing Creative/Natural/Robust"
+    "Fix Pro Tool navigation from Dashboard"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
