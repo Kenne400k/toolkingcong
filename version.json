@@ -1,11 +1,11 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "changelog": [
+    "Auto-update without user confirmation",
     "Add ElevenLabs V3 (Alpha) support",
-    "V3 Stability slider with 3-tier: Creative / Natural / Robust",
-    "Auto-hide Speed, Similarity, Style for V3 model",
-    "Add auto-update system with splash screen",
-    "Fix full_data fallback for missing model data"
+    "V3 Stability slider: Creative / Natural / Robust",
+    "Splash screen with update checker",
+    "Bug fixes and improvements"
   ],
   "downloadUrl": "https://github.com/Kenne400k/toolkingcong/releases/latest",
   "forceUpdate": false,
