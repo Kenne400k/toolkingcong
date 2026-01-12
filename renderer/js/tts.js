@@ -8823,6 +8823,21 @@ async function startVoiceCloneTTS() {
 
             showToast(`Voice "${voiceName}" cloned!`, 'success');
 
+            // Save to localStorage for backup
+            try {
+                const saved = localStorage.getItem('minimaxClonedVoices');
+                const voices = saved ? JSON.parse(saved) : [];
+                voices.push({
+                    voice_id: clonedVoiceId,
+                    name: voiceName,
+                    language: language,
+                    created_at: new Date().toISOString()
+                });
+                localStorage.setItem('minimaxClonedVoices', JSON.stringify(voices));
+            } catch (e) {
+                console.error('Save to localStorage error:', e);
+            }
+
             // Auto-select cloned voice
             if (clonedVoiceId) {
                 $('#voiceIdVal').val(clonedVoiceId);

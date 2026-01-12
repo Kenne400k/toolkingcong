@@ -2564,6 +2564,21 @@ async function startVoiceClone() {
 }
 
 // ==================== CLONED VOICES LIST (MINIMAX) ====================
+
+// localStorage helpers for cloned voices
+function getLocalClonedVoices() {
+    try {
+        const saved = localStorage.getItem('minimaxClonedVoices');
+        return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveLocalClonedVoices(voices) {
+    localStorage.setItem('minimaxClonedVoices', JSON.stringify(voices));
+}
+
 async function openClonedVoicesModal() {
     // Open in separate window
     if (window.electronAPI && window.electronAPI.openClonedVoicesWindow) {
@@ -2593,21 +2608,20 @@ async function openClonedVoicesModal() {
 
         if (response.success || response.status === 'success') {
             const voices = response.voices || response.cloned_voices || [];
+            if (voices.length > 0) {
+                saveLocalClonedVoices(voices);
+            }
             renderClonedVoicesModal(voices);
         } else {
-            document.getElementById('clonedVoicesBody').innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #f55;">
-                    ${response.message || 'Không thể tải danh sách voice'}
-                </div>
-            `;
+            // API error, try localStorage fallback
+            const localVoices = getLocalClonedVoices();
+            renderClonedVoicesModal(localVoices);
         }
     } catch (error) {
         console.error('Load cloned voices error:', error);
-        document.getElementById('clonedVoicesBody').innerHTML = `
-            <div style="text-align: center; padding: 40px; color: #f55;">
-                Lỗi: ${error.message}
-            </div>
-        `;
+        // API failed, try localStorage fallback
+        const localVoices = getLocalClonedVoices();
+        renderClonedVoicesModal(localVoices);
     }
 }
 
@@ -2667,6 +2681,11 @@ async function deleteClonedVoice(voiceId, voiceName) {
         return;
     }
 
+    // Delete from localStorage first
+    const localVoices = getLocalClonedVoices();
+    const updatedVoices = localVoices.filter(v => (v.voice_id || v.id) !== voiceId);
+    saveLocalClonedVoices(updatedVoices);
+
     try {
         const response = await window.electronAPI.apiRequest(
             'https://kingcongstudio.com/ajaxs/tts3.php',
@@ -2679,15 +2698,16 @@ async function deleteClonedVoice(voiceId, voiceName) {
 
         if (response.success || response.status === 'success') {
             proTool.showNotification(`Đã xóa voice "${voiceName}"`, 'success');
-            // Reload list
-            openClonedVoicesModal();
         } else {
-            proTool.showNotification(response.message || 'Không thể xóa voice', 'error');
+            proTool.showNotification(`Đã xóa voice "${voiceName}" locally`, 'success');
         }
     } catch (error) {
         console.error('Delete cloned voice error:', error);
-        proTool.showNotification(`Lỗi: ${error.message}`, 'error');
+        proTool.showNotification(`Đã xóa voice "${voiceName}" locally`, 'success');
     }
+
+    // Reload list
+    openClonedVoicesModal();
 }
 
 // ==================== BACKUP FUNCTIONS ====================

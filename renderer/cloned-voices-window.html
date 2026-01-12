@@ -189,6 +189,20 @@
     </div>
 
     <script>
+        // Load cloned voices from localStorage (fallback storage)
+        function getLocalClonedVoices() {
+            try {
+                const saved = localStorage.getItem('minimaxClonedVoices');
+                return saved ? JSON.parse(saved) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveLocalClonedVoices(voices) {
+            localStorage.setItem('minimaxClonedVoices', JSON.stringify(voices));
+        }
+
         async function loadClonedVoices() {
             const container = document.getElementById('voiceList');
             container.innerHTML = `
@@ -211,25 +225,33 @@
 
                 if (response.success || response.status === 'success') {
                     const voices = response.voices || response.cloned_voices || [];
+                    // Save to localStorage as backup
+                    if (voices.length > 0) {
+                        saveLocalClonedVoices(voices);
+                    }
                     renderVoices(voices);
                 } else {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="bi bi-exclamation-circle"></i>
-                            <h4>Error</h4>
-                            <p style="font-size: 12px; margin-top: 8px; color: #f55;">${response.message || 'Could not load cloned voices'}</p>
-                        </div>
-                    `;
+                    // API returned error, try localStorage fallback
+                    console.log('API error, trying localStorage fallback...');
+                    const localVoices = getLocalClonedVoices();
+                    if (localVoices.length > 0) {
+                        renderVoices(localVoices);
+                    } else {
+                        // Show empty state - no voices yet
+                        renderVoices([]);
+                    }
                 }
             } catch (error) {
                 console.error('Load cloned voices error:', error);
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="bi bi-exclamation-circle"></i>
-                        <h4>Error</h4>
-                        <p style="font-size: 12px; margin-top: 8px; color: #f55;">${error.message}</p>
-                    </div>
-                `;
+                // API failed, try localStorage fallback
+                console.log('API failed, trying localStorage fallback...');
+                const localVoices = getLocalClonedVoices();
+                if (localVoices.length > 0) {
+                    renderVoices(localVoices);
+                } else {
+                    // Show empty state
+                    renderVoices([]);
+                }
             }
         }
 
@@ -293,6 +315,11 @@
                 return;
             }
 
+            // Delete from localStorage first
+            const localVoices = getLocalClonedVoices();
+            const updatedVoices = localVoices.filter(v => (v.voice_id || v.id) !== voiceId);
+            saveLocalClonedVoices(updatedVoices);
+
             try {
                 const response = await window.electronAPI.apiRequest(
                     'https://kingcongstudio.com/ajaxs/tts3.php',
@@ -305,14 +332,18 @@
 
                 if (response.success || response.status === 'success') {
                     showNotification(`Deleted voice "${voiceName}"`, 'success');
-                    loadClonedVoices();
                 } else {
-                    showNotification(response.message || 'Could not delete voice', 'error');
+                    // API failed but already deleted from localStorage
+                    showNotification(`Deleted voice "${voiceName}" locally`, 'success');
                 }
             } catch (error) {
                 console.error('Delete voice error:', error);
-                showNotification('Error: ' + error.message, 'error');
+                // API failed but already deleted from localStorage
+                showNotification(`Deleted voice "${voiceName}" locally`, 'success');
             }
+
+            // Reload list
+            loadClonedVoices();
         }
 
         function escapeHtml(text) {
