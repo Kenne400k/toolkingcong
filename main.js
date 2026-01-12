@@ -5,7 +5,14 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 let mainWindow;
+let splashWindow;
 const SESSION_FILE = path.join(__dirname, 'sessions', 'session.json');
+
+// =================== APP VERSION ===================
+const APP_VERSION = '1.0.0';
+const GITHUB_OWNER = 'Kenne400k';
+const GITHUB_REPO = 'toolkingcong';
+const UPDATE_CHECK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/version.json`;
 
 // ⚠️ IMPORTANT: Load from environment variables
 // For development, create a .env file (see .env.example)
@@ -45,8 +52,106 @@ function decrypt(text) {
   return decrypted;
 }
 
-// =================== CREATE WINDOW ===================
-function createWindow() {
+// =================== SPLASH WINDOW ===================
+function createSplashWindow() {
+  splashWindow = new BrowserWindow({
+    width: 500,
+    height: 600,
+    frame: false,
+    transparent: false,
+    resizable: false,
+    center: true,
+    alwaysOnTop: true,
+    skipTaskbar: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    },
+    icon: path.join(__dirname, 'image', 'Kingcong.jpg'),
+    backgroundColor: '#0a0a0a'
+  });
+
+  splashWindow.loadFile('renderer/splash.html');
+
+  splashWindow.on('closed', () => {
+    splashWindow = null;
+  });
+}
+
+// =================== AUTO UPDATE ===================
+async function checkForUpdates() {
+  const fetch = require('node-fetch');
+
+  try {
+    console.log('🔍 Checking for updates...');
+    const response = await fetch(UPDATE_CHECK_URL, {
+      headers: { 'Cache-Control': 'no-cache' }
+    });
+
+    if (!response.ok) {
+      console.log('⚠️ Could not fetch version info');
+      return { updateAvailable: false };
+    }
+
+    const remoteVersion = await response.json();
+    console.log(`📦 Current: ${APP_VERSION} | Remote: ${remoteVersion.version}`);
+
+    if (compareVersions(remoteVersion.version, APP_VERSION) > 0) {
+      console.log('🆕 Update available!');
+      return {
+        updateAvailable: true,
+        version: remoteVersion.version,
+        changelog: remoteVersion.changelog || [],
+        downloadUrl: remoteVersion.downloadUrl || `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`,
+        forceUpdate: remoteVersion.forceUpdate || false
+      };
+    }
+
+    console.log('✅ App is up to date');
+    return { updateAvailable: false };
+
+  } catch (error) {
+    console.error('❌ Update check error:', error.message);
+    return { updateAvailable: false, error: error.message };
+  }
+}
+
+function compareVersions(v1, v2) {
+  const parts1 = v1.split('.').map(Number);
+  const parts2 = v2.split('.').map(Number);
+
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const p1 = parts1[i] || 0;
+    const p2 = parts2[i] || 0;
+
+    if (p1 > p2) return 1;
+    if (p1 < p2) return -1;
+  }
+
+  return 0;
+}
+
+async function downloadUpdate(updateInfo) {
+  // Open the download URL in browser
+  if (updateInfo.downloadUrl) {
+    shell.openExternal(updateInfo.downloadUrl);
+  }
+  return { success: true };
+}
+
+function finishSplashAndShowMain() {
+  // Close splash window
+  if (splashWindow && !splashWindow.isDestroyed()) {
+    splashWindow.close();
+  }
+
+  // Create main window
+  createMainWindow();
+}
+
+// =================== CREATE MAIN WINDOW ===================
+function createMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -881,13 +986,32 @@ function formatSrtTime(seconds) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(ms).padStart(3, '0')}`;
 }
 
+// =================== UPDATE IPC HANDLERS ===================
+ipcMain.handle('get-version', () => {
+  return APP_VERSION;
+});
+
+ipcMain.handle('check-for-updates', async () => {
+  return await checkForUpdates();
+});
+
+ipcMain.handle('download-update', async (event, updateInfo) => {
+  return await downloadUpdate(updateInfo);
+});
+
+ipcMain.handle('finish-splash', async () => {
+  finishSplashAndShowMain();
+  return { success: true };
+});
+
 // =================== APP LIFECYCLE ===================
 app.whenReady().then(() => {
-  createWindow();
-  
+  // Show splash window first
+  createSplashWindow();
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createSplashWindow();
     }
   });
 });

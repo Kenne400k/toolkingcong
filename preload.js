@@ -58,5 +58,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onVoiceSelected: (callback) => ipcRenderer.on('voice-selected', (event, voiceId) => callback(voiceId)),
 
   // 🔥 Cloned Voices Window
-  openClonedVoicesWindow: () => ipcRenderer.invoke('open-cloned-voices-window')
+  openClonedVoicesWindow: () => ipcRenderer.invoke('open-cloned-voices-window'),
+
+  // 🔥 Auto Update
+  getVersion: () => ipcRenderer.invoke('get-version'),
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: (updateInfo) => ipcRenderer.invoke('download-update', updateInfo),
+  finishSplash: () => ipcRenderer.invoke('finish-splash'),
+  onUpdateProgress: (callback) => ipcRenderer.on('update-progress', (event, progress) => callback(progress)),
+  onUpdateComplete: (callback) => ipcRenderer.on('update-complete', (event, success) => callback(success))
 });

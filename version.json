@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "changelog": [
+    "Initial release",
+    "TTS with ElevenLabs and Minimax",
+    "Pro Tool with batch processing",
+    "Voice Library support"
+  ],
+  "downloadUrl": "https://github.com/Kenne400k/toolkingcong/releases/latest",
+  "forceUpdate": false,
+  "minVersion": "1.0.0"
+}
