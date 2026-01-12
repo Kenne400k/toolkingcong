@@ -2635,7 +2635,79 @@ function closeProjectsModal() {
 }
 
 // ==================== ADD TO LIBRARY ====================
-function addToLibrary() {
+async function addToLibrary() {
+    const voiceId = document.getElementById('selectedVoiceId')?.value?.trim();
+    const model = document.getElementById('modelSelect')?.value;
+    const provider = document.getElementById('providerSelect')?.value || 'elevenlabs';
+
+    if (!voiceId) {
+        proTool.showNotification('Vui lòng nhập Voice ID!', 'warning');
+        return;
+    }
+
+    // Show loading notification
+    proTool.showNotification('Đang tìm thông tin voice...', 'info');
+
+    let voiceName = voiceId; // Default to voiceId if not found
+
+    try {
+        // Call API to get voice info
+        const res = await window.electronAPI.apiRequest(
+            'https://kingcongstudio.com/ajaxs/get_resources2.php?action=search_voice_id',
+            { voice_id: voiceId }
+        );
+
+        console.log('🔍 Voice Info Result:', res);
+
+        if (res && res.status === 'success' && res.data) {
+            voiceName = res.data.name || res.data.voice_name || voiceId;
+            console.log('✅ Found voice name:', voiceName);
+        } else {
+            console.log('⚠️ Voice not found, using ID as name');
+        }
+    } catch (error) {
+        console.error('❌ Error fetching voice info:', error);
+        // Continue with voiceId as name
+    }
+
+    // Get current settings
+    const voiceData = {
+        id: Date.now(),
+        voiceId: voiceId,
+        name: voiceName,
+        provider: provider,
+        model: model,
+        settings: {
+            speed: parseFloat(document.getElementById('voiceSpeed')?.value) || 1,
+            stability: parseFloat(document.getElementById('voiceStability')?.value) || 0.5,
+            similarity: parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75,
+            style: parseFloat(document.getElementById('voiceStyle')?.value) || 0
+        }
+    };
+
+    // Load existing library
+    let library = [];
+    try {
+        library = JSON.parse(localStorage.getItem('voiceLibraryAdvanced') || '[]');
+    } catch (e) {
+        library = [];
+    }
+
+    // Check if voiceId already exists
+    const existingIndex = library.findIndex(v => v.voiceId === voiceId && v.provider === provider);
+    if (existingIndex >= 0) {
+        library[existingIndex] = voiceData;
+        proTool.showNotification(`Đã cập nhật "${voiceName}" trong thư viện!`, 'success');
+    } else {
+        library.push(voiceData);
+        proTool.showNotification(`Đã thêm "${voiceName}" vào thư viện!`, 'success');
+    }
+
+    localStorage.setItem('voiceLibraryAdvanced', JSON.stringify(library));
+}
+
+// Old modal-based add to library (kept for reference)
+function addToLibraryModal() {
     const voiceId = document.getElementById('selectedVoiceId')?.value?.trim();
     const model = document.getElementById('modelSelect')?.value;
     const provider = document.getElementById('providerSelect')?.value || 'elevenlabs';
