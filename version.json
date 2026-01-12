@@ -1,8 +1,8 @@
 {
-  "version": "1.6.4",
+  "version": "1.6.5",
   "changelog": [
-    "Download to separate folders: ImportFile, ImportFolder, Backup",
-    "Auto fetch voice name when adding to library"
+    "Fix: Voice Library not saving when clicking + button",
+    "Fixed localStorage key mismatch between addToLibrary and Voice Library window"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

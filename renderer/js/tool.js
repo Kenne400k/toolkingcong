@@ -2708,7 +2708,7 @@ async function addToLibrary() {
     // Load existing library
     let library = [];
     try {
-        library = JSON.parse(localStorage.getItem('voiceLibraryAdvanced') || '[]');
+        library = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
     } catch (e) {
         library = [];
     }
@@ -2723,7 +2723,7 @@ async function addToLibrary() {
         proTool.showNotification(`Đã thêm "${voiceName}" vào thư viện!`, 'success');
     }
 
-    localStorage.setItem('voiceLibraryAdvanced', JSON.stringify(library));
+    localStorage.setItem('voiceLibrary', JSON.stringify(library));
 }
 
 // Old modal-based add to library (kept for reference)
@@ -2777,7 +2777,7 @@ function saveToLibrary() {
     // Load existing library
     let library = [];
     try {
-        library = JSON.parse(localStorage.getItem('voiceLibraryAdvanced') || '[]');
+        library = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
     } catch (e) {
         library = [];
     }
@@ -2790,7 +2790,7 @@ function saveToLibrary() {
         library.push(voiceData);
     }
 
-    localStorage.setItem('voiceLibraryAdvanced', JSON.stringify(library));
+    localStorage.setItem('voiceLibrary', JSON.stringify(library));
 
     closeAddToLibraryModal();
     proTool.showNotification(`Đã lưu "${voiceName || voiceId}" vào thư viện!`, 'success');
