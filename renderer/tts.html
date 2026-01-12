@@ -570,14 +570,6 @@
                                     <div class="slider-header"><span>Âm lượng: <span id="volVal">1.00</span></span></div>
                                     <input type="range" id="vol" min="0.01" max="10.0" step="0.01" value="1.0">
                                 </div>
-
-                                <!-- Voice Clone Button -->
-                                <div class="setting-group" style="margin-top: 12px;">
-                                    <button class="btn-generate" style="background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); border: 1px solid #333;" onclick="openVoiceCloneModal()">
-                                        <i class="bi bi-mic"></i>
-                                        <span>Voice Clone</span>
-                                    </button>
-                                </div>
                             </div>
 
                             <div id="elevenlabs-settings" class="hidden">
@@ -901,71 +893,6 @@
                     <div class="spinner-border text-primary" role="status"></div>
                     <div style="margin-top:10px">Đang tải dữ liệu...</div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Voice Clone Modal (Minimax) -->
-    <div id="voiceCloneModal" class="voice-modal" style="display: none;">
-        <div class="voice-modal-content" style="max-width: 500px;">
-            <div class="vm-header" style="padding: 20px; border-bottom: 1px solid #333;">
-                <h3 style="font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
-                    <i class="bi bi-mic-fill" style="color: #a855f7;"></i>
-                    Voice Clone (Minimax)
-                </h3>
-                <i class="bi bi-x-lg vm-close" onclick="closeVoiceCloneModal()" style="cursor: pointer;"></i>
-            </div>
-
-            <div style="padding: 20px;">
-                <div style="margin-bottom: 16px;">
-                    <label style="font-size: 13px; color: #888; margin-bottom: 6px; display: block;">Voice Name</label>
-                    <input type="text" id="cloneVoiceName" class="tts-textarea" style="width: 100%; padding: 10px 12px; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 14px;" placeholder="My Custom Voice">
-                </div>
-
-                <div style="margin-bottom: 16px;">
-                    <label style="font-size: 13px; color: #888; margin-bottom: 6px; display: block;">Language</label>
-                    <select id="cloneLanguage" style="width: 100%; padding: 10px 12px; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 14px;">
-                        <option value="Vietnamese">Vietnamese</option>
-                        <option value="English">English</option>
-                        <option value="Chinese">Chinese (Mandarin)</option>
-                        <option value="Japanese">Japanese</option>
-                        <option value="Korean">Korean</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="Italian">Italian</option>
-                        <option value="Portuguese">Portuguese</option>
-                        <option value="Russian">Russian</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="Thai">Thai</option>
-                        <option value="Indonesian">Indonesian</option>
-                    </select>
-                </div>
-
-                <div style="margin-bottom: 16px;">
-                    <label style="font-size: 13px; color: #888; margin-bottom: 6px; display: block;">Audio File (MP3/WAV, 10-300 seconds)</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="cloneAudioPath" readonly style="flex: 1; padding: 10px 12px; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 12px;" placeholder="Select audio file...">
-                        <button onclick="selectCloneAudioFile()" style="padding: 10px 16px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff; cursor: pointer;">
-                            <i class="bi bi-folder2-open"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="font-size: 13px; color: #888; margin-bottom: 6px; display: block;">Preview Text</label>
-                    <textarea id="clonePreviewText" style="width: 100%; padding: 10px 12px; background: #111; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 13px; min-height: 60px; resize: vertical;">Hello, this is my cloned voice. Nice to meet you!</textarea>
-                </div>
-
-                <div id="cloneStatus" style="display: none; padding: 12px; background: #1a1a1a; border-radius: 8px; margin-bottom: 16px; text-align: center;">
-                    <div class="spinner-border spinner-border-sm" style="margin-right: 8px;"></div>
-                    <span id="cloneStatusText">Processing...</span>
-                </div>
-
-                <button id="btnStartClone" onclick="startVoiceCloneTTS()" class="btn-generate" style="width: 100%;">
-                    <i class="bi bi-magic"></i>
-                    <span>Clone Voice</span>
-                </button>
             </div>
         </div>
     </div>
