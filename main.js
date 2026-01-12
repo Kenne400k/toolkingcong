@@ -941,6 +941,36 @@ ipcMain.handle('select-voice-from-window', async (event, voiceId) => {
   return { success: true };
 });
 
+// Check which files already exist in output folder (for resume functionality)
+ipcMain.handle('check-completed-files', async (event, { fileNames, subfolder }) => {
+  try {
+    const outputDir = path.join(__dirname, 'output', subfolder || 'ImportFile');
+
+    if (!fs.existsSync(outputDir)) {
+      return { success: true, completedFiles: {} };
+    }
+
+    const completedFiles = {};
+
+    for (const fileName of fileNames) {
+      // Check for .mp3 file
+      const mp3Path = path.join(outputDir, `${fileName}.mp3`);
+      if (fs.existsSync(mp3Path)) {
+        completedFiles[fileName] = {
+          exists: true,
+          filePath: mp3Path
+        };
+      }
+    }
+
+    console.log(`✅ Found ${Object.keys(completedFiles).length}/${fileNames.length} completed files in ${subfolder}`);
+    return { success: true, completedFiles };
+  } catch (error) {
+    console.error('❌ Check completed files error:', error);
+    return { success: false, error: error.message, completedFiles: {} };
+  }
+});
+
 // Join audio files locally (using ffmpeg if available)
 ipcMain.handle('join-audio-local', async (event, { files, delay, outputName, createSrt, taskData }) => {
   const { exec } = require('child_process');

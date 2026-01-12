@@ -413,22 +413,49 @@ class ProToolManager {
                 return;
             }
 
+            // Collect file names for checking
+            const fileNames = [];
+            const fileDataList = [];
+
             for (const filePath of result.files) {
                 const fileResult = await window.electronAPI.readFile(filePath);
                 if (fileResult.success) {
-                    this.addTask({
-                        id: this.generateTaskId(),
+                    fileNames.push(fileResult.fileName);
+                    fileDataList.push({
                         content: fileResult.content,
-                        fileName: fileResult.fileName,
-                        voiceId: document.getElementById('selectedVoiceId')?.value || '',
-                        status: 'pending',
-                        importSource: 'ImportFolder'
+                        fileName: fileResult.fileName
                     });
                 }
             }
 
+            // Check which files already exist
+            const completedFiles = await this.checkCompletedFiles(fileNames, 'ImportFolder');
+
+            let completedCount = 0;
+            for (const fileData of fileDataList) {
+                const isCompleted = completedFiles[fileData.fileName]?.exists;
+
+                if (isCompleted) completedCount++;
+
+                this.addTask({
+                    id: this.generateTaskId(),
+                    content: fileData.content,
+                    fileName: fileData.fileName,
+                    voiceId: document.getElementById('selectedVoiceId')?.value || '',
+                    status: isCompleted ? 'done' : 'pending',
+                    filePath: completedFiles[fileData.fileName]?.filePath || null,
+                    importSource: 'ImportFolder'
+                });
+            }
+
             this.updateTaskDisplay();
-            this.showNotification(`Đã import ${result.files.length} file`, 'success');
+
+            if (completedCount > 0) {
+                this.showNotification(`Đã import ${result.files.length} file (${completedCount} đã hoàn thành)`, 'success');
+            } else {
+                this.showNotification(`Đã import ${result.files.length} file`, 'success');
+            }
+
             this.currentImportSource = null;
         } catch (error) {
             console.error('Import folder error:', error);
@@ -488,16 +515,16 @@ class ProToolManager {
         
         if (hasMultiVoice) {
             console.log('📄 Processing as multi-voice');
-            this.processMultiVoiceText(text, fileName);
+            await this.processMultiVoiceText(text, fileName);
         } else if (optLoop) {
             console.log('📄 Processing as loop');
-            this.processLoopText(text, fileName);
+            await this.processLoopText(text, fileName);
         } else if (optAutoSplit) {
             console.log('📄 Processing as auto-split');
-            this.processAutoSplitText(text, fileName);
+            await this.processAutoSplitText(text, fileName);
         } else if (opt1Line1File) {
             console.log('📄 Processing as 1-line-1-file');
-            this.processLineByLineText(text, fileName);
+            await this.processLineByLineText(text, fileName);
         } else {
             console.log('📄 Processing as single task');
             const voiceId = document.getElementById('selectedVoiceId')?.value || '';
@@ -970,15 +997,15 @@ class ProToolManager {
     
     // ==================== TEXT PROCESSING ====================
     
-    processMultiVoiceText(text, baseFileName) {
+    async processMultiVoiceText(text, baseFileName) {
         // Parse text with #1, #2, #3 markers
         const lines = text.split('\n');
         let currentVoiceNum = null;
         let currentContent = '';
         let segmentNum = 1;
-        
+
         const segments = [];
-        
+
         for (const line of lines) {
             const match = line.match(/^#(\d+)\s*(.*)/);
             if (match) {
@@ -996,7 +1023,7 @@ class ProToolManager {
                 currentContent += line + '\n';
             }
         }
-        
+
         // Add last segment
         if (currentVoiceNum !== null && currentContent.trim()) {
             segments.push({
@@ -1004,43 +1031,82 @@ class ProToolManager {
                 content: currentContent.trim()
             });
         }
-        
+
+        const importSource = this.currentImportSource || 'ImportFile';
+
+        // Generate file names for checking
+        const fileNames = segments.map((_, index) => `${baseFileName}_${index + 1}`);
+
+        // Check which files already exist
+        const completedFiles = await this.checkCompletedFiles(fileNames, importSource);
+
         // Create tasks with voice library mapping
+        let completedCount = 0;
         segments.forEach((seg, index) => {
             const voice = this.voiceLibrary.find(v => v.id === seg.voiceNum);
+            const fileName = `${baseFileName}_${index + 1}`;
+            const isCompleted = completedFiles[fileName]?.exists;
+
+            if (isCompleted) completedCount++;
+
             this.addTask({
                 id: this.generateTaskId(),
                 content: seg.content,
-                fileName: `${baseFileName}_${index + 1}`,
+                fileName: fileName,
                 voiceId: voice?.voiceId || '',
                 voiceName: voice?.name || `Voice #${seg.voiceNum}`,
                 voiceNum: seg.voiceNum,
-                status: 'pending'
+                status: isCompleted ? 'done' : 'pending',
+                filePath: completedFiles[fileName]?.filePath || null,
+                importSource: importSource
             });
         });
+
+        if (completedCount > 0) {
+            this.showNotification(`Đã có ${completedCount}/${segments.length} file hoàn thành`, 'info');
+        }
     }
     
-    processLoopText(text, baseFileName) {
+    async processLoopText(text, baseFileName) {
         const maxChars = parseInt(document.getElementById('maxChars')?.value) || 10000;
         const chunks = this.splitByCharCount(text, maxChars);
-        
+        const importSource = this.currentImportSource || 'ImportFile';
+
+        // Generate file names for checking
+        const fileNames = chunks.map((_, index) => `${baseFileName}_${index + 1}`);
+
+        // Check which files already exist
+        const completedFiles = await this.checkCompletedFiles(fileNames, importSource);
+
+        let completedCount = 0;
         chunks.forEach((chunk, index) => {
+            const fileName = `${baseFileName}_${index + 1}`;
+            const isCompleted = completedFiles[fileName]?.exists;
+
+            if (isCompleted) completedCount++;
+
             this.addTask({
                 id: this.generateTaskId(),
                 content: chunk,
-                fileName: `${baseFileName}_${index + 1}`,
+                fileName: fileName,
                 voiceId: document.getElementById('selectedVoiceId')?.value || '',
-                status: 'pending'
+                status: isCompleted ? 'done' : 'pending',
+                filePath: completedFiles[fileName]?.filePath || null,
+                importSource: importSource
             });
         });
+
+        if (completedCount > 0) {
+            this.showNotification(`Đã có ${completedCount}/${chunks.length} file hoàn thành`, 'info');
+        }
     }
-    
-    processAutoSplitText(text, baseFileName) {
+
+    async processAutoSplitText(text, baseFileName) {
         // Split by punctuation marks: 。、,:.!?
         const parts = text.split(/([。、,:.!?]+)/);
         let segments = [];
         let current = '';
-        
+
         for (let i = 0; i < parts.length; i++) {
             current += parts[i];
             if (i % 2 === 1) { // After punctuation
@@ -1053,30 +1119,85 @@ class ProToolManager {
         if (current.trim()) {
             segments.push(current.trim());
         }
-        
+
+        const importSource = this.currentImportSource || 'ImportFile';
+
+        // Generate file names for checking
+        const fileNames = segments.map((_, index) => `${baseFileName}_${index + 1}`);
+
+        // Check which files already exist
+        const completedFiles = await this.checkCompletedFiles(fileNames, importSource);
+
+        let completedCount = 0;
         segments.forEach((seg, index) => {
+            const fileName = `${baseFileName}_${index + 1}`;
+            const isCompleted = completedFiles[fileName]?.exists;
+
+            if (isCompleted) completedCount++;
+
             this.addTask({
                 id: this.generateTaskId(),
                 content: seg,
-                fileName: `${baseFileName}_${index + 1}`,
+                fileName: fileName,
                 voiceId: document.getElementById('selectedVoiceId')?.value || '',
-                status: 'pending'
+                status: isCompleted ? 'done' : 'pending',
+                filePath: completedFiles[fileName]?.filePath || null,
+                importSource: importSource
             });
         });
+
+        if (completedCount > 0) {
+            this.showNotification(`Đã có ${completedCount}/${segments.length} file hoàn thành`, 'info');
+        }
     }
-    
-    processLineByLineText(text, baseFileName) {
+
+    async processLineByLineText(text, baseFileName) {
         const lines = text.split('\n').filter(line => line.trim());
-        
+        const importSource = this.currentImportSource || 'ImportFile';
+
+        // Generate file names for checking
+        const fileNames = lines.map((_, index) => `${baseFileName}_${index + 1}`);
+
+        // Check which files already exist
+        const completedFiles = await this.checkCompletedFiles(fileNames, importSource);
+
+        let completedCount = 0;
         lines.forEach((line, index) => {
+            const fileName = `${baseFileName}_${index + 1}`;
+            const isCompleted = completedFiles[fileName]?.exists;
+
+            if (isCompleted) completedCount++;
+
             this.addTask({
                 id: this.generateTaskId(),
                 content: line.trim(),
-                fileName: `${baseFileName}_${index + 1}`,
+                fileName: fileName,
                 voiceId: document.getElementById('selectedVoiceId')?.value || '',
-                status: 'pending'
+                status: isCompleted ? 'done' : 'pending',
+                filePath: completedFiles[fileName]?.filePath || null,
+                importSource: importSource
             });
         });
+
+        if (completedCount > 0) {
+            this.showNotification(`Đã có ${completedCount}/${lines.length} file hoàn thành`, 'info');
+        }
+    }
+
+    // Check which files already exist in output folder
+    async checkCompletedFiles(fileNames, subfolder) {
+        try {
+            if (window.electronAPI && window.electronAPI.checkCompletedFiles) {
+                const result = await window.electronAPI.checkCompletedFiles({
+                    fileNames: fileNames,
+                    subfolder: subfolder
+                });
+                return result.completedFiles || {};
+            }
+        } catch (error) {
+            console.error('Check completed files error:', error);
+        }
+        return {};
     }
     
     splitByCharCount(text, maxChars) {

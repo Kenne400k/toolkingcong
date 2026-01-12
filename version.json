@@ -1,8 +1,9 @@
 {
-  "version": "1.6.7",
+  "version": "1.6.8",
   "changelog": [
-    "Add delay confirmation dialog before joining files",
-    "Smart output naming: test_1, test_2, test_3 -> test_join"
+    "Resume incomplete work: auto-detect completed files when importing",
+    "Skip already completed files when running Start",
+    "Shows completed count when importing files"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

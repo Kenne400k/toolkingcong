@@ -43,6 +43,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveFile: (options) => ipcRenderer.invoke('save-file', options),
   downloadFile: (options) => ipcRenderer.invoke('download-file', options),
   joinAudioLocal: (options) => ipcRenderer.invoke('join-audio-local', options),
+  checkCompletedFiles: (options) => ipcRenderer.invoke('check-completed-files', options),
 
   // 🔥 Voice Library
   openVoiceLibrary: () => ipcRenderer.invoke('open-voice-library'),
