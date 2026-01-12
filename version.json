@@ -1,9 +1,10 @@
 {
-  "version": "1.7.1",
+  "version": "1.8.0",
   "changelog": [
-    "Fix add voice to library: add speakerBoost setting",
-    "Fix add voice to library: update memory after save",
-    "Add debug logging for voice library operations"
+    "Add Voice Cloning tab - Clone any voice using Minimax",
+    "New dedicated page for voice cloning with full UI",
+    "Support upload MP3, select language & gender",
+    "View and manage cloned voices library"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

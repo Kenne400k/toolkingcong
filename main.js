@@ -1098,6 +1098,181 @@ ipcMain.handle('finish-splash', async () => {
   return { success: true };
 });
 
+// =================== VOICE CLONING API ===================
+// Clone Voice
+ipcMain.handle('clone-voice', async (event, data) => {
+  const sessionData = loadSession();
+  if (!sessionData) {
+    return { status: 'error', message: 'No session found' };
+  }
+
+  const FormData = require('form-data');
+  const fetch = require('node-fetch');
+
+  const API_ENDPOINT = 'https://kingcongstudio.com/ajaxs/voice_cloning3.php';
+
+  try {
+    const form = new FormData();
+    form.append('action', 'create_clone');
+    form.append('session_id', sessionData.session_id);
+    form.append('user_id', sessionData.user_id);
+    form.append('username', sessionData.username);
+    form.append('source', 'electron-tool');
+
+    form.append('voice_name', data.voice_name);
+    form.append('gender', data.gender);
+    form.append('language', data.language);
+    form.append('preview_text', data.preview_text);
+    form.append('need_noise_reduction', data.need_noise_reduction ? 'true' : 'false');
+
+    // Convert base64 to buffer and append as file
+    if (data.file_data) {
+      const base64Data = data.file_data.replace(/^data:audio\/[^;]+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      form.append('file', buffer, {
+        filename: data.file_name || 'audio.mp3',
+        contentType: 'audio/mpeg'
+      });
+    }
+
+    // Get cookies
+    let cookieHeader = '';
+    if (mainWindow) {
+      try {
+        const cookies = await mainWindow.webContents.session.cookies.get({ url: 'https://kingcongstudio.com' });
+        cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+      } catch (err) {
+        console.error('Could not get cookies:', err);
+      }
+    }
+
+    const headers = form.getHeaders();
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+    headers['X-Client'] = 'kingcong-electron-tool';
+
+    console.log('Cloning voice:', data.voice_name);
+
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      body: form,
+      headers: headers,
+      timeout: 300000 // 5 minutes timeout for cloning
+    });
+
+    const result = await response.json();
+    return result;
+
+  } catch (error) {
+    console.error('Clone voice error:', error);
+    return { status: 'error', message: error.message };
+  }
+});
+
+// Get Cloned Voices
+ipcMain.handle('get-cloned-voices', async () => {
+  const sessionData = loadSession();
+  if (!sessionData) {
+    return { status: 'error', message: 'No session found', voices: [] };
+  }
+
+  const FormData = require('form-data');
+  const fetch = require('node-fetch');
+
+  const API_ENDPOINT = 'https://kingcongstudio.com/ajaxs/voice_cloning3.php';
+
+  try {
+    const form = new FormData();
+    form.append('action', 'list_clones');
+    form.append('session_id', sessionData.session_id);
+    form.append('user_id', sessionData.user_id);
+    form.append('username', sessionData.username);
+    form.append('source', 'electron-tool');
+
+    let cookieHeader = '';
+    if (mainWindow) {
+      try {
+        const cookies = await mainWindow.webContents.session.cookies.get({ url: 'https://kingcongstudio.com' });
+        cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+      } catch (err) {
+        console.error('Could not get cookies:', err);
+      }
+    }
+
+    const headers = form.getHeaders();
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+    headers['X-Client'] = 'kingcong-electron-tool';
+
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      body: form,
+      headers: headers
+    });
+
+    const result = await response.json();
+    return result;
+
+  } catch (error) {
+    console.error('Get cloned voices error:', error);
+    return { status: 'error', message: error.message, voices: [] };
+  }
+});
+
+// Delete Cloned Voice
+ipcMain.handle('delete-cloned-voice', async (event, voiceId) => {
+  const sessionData = loadSession();
+  if (!sessionData) {
+    return { status: 'error', message: 'No session found' };
+  }
+
+  const FormData = require('form-data');
+  const fetch = require('node-fetch');
+
+  const API_ENDPOINT = 'https://kingcongstudio.com/ajaxs/voice_cloning3.php';
+
+  try {
+    const form = new FormData();
+    form.append('action', 'delete_clone');
+    form.append('voice_id', voiceId);
+    form.append('session_id', sessionData.session_id);
+    form.append('user_id', sessionData.user_id);
+    form.append('username', sessionData.username);
+    form.append('source', 'electron-tool');
+
+    let cookieHeader = '';
+    if (mainWindow) {
+      try {
+        const cookies = await mainWindow.webContents.session.cookies.get({ url: 'https://kingcongstudio.com' });
+        cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+      } catch (err) {
+        console.error('Could not get cookies:', err);
+      }
+    }
+
+    const headers = form.getHeaders();
+    if (cookieHeader) {
+      headers['Cookie'] = cookieHeader;
+    }
+    headers['X-Client'] = 'kingcong-electron-tool';
+
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      body: form,
+      headers: headers
+    });
+
+    const result = await response.json();
+    return result;
+
+  } catch (error) {
+    console.error('Delete cloned voice error:', error);
+    return { status: 'error', message: error.message };
+  }
+});
+
 // =================== APP LIFECYCLE ===================
 app.whenReady().then(() => {
   // Show splash window first

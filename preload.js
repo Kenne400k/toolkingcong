@@ -61,6 +61,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 🔥 Cloned Voices Window
   openClonedVoicesWindow: () => ipcRenderer.invoke('open-cloned-voices-window'),
 
+  // 🔥 Voice Cloning API
+  cloneVoice: (data) => ipcRenderer.invoke('clone-voice', data),
+  getClonedVoices: () => ipcRenderer.invoke('get-cloned-voices'),
+  deleteClonedVoice: (voiceId) => ipcRenderer.invoke('delete-cloned-voice', voiceId),
+
   // 🔥 Auto Update
   getVersion: () => ipcRenderer.invoke('get-version'),
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
