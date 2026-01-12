@@ -180,6 +180,12 @@ class ProToolManager {
         this.autoSRT = false;
         this.autoSplitChars = '。、,:.!?';
 
+        // ElevenLabs Library
+        this.libraryVoices = [];
+        this.libraryVoicesLoaded = false;
+        this.libraryVoicesLoading = false;
+        this.currentVoiceTab = 'default';
+
         this.init();
     }
 
@@ -553,62 +559,59 @@ class ProToolManager {
     
     // Load voices from server - mở cửa sổ riêng
     async loadVoicesFromServer() {
-        // Open in separate window
-        if (window.electronAPI && window.electronAPI.openVoicesWindow) {
-            window.electronAPI.openVoicesWindow(this.provider);
-            return;
-        }
+        // Open in separate window (disabled for now to use modal with tabs)
+        // if (window.electronAPI && window.electronAPI.openVoicesWindow) {
+        //     window.electronAPI.openVoicesWindow(this.provider);
+        //     return;
+        // }
 
-        // Fallback to modal
-        const modalBody = document.getElementById('voicesModalBody');
+        // Show modal
         document.getElementById('voicesModal').classList.add('show');
 
-        // Nếu đã có voices trong cache thì dùng luôn
-        const cachedVoices = this.loadedVoices?.[this.provider];
-        if (cachedVoices && cachedVoices.length > 0) {
-            console.log(`✅ Using cached ${cachedVoices.length} voices for ${this.provider}`);
-            this.renderVoicesModal(cachedVoices);
-            return;
+        // Show/hide Library tab based on provider
+        const libraryTab = document.querySelector('.voice-tab[data-tab="library"]');
+        if (libraryTab) {
+            libraryTab.style.display = this.provider === 'elevenlabs' ? 'block' : 'none';
         }
 
-        modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Loading voices...</div>`;
+        // Reset to default tab
+        this.currentVoiceTab = 'default';
+        this.switchVoiceTab('default');
 
-        try {
-            const res = await window.electronAPI.getResources();
-            console.log('✅ getResources response:', res);
+        // Load default voices if not cached
+        const cachedVoices = this.loadedVoices?.[this.provider];
+        if (!cachedVoices || cachedVoices.length === 0) {
+            const modalBody = document.getElementById('voicesModalBody');
+            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Loading voices...</div>`;
 
-            if (res && res.status === 'success' && res.data) {
-                // Lưu tất cả voices
-                this.loadedVoices = {
-                    elevenlabs: res.data.elevenlabs?.voices || [],
-                    minimax: res.data.minimax?.voices || []
-                };
+            try {
+                const res = await window.electronAPI.getResources();
+                console.log('✅ getResources response:', res);
 
-                // Lưu models luôn
-                this.loadedModels = {
-                    elevenlabs: res.data.elevenlabs?.models || [],
-                    minimax: res.data.minimax?.models || []
-                };
-                this.updateModelOptions();
+                if (res && res.status === 'success' && res.data) {
+                    this.loadedVoices = {
+                        elevenlabs: res.data.elevenlabs?.voices || [],
+                        minimax: res.data.minimax?.voices || []
+                    };
 
-                const voices = this.loadedVoices[this.provider] || [];
-                console.log(`✅ Found ${voices.length} voices for ${this.provider}`);
+                    this.loadedModels = {
+                        elevenlabs: res.data.elevenlabs?.models || [],
+                        minimax: res.data.minimax?.models || []
+                    };
+                    this.updateModelOptions();
 
-                if (voices.length > 0) {
-                    this.renderVoicesModal(voices);
+                    this.renderDefaultVoices();
                 } else {
-                    modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #888;">Không có voices cho ${this.provider}</div>`;
+                    console.error('❌ Invalid response:', res);
+                    modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Không thể tải voices</div>`;
                 }
-            } else {
-                console.error('❌ Invalid response:', res);
-                modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Không thể tải voices</div>`;
+            } catch (error) {
+                console.error('❌ Load voices error:', error);
+                modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Lỗi: ${error.message}</div>`;
             }
-        } catch (error) {
-            console.error('❌ Load voices error:', error);
-            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #f55;">Lỗi: ${error.message}</div>`;
         }
     }
-    
+
     renderVoicesModal(voices) {
         const modalBody = document.getElementById('voicesModalBody');
         
@@ -656,7 +659,184 @@ class ProToolManager {
     closeVoicesModal() {
         document.getElementById('voicesModal').classList.remove('show');
     }
-    
+
+    // ==================== VOICE TABS ====================
+
+    switchVoiceTab(tab) {
+        console.log('🔄 Switch voice tab:', tab);
+        this.currentVoiceTab = tab;
+
+        // Update tab UI
+        document.querySelectorAll('.voice-tab').forEach(btn => {
+            if (btn.dataset.tab === tab) {
+                btn.style.color = '#fff';
+                btn.style.borderBottom = '2px solid #a855f7';
+                btn.style.fontWeight = '500';
+            } else {
+                btn.style.color = '#888';
+                btn.style.borderBottom = '2px solid transparent';
+                btn.style.fontWeight = 'normal';
+            }
+        });
+
+        // Load content based on tab
+        if (tab === 'default') {
+            this.renderDefaultVoices();
+        } else if (tab === 'library') {
+            this.loadElevenLabsLibrary();
+        }
+    }
+
+    renderDefaultVoices() {
+        const voices = this.loadedVoices?.[this.provider] || [];
+        if (voices.length > 0) {
+            this.renderVoicesModal(voices);
+        } else {
+            document.getElementById('voicesModalBody').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #888;">
+                    Không có voices mặc định
+                </div>
+            `;
+        }
+    }
+
+    async loadElevenLabsLibrary() {
+        console.log('🔄 loadElevenLabsLibrary() called');
+
+        // Nếu đã load rồi thì render luôn
+        if (this.libraryVoicesLoaded && this.libraryVoices.length > 0) {
+            this.renderLibraryVoices(this.libraryVoices);
+            return;
+        }
+
+        // Đang loading thì hiển thị spinner
+        if (this.libraryVoicesLoading) {
+            this.showLibraryLoadingSpinner();
+            return;
+        }
+
+        console.log('🌐 Fetching ElevenLabs Library from server...');
+        this.showLibraryLoadingSpinner();
+        this.libraryVoicesLoading = true;
+
+        try {
+            const res = await window.electronAPI.apiRequest(
+                'https://kingcongstudio.com/ajaxs/get_voices.php?v=' + Date.now(),
+                {}
+            );
+
+            console.log('📦 Library Response:', res);
+
+            if (res && res.status === 'success' && res.data && res.data.length > 0) {
+                this.libraryVoices = this.enhanceLibraryVoices(res.data);
+                this.libraryVoicesLoaded = true;
+                console.log(`✅ SUCCESS: ${res.count || res.data.length} library voices loaded!`);
+                this.renderLibraryVoices(this.libraryVoices);
+            } else {
+                console.error('❌ Invalid response or empty');
+                document.getElementById('voicesModalBody').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #f55;">
+                        Không có dữ liệu thư viện
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('❌ Load library error:', error);
+            document.getElementById('voicesModalBody').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #f55;">
+                    Lỗi kết nối: ${error.message}
+                </div>
+            `;
+        } finally {
+            this.libraryVoicesLoading = false;
+        }
+    }
+
+    showLibraryLoadingSpinner() {
+        document.getElementById('voicesModalBody').innerHTML = `
+            <div style="text-align: center; padding: 60px;">
+                <div style="width: 40px; height: 40px; border: 3px solid #333; border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+                <div style="color: #888; font-size: 13px;">Đang tải thư viện ElevenLabs...</div>
+            </div>
+            <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+        `;
+    }
+
+    enhanceLibraryVoices(voices) {
+        if (!voices || !Array.isArray(voices)) return [];
+
+        return voices.map(v => ({
+            id: v.voice_id || v.id,
+            voice_id: v.voice_id || v.id,
+            name: v.name || 'Unknown',
+            avatar: v.image_url || v.avatar || null,
+            preview_url: v.preview_url || null,
+            description: v.description || '',
+            gender: v.gender || 'unknown',
+            age: v.age || 'unknown',
+            accent: v.accent || 'neutral',
+            language: v.language || 'en',
+            use_case: v.use_case || 'conversational',
+            category: v.category || 'shared',
+            labels: v.labels || {},
+            source: 'elevenlabs_library'
+        }));
+    }
+
+    renderLibraryVoices(voices) {
+        const modalBody = document.getElementById('voicesModalBody');
+
+        if (!voices || voices.length === 0) {
+            modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Thư viện trống</div>`;
+            return;
+        }
+
+        modalBody.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <input type="text" class="form-input" id="libraryVoiceSearch" placeholder="Tìm kiếm trong thư viện..." oninput="proTool.filterLibraryVoices(this.value)">
+            </div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                <i class="bi bi-collection"></i> ${voices.length} voices từ ElevenLabs Library
+            </div>
+            <div id="libraryVoicesList" style="max-height: 400px; overflow-y: auto;">
+                ${voices.map(voice => `
+                    <div class="voice-item" data-name="${voice.name.toLowerCase()}" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid #1a1a1a; cursor: pointer; transition: background 0.2s;"
+                         onclick="proTool.selectVoice('${voice.voice_id || voice.id}', '${voice.name}')"
+                         onmouseover="this.style.background='#1a1a1a'"
+                         onmouseout="this.style.background='transparent'">
+                        ${voice.avatar ? `<img src="${voice.avatar}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` : `<div style="width: 40px; height: 40px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; color: #666;"><i class="bi bi-person"></i></div>`}
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 13px; color: #fff; font-weight: 500;">${voice.name}</div>
+                            <div style="font-size: 10px; color: #555; margin-top: 2px;">${voice.voice_id || voice.id}</div>
+                            <div style="font-size: 10px; color: #666; margin-top: 4px;">
+                                ${[voice.gender, voice.age, voice.accent].filter(x => x && x !== 'unknown' && x !== 'neutral').join(' • ')}
+                            </div>
+                        </div>
+                        ${voice.preview_url ? `<button class="btn btn-sm" style="flex-shrink: 0;" onclick="event.stopPropagation(); proTool.playVoicePreview('${voice.preview_url}')"><i class="bi bi-play-fill"></i></button>` : ''}
+                        <button class="btn btn-sm btn-primary" style="flex-shrink: 0;" onclick="event.stopPropagation(); proTool.selectVoice('${voice.voice_id || voice.id}', '${voice.name}')">Chọn</button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    filterLibraryVoices(query) {
+        const items = document.querySelectorAll('#libraryVoicesList .voice-item');
+        query = query.toLowerCase();
+
+        items.forEach(item => {
+            const name = item.dataset.name || '';
+            const text = item.textContent.toLowerCase();
+            item.style.display = (name.includes(query) || text.includes(query)) ? 'flex' : 'none';
+        });
+    }
+
+    playVoicePreview(url) {
+        if (!url) return;
+        const audio = new Audio(url);
+        audio.play().catch(e => console.error('Preview error:', e));
+    }
+
     // ==================== FILE HANDLING ====================
     
     async handleFileImport(files) {
