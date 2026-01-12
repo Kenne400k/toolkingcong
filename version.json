@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.3.1",
   "changelog": [
     "Silent auto-update via git pull",
     "Auto-restart after update",
@@ -7,7 +7,6 @@
     "V3 Stability: Creative / Natural / Robust",
     "Splash screen with progress bar"
   ],
-  "downloadUrl": "https://github.com/Kenne400k/toolkingcong/releases/latest",
   "forceUpdate": false,
   "minVersion": "1.0.0"
 }
