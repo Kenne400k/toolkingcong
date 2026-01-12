@@ -1746,9 +1746,16 @@ class ProToolManager {
             return;
         }
 
-        // Get delay from Advanced Settings
+        // Get default delay from Advanced Settings
         const useDelay = document.getElementById('optDelayJoin')?.checked;
-        const delaySeconds = useDelay ? (parseFloat(document.getElementById('delayJoinTime')?.value) || 0.5) : 0;
+        const defaultDelay = useDelay ? (parseFloat(document.getElementById('delayJoinTime')?.value) || 0.5) : 0;
+
+        // Show confirmation dialog with delay input
+        const delaySeconds = await this.showJoinConfirmDialog(doneTasks.length, defaultDelay);
+        if (delaySeconds === null) {
+            // User cancelled
+            return;
+        }
 
         this.showNotification('Đang chuẩn bị nối file...', 'info');
 
@@ -1756,6 +1763,7 @@ class ProToolManager {
             // Step 1: Download all files first
             const downloadedFiles = [];
             const taskData = [];
+            const fileNames = [];
 
             for (const task of doneTasks) {
                 if (task.isAudioImport && task.filePath) {
@@ -1765,6 +1773,7 @@ class ProToolManager {
                         content: task.content || task.fileName,
                         duration: task.duration || 3
                     });
+                    fileNames.push(task.fileName || task.outputName || '');
                 } else if (task.resultUrl) {
                     // Need to download
                     const fileName = `${task.outputName || task.fileName || task.id}.mp3`;
@@ -1780,6 +1789,7 @@ class ProToolManager {
                             content: task.content || task.fileName,
                             duration: task.duration || 3
                         });
+                        fileNames.push(task.outputName || task.fileName || '');
                     }
                 }
             }
@@ -1789,10 +1799,8 @@ class ProToolManager {
                 return;
             }
 
-            // Step 2: Get output name from first task
-            const firstTask = doneTasks[0];
-            const baseName = firstTask.outputName || firstTask.fileName || 'joined';
-            const outputName = `${baseName}_joined_${Date.now()}`;
+            // Step 2: Get output name - find common prefix from file names
+            const outputName = this.getJoinOutputName(fileNames);
 
             // Step 3: Join files with delay and create SRT
             const joinResult = await window.electronAPI.joinAudioLocal({
@@ -1817,6 +1825,124 @@ class ProToolManager {
             console.error('Join error:', error);
             this.showNotification('Lỗi khi nối file: ' + error.message, 'error');
         }
+    }
+
+    // Show confirmation dialog for join with delay input
+    showJoinConfirmDialog(fileCount, defaultDelay) {
+        return new Promise((resolve) => {
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.id = 'joinConfirmModal';
+            modal.innerHTML = `
+                <div class="modal-box" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h3><i class="bi bi-link"></i> Join ${fileCount} Files</h3>
+                        <button class="modal-close" onclick="this.closest('.modal').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Khoảng trống giữa các đoạn (giây)</label>
+                            <input type="number" class="form-input" id="joinDelayInput"
+                                   value="${defaultDelay}" step="0.1" min="0" max="10"
+                                   style="font-size: 16px; text-align: center;">
+                            <div style="font-size: 11px; color: #666; margin-top: 4px;">
+                                Để 0 nếu không muốn có khoảng trống
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" id="joinCancelBtn">Hủy</button>
+                        <button class="btn btn-primary" id="joinConfirmBtn">
+                            <i class="bi bi-check-lg"></i> Xác nhận
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Focus input
+            setTimeout(() => {
+                const input = document.getElementById('joinDelayInput');
+                input?.focus();
+                input?.select();
+            }, 100);
+
+            // Handle confirm
+            document.getElementById('joinConfirmBtn').onclick = () => {
+                const delay = parseFloat(document.getElementById('joinDelayInput').value) || 0;
+                modal.remove();
+                resolve(delay);
+            };
+
+            // Handle cancel
+            document.getElementById('joinCancelBtn').onclick = () => {
+                modal.remove();
+                resolve(null);
+            };
+
+            // Handle Enter key
+            document.getElementById('joinDelayInput').onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('joinConfirmBtn').click();
+                }
+            };
+
+            // Handle close button
+            modal.querySelector('.modal-close').onclick = () => {
+                modal.remove();
+                resolve(null);
+            };
+        });
+    }
+
+    // Get output name for joined file - find common prefix
+    getJoinOutputName(fileNames) {
+        if (!fileNames || fileNames.length === 0) {
+            return 'joined_' + Date.now();
+        }
+
+        // Clean file names (remove extension and numbers/suffixes)
+        const cleanNames = fileNames.map(name => {
+            // Remove extension
+            let clean = name.replace(/\.(mp3|wav|ogg)$/i, '');
+            // Remove trailing numbers like _1, _2, -1, -2, (1), (2)
+            clean = clean.replace(/[_\-\s]?\d+$/, '');
+            clean = clean.replace(/\s*\(\d+\)$/, '');
+            return clean.trim();
+        });
+
+        // Find common prefix
+        if (cleanNames.length === 0) {
+            return 'joined_' + Date.now();
+        }
+
+        // Check if all names are the same after cleaning
+        const firstName = cleanNames[0];
+        const allSame = cleanNames.every(n => n === firstName);
+
+        if (allSame && firstName) {
+            return firstName + '_join';
+        }
+
+        // Find longest common prefix
+        let prefix = cleanNames[0];
+        for (let i = 1; i < cleanNames.length; i++) {
+            while (cleanNames[i].indexOf(prefix) !== 0 && prefix.length > 0) {
+                prefix = prefix.substring(0, prefix.length - 1);
+            }
+        }
+
+        // Clean up prefix (remove trailing underscores, dashes, spaces)
+        prefix = prefix.replace(/[_\-\s]+$/, '').trim();
+
+        if (prefix && prefix.length >= 2) {
+            return prefix + '_join';
+        }
+
+        // Fallback to first file name
+        return (cleanNames[0] || 'joined') + '_join';
     }
 
     async joinFiles() {
