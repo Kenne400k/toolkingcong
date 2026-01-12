@@ -1,11 +1,8 @@
 {
-  "version": "1.4.3",
+  "version": "1.4.4",
   "changelog": [
-    "Add Voice Settings from TTS to Pro Tool",
-    "ElevenLabs: Speed, Stability, Similarity, Style, Speaker Boost",
-    "ElevenLabs V3 Alpha: Creative/Natural/Robust stability modes",
-    "Minimax: Speed, Pitch, Volume",
-    "Add model selection for both providers"
+    "Load models from server (real models)",
+    "White text for Creative/Natural/Robust labels"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

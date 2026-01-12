@@ -499,12 +499,40 @@ class ProToolManager {
     }
     
     updateModelOptions() {
-        // Get model based on current provider
+        // Populate ElevenLabs model dropdown
+        const modelSelect = document.getElementById('modelSelect');
+        if (modelSelect && this.loadedModels?.elevenlabs?.length > 0) {
+            const currentVal = modelSelect.value;
+            modelSelect.innerHTML = this.loadedModels.elevenlabs.map(m =>
+                `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1-m.cost_factor)*100)}% rẻ hơn)` : ''}</option>`
+            ).join('');
+            // Restore selection if exists
+            if (currentVal && [...modelSelect.options].some(o => o.value === currentVal)) {
+                modelSelect.value = currentVal;
+            }
+        }
+
+        // Populate Minimax model dropdown
+        const minimaxModelSelect = document.getElementById('minimaxModelSelect');
+        if (minimaxModelSelect && this.loadedModels?.minimax?.length > 0) {
+            const currentVal = minimaxModelSelect.value;
+            minimaxModelSelect.innerHTML = this.loadedModels.minimax.map(m =>
+                `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1-m.cost_factor)*100)}% rẻ hơn)` : ''}</option>`
+            ).join('');
+            // Restore selection if exists
+            if (currentVal && [...minimaxModelSelect.options].some(o => o.value === currentVal)) {
+                minimaxModelSelect.value = currentVal;
+            }
+        }
+
+        // Update current model based on provider
         if (this.provider === 'elevenlabs') {
-            const modelSelect = document.getElementById('modelSelect');
             this.model = modelSelect?.value || 'eleven_multilingual_v2';
+            // Check if V3 model
+            if (this.model === 'eleven_v3') {
+                applyV3ModelSettings();
+            }
         } else {
-            const minimaxModelSelect = document.getElementById('minimaxModelSelect');
             this.model = minimaxModelSelect?.value || 'speech-02-hd';
         }
     }
@@ -2940,17 +2968,15 @@ function updateSlider(type) {
             const stabVal = parseInt(document.getElementById('voiceStability').value);
             const stabDisplay = document.getElementById('stabilityValue');
             if (isV3Model) {
-                // V3 mode: Creative/Natural/Robust
+                // V3 mode: Creative/Natural/Robust (white text)
                 if (stabVal <= 25) {
                     stabDisplay.textContent = 'Creative';
-                    stabDisplay.style.color = '#f0ad4e';
                 } else if (stabVal <= 75) {
                     stabDisplay.textContent = 'Natural';
-                    stabDisplay.style.color = '#5bc0de';
                 } else {
                     stabDisplay.textContent = 'Robust';
-                    stabDisplay.style.color = '#5cb85c';
                 }
+                stabDisplay.style.color = '#fff';
             } else {
                 stabDisplay.textContent = stabVal + '%';
                 stabDisplay.style.color = '#fff';
