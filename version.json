@@ -1,5 +1,5 @@
 {
-  "version": "1.3.4",
+  "version": "1.3.5",
   "changelog": [
     "Fix infinite update loop issue",
     "Read version from local version.json",
