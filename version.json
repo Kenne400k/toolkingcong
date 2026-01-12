@@ -1,7 +1,7 @@
 {
-  "version": "1.4.9",
+  "version": "1.5.0",
   "changelog": [
-    "Add start scripts for Windows, Linux, macOS"
+    "Add start.vbs to run app without showing terminal on Windows"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
