@@ -1,13 +1,7 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.2",
   "changelog": [
-    "Fix auto-update conflict error",
-    "Add ElevenLabs Library to Pro Tool",
-    "Fix infinite update loop issue",
-    "Read version from local version.json",
-    "Silent auto-update via git pull",
-    "Auto-restart after update",
-    "ElevenLabs V3 (Alpha) support"
+    "Rollback to stable v1.4.0"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
