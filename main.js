@@ -9,7 +9,7 @@ let splashWindow;
 const SESSION_FILE = path.join(__dirname, 'sessions', 'session.json');
 
 // =================== APP VERSION ===================
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 const GITHUB_OWNER = 'Kenne400k';
 const GITHUB_REPO = 'toolkingcong';
 const UPDATE_CHECK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/version.json`;
