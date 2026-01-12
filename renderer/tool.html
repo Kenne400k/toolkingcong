@@ -1266,19 +1266,8 @@
             }
         });
         
-        // Slider updates
-        function updateSlider(type) {
-            if (type === 'speed') {
-                document.getElementById('speedValue').textContent = document.getElementById('voiceSpeed').value;
-            } else if (type === 'stability') {
-                document.getElementById('stabilityValue').textContent = document.getElementById('voiceStability').value;
-            } else if (type === 'similarity') {
-                document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value;
-            } else if (type === 'style') {
-                document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value;
-            }
-        }
-        
+        // Slider updates - đã chuyển sang tool.js để hỗ trợ V3 model
+
         // Floating tooltip for info icons
         const floatingTip = document.getElementById('floatingTip');
         

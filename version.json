@@ -1,7 +1,7 @@
 {
-  "version": "1.4.7",
+  "version": "1.4.8",
   "changelog": [
-    "Fix Pro Tool navigation from Dashboard"
+    "Fix V3 Stability showing Creative/Natural/Robust instead of numbers"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
