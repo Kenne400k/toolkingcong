@@ -2809,27 +2809,26 @@ function setupEventListeners() {
     });
     
     // 🔥 Logic hiển thị chữ cho Stability v3
-    $('#stability').on('input', function() { 
-        let currentModelName = $('#selectedModelName').text();
+    $('#stability').on('input', function() {
         let val = parseInt(this.value);
 
         // Kiểm tra step=50 để biết là model V3
         let isV3 = $(this).attr('step') === '50';
 
         if (isV3) {
-            let text = "Natural"; 
-            let color = "#ffffff"; 
+            let text = "Natural";
+            let color = "#5bc0de"; // Blue for Natural
 
             if (val === 0) {
                 text = "Creative";
-                color = "#ffffff"; 
+                color = "#f0ad4e"; // Orange for Creative
             } else if (val === 100) {
                 text = "Robust";
-                color = "#ffffff"; 
+                color = "#5cb85c"; // Green for Robust
             }
-            
-            // Hiển thị chữ
-            $('#stabilityVal').html(`<span style="color: ${color}; font-weight: bold; text-transform: uppercase;">${text}</span>`);
+
+            // Hiển thị chữ với màu sắc tương ứng
+            $('#stabilityVal').html(`<span style="color: ${color}; font-weight: bold;">${text}</span>`);
         } else {
             // Model thường hiển thị %
             $('#stabilityVal').text(this.value + '%');
@@ -3298,119 +3297,171 @@ function selectMinimaxModel(modelId, elem) {
 
 // ========== RENDER ELEVENLABS MODELS ==========
 function renderElevenLabsModels() {
+    if (currentProvider !== 'elevenlabs') return;
+
     console.log('🎯 renderElevenLabsModels()');
-    
+
     let models = loadedModels.elevenlabs || [];
-    
+
     // Nếu không có model nào -> Dừng
     if (models.length === 0) {
-        $('#selectedModelName').text('GenAI Backup'); 
-        $('#elevenlabs-settings').hide(); 
+        $('#selectedModelName').text('GenAI Backup');
+        $('#elevenlabs-settings').hide();
         return;
     }
-    
+
     // Tìm model mặc định
     let targetId = 'eleven_multilingual_v2';
     let defaultModel = models.find(m => m.id === targetId) || models[0];
 
     if(defaultModel) {
+        // 🔥 [FIX V3] THÊM full_data NẾU THIẾU
+        if (!defaultModel.full_data) {
+            console.warn('⚠️ Model missing full_data, creating fallback for:', defaultModel.id);
+            defaultModel.full_data = {
+                can_use_style: defaultModel.id !== 'eleven_v3',
+                can_use_speaker_boost: true
+            };
+        }
+
         // 🔥 THÊM GHI CHÚ "Not used for Vietnamese" CHO V2
         let displayName = defaultModel.name;
-        
+
         if (defaultModel.id === 'eleven_multilingual_v2') {
             displayName += ' (Không dùng cho Tiếng Việt)';
         }
-        
+
         $('#selectedModelName').text(displayName);
-        
-        // Cập nhật UI
+
+        // 🔥 CẬP NHẬT UI (Gọi với fallback data đã fix)
         updateElevenLabsUI(defaultModel.id);
     }
 }
 
 // ========== UPDATE ELEVENLABS UI BASED ON MODEL ==========
 function updateElevenLabsUI(modelId) {
+    console.log('🔧 updateElevenLabsUI called for:', modelId);
+
     let model = loadedModels.elevenlabs.find(m => m.id === modelId);
-    
-    if (!model || !model.full_data) {
-        console.warn('⚠️ Model not found or missing full_data:', modelId);
-        return;
+
+    // 🔥 [FIX V3] FALLBACK NẾU KHÔNG TÌM THẤY MODEL
+    if (!model) {
+        console.warn('⚠️ Model not found:', modelId, '- Using defaults');
+        model = {
+            id: modelId,
+            full_data: {
+                can_use_style: modelId !== 'eleven_v3',
+                can_use_speaker_boost: true
+            }
+        };
     }
-    
-    // Lấy thông tin từ full_data
+
+    // 🔥 [FIX V3] FALLBACK NẾU THIẾU full_data
+    if (!model.full_data) {
+        console.warn('⚠️ Model missing full_data:', modelId, '- Creating fallback');
+        model.full_data = {
+            can_use_style: modelId !== 'eleven_v3',
+            can_use_speaker_boost: true
+        };
+    }
+
+    // Lấy thông tin từ full_data (đã có fallback)
     let canUseStyle = model.full_data.can_use_style === true;
     let canUseSpeakerBoost = model.full_data.can_use_speaker_boost === true;
-    
-    // ========== LOGIC ẨN/HIỆN ==========
-    
-    // 1. Speed -> SỬA: Ẩn nếu là v3, hiện với các model khác
+
+    // ========== LOGIC ẨN/HIỆN CONTROLS ==========
+
+    // 1. Speed -> 🔥 ẨN HOÀN TOÀN VỚI V3
     if (modelId === 'eleven_v3') {
-        $('#slider-speed').hide(); 
+        $('#slider-speed').hide();
+        console.log('  → Speed: HIDDEN (V3)');
     } else {
         $('#slider-speed').show();
+        console.log('  → Speed: VISIBLE');
     }
-    
+
     // 2. Stability -> LUÔN HIỆN
     $('#slider-stability').show();
-    
-    // 3. Similarity -> Ẩn với eleven_v3
+    console.log('  → Stability: VISIBLE');
+
+    // 3. Similarity -> Ẩn với V3
     if (modelId === 'eleven_v3') {
         $('#slider-similarity').hide();
+        console.log('  → Similarity: HIDDEN (V3)');
     } else {
         $('#slider-similarity').show();
+        console.log('  → Similarity: VISIBLE');
     }
-    
-    // 4. Style -> Ẩn nếu là v3, ngược lại check canUseStyle
-    if (modelId === 'eleven_v3') {
-        $('#slider-style').hide(); 
+
+    // 4. Style -> Ẩn với V3 hoặc model không hỗ trợ
+    if (modelId === 'eleven_v3' || !canUseStyle) {
+        $('#slider-style').hide();
+        console.log('  → Style: HIDDEN');
     } else {
-        if (canUseStyle) {
-            $('#slider-style').show();
-        } else {
-            $('#slider-style').hide();
-        }
+        $('#slider-style').show();
+        console.log('  → Style: VISIBLE');
     }
-    
+
     // 5. Speaker Boost
     if (canUseSpeakerBoost) {
         $('#toggle-boost').show();
+        console.log('  → Boost: VISIBLE');
     } else {
         $('#toggle-boost').hide();
+        console.log('  → Boost: HIDDEN');
     }
 
-    // ========== TÙY CHỈNH GIAO DIỆN V3 (Stability 3 NẤC) ==========
-    if (modelId === 'eleven_v3') {
-        // 1. Ép thanh trượt chỉ nhảy 3 nấc (0 - 50 - 100)
-        $('#stability').attr('step', '50');
-        $('#stability').attr('min', '0');
-        $('#stability').attr('max', '100');
+    // ========== CẤU HÌNH STABILITY SLIDER ==========
 
-        // Thêm nhãn Creative / Natural / Robust ở dưới nếu chưa có
+    if (modelId === 'eleven_v3') {
+        console.log('🎯 Configuring V3 3-tier stability...');
+
+        // 1. Set step = 50 (chỉ 3 nấc: 0, 50, 100)
+        $('#stability').attr({
+            'step': '50',
+            'min': '0',
+            'max': '100'
+        });
+
+        // 2. Set giá trị mặc định là 50 (Natural)
+        $('#stability').val(50);
+
+        // 3. Thêm labels nếu chưa có
         if ($('#stability-labels').length === 0) {
             $('#stability').after(`
                 <div id="stability-labels" style="display:flex; justify-content:space-between; font-size:12px; color:#888; margin-top:6px; font-weight:600;">
-                    <span>Creative</span>
-                    <span>Natural</span>
-                    <span>Robust</span>
+                    <span style="color:#f0ad4e;">Creative</span>
+                    <span style="color:#5bc0de;">Natural</span>
+                    <span style="color:#5cb85c;">Robust</span>
                 </div>
             `);
         }
         $('#stability-labels').show();
-        
-        // Trigger input để cập nhật chữ và màu sắc ngay lập tức
+
+        // 4. Cập nhật header để hiển thị text thay vì %
+        $('#slider-stability .slider-header').html('<span>Stability: <span id="stabilityVal" style="color: #5bc0de; font-weight: bold;">Natural</span></span>');
+
+        // 5. Trigger input để cập nhật chữ và màu sắc
         $('#stability').trigger('input');
-        
+
     } else {
         // Revert về giao diện cũ (hiện %) cho các model khác
         // Trả lại step = 1 để kéo mượt %
-        $('#stability').attr('step', '1');
-        
+        $('#stability').attr({
+            'step': '1',
+            'min': '0',
+            'max': '100'
+        });
+
         // Cập nhật lại text %
         let currentVal = $('#stability').val();
         $('#slider-stability .slider-header').html('<span>Độ ổn định: <span id="stabilityVal" style="color: #ffffff;">' + currentVal + '%</span></span>');
-        
+
         // Ẩn nhãn 3 nấc
         $('#stability-labels').hide();
+
+        // Trigger input để cập nhật fill
+        $('#stability').trigger('input');
     }
 }
 
