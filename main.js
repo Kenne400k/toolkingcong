@@ -133,11 +133,45 @@ function compareVersions(v1, v2) {
 }
 
 async function downloadUpdate(updateInfo) {
-  // Open the download URL in browser
-  if (updateInfo.downloadUrl) {
-    shell.openExternal(updateInfo.downloadUrl);
+  const { exec } = require('child_process');
+  const util = require('util');
+  const execPromise = util.promisify(exec);
+
+  try {
+    console.log('🔄 Auto-updating via git pull...');
+
+    // Notify splash about progress
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      splashWindow.webContents.send('update-progress', { percent: 30, status: 'Pulling updates...' });
+    }
+
+    // Run git pull to update
+    const { stdout, stderr } = await execPromise('git pull origin main', {
+      cwd: __dirname
+    });
+
+    console.log('✅ Git pull output:', stdout);
+
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      splashWindow.webContents.send('update-progress', { percent: 100, status: 'Update complete!' });
+    }
+
+    // Update successful - need to restart app
+    console.log('🔄 Update complete! Restarting app...');
+
+    setTimeout(() => {
+      app.relaunch();
+      app.exit(0);
+    }, 1500);
+
+    return { success: true, message: 'Updated successfully' };
+
+  } catch (error) {
+    console.error('❌ Auto-update error:', error);
+
+    // Fallback: try to continue anyway
+    return { success: false, error: error.message };
   }
-  return { success: true };
 }
 
 function finishSplashAndShowMain() {

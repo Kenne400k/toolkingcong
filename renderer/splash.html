@@ -440,18 +440,30 @@
                 return;
             }
 
-            setStatus('downloading', 'Opening download page...', 'Please download the latest version');
+            setStatus('downloading', 'Updating...', 'Downloading latest version');
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressFill').style.width = '10%';
+            document.getElementById('progressText').textContent = 'Starting...';
 
             try {
                 if (window.electronAPI && window.electronAPI.downloadUpdate) {
-                    await window.electronAPI.downloadUpdate(updateInfo);
-                }
+                    const result = await window.electronAPI.downloadUpdate(updateInfo);
 
-                // Sau khi mở trang download, vẫn cho vào app (user tự cài sau)
-                setTimeout(() => {
-                    setStatus('success', 'Download page opened', 'Continuing to app...');
-                    setTimeout(() => continueToApp(), 1500);
-                }, 1000);
+                    if (result.success) {
+                        // Update thành công - app sẽ tự restart
+                        setStatus('success', 'Update complete!', 'Restarting...');
+                        document.getElementById('progressFill').style.width = '100%';
+                        document.getElementById('progressText').textContent = 'Restarting...';
+                        // App sẽ tự restart từ main.js
+                    } else {
+                        // Update thất bại, tiếp tục vào app
+                        console.warn('Update failed:', result.error);
+                        setStatus('success', 'Ready', 'Launching application...');
+                        setTimeout(() => continueToApp(), 1000);
+                    }
+                } else {
+                    continueToApp();
+                }
 
             } catch (error) {
                 console.error('Download error:', error);
@@ -474,9 +486,10 @@
         if (window.electronAPI && window.electronAPI.onUpdateProgress) {
             window.electronAPI.onUpdateProgress((progress) => {
                 document.getElementById('progressFill').style.width = progress.percent + '%';
-                document.getElementById('progressText').textContent = progress.percent + '%';
-                document.getElementById('statusDetail').textContent =
-                    `${formatBytes(progress.transferred)} / ${formatBytes(progress.total)}`;
+                document.getElementById('progressText').textContent = progress.status || (progress.percent + '%');
+                if (progress.status) {
+                    document.getElementById('statusDetail').textContent = progress.status;
+                }
             });
         }
 
