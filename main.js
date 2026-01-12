@@ -9,7 +9,7 @@ let splashWindow;
 const SESSION_FILE = path.join(__dirname, 'sessions', 'session.json');
 
 // =================== APP VERSION ===================
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.3.2';
 const GITHUB_OWNER = 'Kenne400k';
 const GITHUB_REPO = 'toolkingcong';
 const UPDATE_CHECK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/version.json`;
@@ -85,8 +85,13 @@ async function checkForUpdates() {
 
   try {
     console.log('🔍 Checking for updates...');
-    const response = await fetch(UPDATE_CHECK_URL, {
-      headers: { 'Cache-Control': 'no-cache' }
+    // Add timestamp to bypass GitHub CDN cache
+    const urlWithCacheBust = `${UPDATE_CHECK_URL}?t=${Date.now()}`;
+    const response = await fetch(urlWithCacheBust, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
     });
 
     if (!response.ok) {

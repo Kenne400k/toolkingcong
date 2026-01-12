@@ -1,5 +1,5 @@
 {
-  "version": "1.3.1",
+  "version": "1.3.2",
   "changelog": [
     "Silent auto-update via git pull",
     "Auto-restart after update",
