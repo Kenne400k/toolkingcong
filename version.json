@@ -1,7 +1,7 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "changelog": [
-    "Sync all files to fix CSS issues"
+    "Add Reset All Settings button in Pro Tool"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

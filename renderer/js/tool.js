@@ -3098,3 +3098,40 @@ function onMinimaxModelChange() {
     const modelId = document.getElementById('minimaxModelSelect')?.value;
     proTool.model = modelId;
 }
+
+// Reset all settings - clear localStorage and reload
+function resetAllSettings() {
+    if (!confirm('Are you sure you want to reset ALL settings?\n\nThis will clear:\n- Voice Library\n- All voice settings\n- Provider & Model preferences\n- All saved configurations\n\nThe app will reload after reset.')) {
+        return;
+    }
+
+    try {
+        // Clear all localStorage
+        localStorage.removeItem('proToolSettings');
+        localStorage.removeItem('voiceLibrary');
+        localStorage.removeItem('ttsSettings');
+        localStorage.removeItem('lastVoiceId');
+        localStorage.removeItem('lastProvider');
+        localStorage.removeItem('lastModel');
+
+        // Clear all localStorage items (in case there are more)
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key) keysToRemove.push(key);
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+
+        // Show success message
+        proTool?.showNotification?.('All settings have been reset!', 'success');
+
+        // Reload page after short delay
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+
+    } catch (error) {
+        console.error('Error resetting settings:', error);
+        proTool?.showNotification?.('Failed to reset settings: ' + error.message, 'error');
+    }
+}
