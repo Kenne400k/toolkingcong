@@ -1,8 +1,7 @@
 {
-  "version": "1.4.4",
+  "version": "1.4.5",
   "changelog": [
-    "Load models from server (real models)",
-    "White text for Creative/Natural/Robust labels"
+    "Fix V3 model detection for Creative/Natural/Robust"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

@@ -528,9 +528,11 @@ class ProToolManager {
         // Update current model based on provider
         if (this.provider === 'elevenlabs') {
             this.model = modelSelect?.value || 'eleven_multilingual_v2';
-            // Check if V3 model
-            if (this.model === 'eleven_v3') {
+            // Check if V3 model and apply settings
+            if (typeof isModelV3 === 'function' && isModelV3(this.model)) {
                 applyV3ModelSettings();
+            } else if (typeof applyNormalModelSettings === 'function') {
+                applyNormalModelSettings();
             }
         } else {
             this.model = minimaxModelSelect?.value || 'speech-02-hd';
@@ -2589,7 +2591,7 @@ function selectProvider(provider) {
     // Reset V3 mode when switching providers
     if (provider === 'elevenlabs') {
         const currentModel = document.getElementById('modelSelect')?.value;
-        if (currentModel === 'eleven_v3') {
+        if (typeof isModelV3 === 'function' && isModelV3(currentModel)) {
             applyV3ModelSettings();
         } else {
             applyNormalModelSettings();
@@ -3065,12 +3067,19 @@ function resetVoiceSettings() {
     proTool?.showNotification?.('Reset voice settings', 'success');
 }
 
+// Check if model is V3
+function isModelV3(modelId) {
+    if (!modelId) return false;
+    const id = modelId.toLowerCase();
+    return id.includes('v3') || id.includes('_v3') || id === 'eleven_v3';
+}
+
 // Model change handler for ElevenLabs
 function onModelChange() {
     const modelId = document.getElementById('modelSelect')?.value;
     proTool.model = modelId;
 
-    if (modelId === 'eleven_v3') {
+    if (isModelV3(modelId)) {
         applyV3ModelSettings();
     } else {
         applyNormalModelSettings();
