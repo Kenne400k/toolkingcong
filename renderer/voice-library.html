@@ -193,7 +193,6 @@
                     <th style="width: 80px;">Provider</th>
                     <th style="width: 180px;">Voice ID</th>
                     <th style="width: 120px;">Tên</th>
-                    <th style="width: 100px;">Project</th>
                     <th>Settings</th>
                     <th style="width: 120px;">Actions</th>
                 </tr>
@@ -249,7 +248,6 @@
                 voiceId: '',
                 name: '',
                 provider: 'elevenlabs',
-                project: '',
                 settings: {
                     speed: 1.0,
                     stability: 0.5,
@@ -291,12 +289,6 @@
                                value="${escapeHtml(voice.name || '')}"
                                placeholder="Tên..."
                                onchange="updateVoice(${index}, 'name', this.value)">
-                    </td>
-                    <td>
-                        <input type="text"
-                               value="${escapeHtml(voice.project || '')}"
-                               placeholder="Project..."
-                               onchange="updateVoice(${index}, 'project', this.value)">
                     </td>
                     <td>
                         <div class="settings-preview" title="${settingsText}">${settingsText}</div>
