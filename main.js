@@ -9,7 +9,21 @@ let splashWindow;
 const SESSION_FILE = path.join(__dirname, 'sessions', 'session.json');
 
 // =================== APP VERSION ===================
-const APP_VERSION = '1.3.2';
+// Read version from local version.json to avoid infinite update loop
+function getLocalVersion() {
+  try {
+    const versionFile = path.join(__dirname, 'version.json');
+    if (fs.existsSync(versionFile)) {
+      const data = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
+      return data.version || '1.0.0';
+    }
+  } catch (e) {
+    console.error('Error reading local version.json:', e.message);
+  }
+  return '1.0.0';
+}
+
+const APP_VERSION = getLocalVersion();
 const GITHUB_OWNER = 'Kenne400k';
 const GITHUB_REPO = 'toolkingcong';
 const UPDATE_CHECK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/version.json`;
