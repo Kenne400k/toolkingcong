@@ -1,9 +1,8 @@
 {
-  "version": "1.8.3",
+  "version": "1.8.4",
   "changelog": [
-    "Add language switcher (VI/EN) to all pages",
-    "Fix Vietnamese text with diacritics in Voice Cloning",
-    "Add i18n system for multi-language support"
+    "Fix add voice to library error (library.findIndex)",
+    "Ensure voiceLibrary is always an array"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

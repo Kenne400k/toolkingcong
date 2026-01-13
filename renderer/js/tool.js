@@ -2960,7 +2960,9 @@ async function addToLibrary() {
     // Load existing library
     let library = [];
     try {
-        library = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
+        const stored = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
+        // Ensure library is always an array
+        library = Array.isArray(stored) ? stored : [];
     } catch (e) {
         library = [];
     }
@@ -3035,7 +3037,9 @@ function saveToLibrary() {
     // Load existing library
     let library = [];
     try {
-        library = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
+        const stored = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
+        // Ensure library is always an array
+        library = Array.isArray(stored) ? stored : [];
     } catch (e) {
         library = [];
     }
