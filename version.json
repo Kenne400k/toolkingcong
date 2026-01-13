@@ -1,8 +1,7 @@
 {
-  "version": "1.8.6",
+  "version": "1.8.7",
   "changelog": [
-    "Voice Library: Use button now auto-closes modal",
-    "Minimax columns: #, Name, Voice ID, Model, Speed, Pitch, Volume, Actions"
+    "Remove Add Voice buttons from Voice Library"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
