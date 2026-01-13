@@ -1,10 +1,8 @@
 {
-  "version": "1.8.5",
+  "version": "1.8.6",
   "changelog": [
-    "Separate Voice Library for ElevenLabs and Minimax",
-    "New library columns: Name, Voice ID, Model, Speed, Stability/Pitch, Similarity/Volume, Style, Boost",
-    "Add tabs to switch between provider libraries",
-    "Auto-migrate old library data to new format"
+    "Voice Library: Use button now auto-closes modal",
+    "Minimax columns: #, Name, Voice ID, Model, Speed, Pitch, Volume, Actions"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
