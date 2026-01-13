@@ -355,8 +355,19 @@
             
             <!-- Header -->
             <header class="h-16 flex items-center justify-between border-b border-custom px-6 bg-main shrink-0" id="app-header">
-                <h2 class="text-white text-lg font-semibold" id="page-title">Overview</h2>
+                <h2 class="text-white text-lg font-semibold" id="page-title" data-i18n="db_overview">Overview</h2>
                 <div class="flex items-center gap-4">
+                    <button id="langSwitchBtn" onclick="toggleAppLanguage()" style="
+                        padding: 6px 12px;
+                        background: var(--bg-secondary);
+                        border: 1px solid var(--border);
+                        border-radius: 6px;
+                        color: #fff;
+                        font-size: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    ">VI</button>
                     <div class="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg border border-custom">
                         <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
                         <span class="text-sm font-semibold text-white" id="header-credits">0</span>
@@ -476,6 +487,7 @@
         </main>
     </div>
     
+    <script src="js/i18n.js"></script>
     <script src="js/api-handler.js"></script>
     <script src="js/dashboard.js"></script>
 </body>

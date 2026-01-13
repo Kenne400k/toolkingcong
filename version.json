@@ -1,9 +1,9 @@
 {
-  "version": "1.8.2",
+  "version": "1.8.3",
   "changelog": [
-    "Sync sidebar font size across all pages",
-    "Remove History tab from sidebar",
-    "Reorder sidebar: Voice Cloning now under Text to Speech"
+    "Add language switcher (VI/EN) to all pages",
+    "Fix Vietnamese text with diacritics in Voice Cloning",
+    "Add i18n system for multi-language support"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

@@ -684,10 +684,23 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             
             <div class="top-bar" id="app-header">
-                <div class="top-bar-title">Pro Tool</div>
-                <div class="credits-box">
-                    <i class="bi bi-wallet2"></i>
-                    <span id="userCredits">0</span> Credits
+                <div class="top-bar-title" data-i18n="pro_tool">Pro Tool</div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button id="langSwitchBtn" onclick="toggleAppLanguage()" style="
+                        padding: 6px 12px;
+                        background: var(--bg-secondary);
+                        border: 1px solid var(--border);
+                        border-radius: 6px;
+                        color: #fff;
+                        font-size: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    ">VI</button>
+                    <div class="credits-box">
+                        <i class="bi bi-wallet2"></i>
+                        <span id="userCredits">0</span> Credits
+                    </div>
                 </div>
             </div>
             
@@ -1286,6 +1299,7 @@
     <!-- Floating tooltip -->
     <div id="floatingTip"></div>
 
+    <script src="js/i18n.js"></script>
     <script src="js/api-handler.js"></script>
     <script src="js/shared-ui.js"></script>
     <script src="js/tool.js"></script>
