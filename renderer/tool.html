@@ -1051,33 +1051,74 @@
     
     <!-- Voice Library Modal -->
     <div class="modal" id="voiceLibraryModal">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 1200px; max-height: 90vh;">
             <div class="modal-header">
                 <h3><i class="bi bi-collection"></i> Voice Library</h3>
                 <button class="modal-close" onclick="closeVoiceLibrary()">×</button>
             </div>
-            <div class="modal-body">
-                <div class="info-text">
+
+            <!-- Tabs -->
+            <div style="display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 16px;">
+                <button class="lib-tab active" data-provider="elevenlabs" onclick="switchLibraryTab('elevenlabs')" style="padding: 12px 20px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500;">
+                    <i class="bi bi-lightning-charge"></i> ElevenLabs
+                </button>
+                <button class="lib-tab" data-provider="minimax" onclick="switchLibraryTab('minimax')" style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent;">
+                    <i class="bi bi-robot"></i> Minimax
+                </button>
+            </div>
+
+            <div class="modal-body" style="padding: 16px; overflow-x: auto;">
+                <div class="info-text" style="margin-bottom: 12px;">
                     Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu mỗi dòng để dùng voice tương ứng cho hội thoại nhiều người.
                 </div>
-                <table class="voice-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;">ID</th>
-                            <th>Voice ID</th>
-                            <th>Name</th>
-                            <th style="width: 40px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="voiceLibraryBody">
-                        <tr><td>1</td><td><input type="text" placeholder="Voice ID..."></td><td><input type="text" placeholder="Name..."></td><td><button class="btn btn-sm" onclick="removeVoiceRow(this)">×</button></td></tr>
-                    </tbody>
-                </table>
-                <button class="btn" style="margin-top: 12px;" onclick="addVoiceRow()"><i class="bi bi-plus"></i> Add</button>
+
+                <!-- ElevenLabs Library -->
+                <div id="elevenlabsLibrary" class="library-content">
+                    <table class="voice-table" style="width: 100%; font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th style="min-width: 100px;">Name</th>
+                                <th style="min-width: 180px;">Voice ID</th>
+                                <th style="min-width: 120px;">Model</th>
+                                <th style="width: 70px;">Speed</th>
+                                <th style="width: 70px;">Stability</th>
+                                <th style="width: 70px;">Similarity</th>
+                                <th style="width: 60px;">Style</th>
+                                <th style="width: 50px;">Boost</th>
+                                <th style="width: 80px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="elevenlabsLibraryBody">
+                        </tbody>
+                    </table>
+                    <button class="btn" style="margin-top: 12px;" onclick="addLibraryRow('elevenlabs')"><i class="bi bi-plus"></i> Add Voice</button>
+                </div>
+
+                <!-- Minimax Library -->
+                <div id="minimaxLibrary" class="library-content" style="display: none;">
+                    <table class="voice-table" style="width: 100%; font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th style="min-width: 100px;">Name</th>
+                                <th style="min-width: 180px;">Voice ID</th>
+                                <th style="min-width: 120px;">Model</th>
+                                <th style="width: 70px;">Speed</th>
+                                <th style="width: 70px;">Pitch</th>
+                                <th style="width: 70px;">Volume</th>
+                                <th style="width: 80px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="minimaxLibraryBody">
+                        </tbody>
+                    </table>
+                    <button class="btn" style="margin-top: 12px;" onclick="addLibraryRow('minimax')"><i class="bi bi-plus"></i> Add Voice</button>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeVoiceLibrary()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveVoiceLibrary()">Save</button>
+                <button class="btn btn-primary" onclick="saveVoiceLibrary()"><i class="bi bi-save"></i> Save</button>
             </div>
         </div>
     </div>

@@ -1795,66 +1795,194 @@ class ProToolManager {
     }
     
     // ==================== VOICE LIBRARY ====================
-    
+
     loadVoiceLibrary() {
-        const saved = localStorage.getItem('voiceLibrary');
-        if (saved) {
-            try {
-                this.voiceLibrary = JSON.parse(saved);
-                this.renderVoiceLibraryTable();
-            } catch (e) {
-                this.voiceLibrary = [];
-            }
+        // Load both libraries
+        try {
+            const elevenlabs = localStorage.getItem('voiceLibrary_elevenlabs');
+            this.voiceLibraryElevenlabs = elevenlabs ? JSON.parse(elevenlabs) : [];
+            if (!Array.isArray(this.voiceLibraryElevenlabs)) this.voiceLibraryElevenlabs = [];
+        } catch (e) {
+            this.voiceLibraryElevenlabs = [];
         }
+
+        try {
+            const minimax = localStorage.getItem('voiceLibrary_minimax');
+            this.voiceLibraryMinimax = minimax ? JSON.parse(minimax) : [];
+            if (!Array.isArray(this.voiceLibraryMinimax)) this.voiceLibraryMinimax = [];
+        } catch (e) {
+            this.voiceLibraryMinimax = [];
+        }
+
+        // Also load old format for migration
+        try {
+            const old = localStorage.getItem('voiceLibrary');
+            if (old) {
+                const oldLib = JSON.parse(old);
+                if (Array.isArray(oldLib) && oldLib.length > 0) {
+                    // Migrate old data to elevenlabs
+                    oldLib.forEach(v => {
+                        if (v.provider === 'minimax') {
+                            if (!this.voiceLibraryMinimax.find(x => x.voiceId === v.voiceId)) {
+                                this.voiceLibraryMinimax.push(v);
+                            }
+                        } else {
+                            if (!this.voiceLibraryElevenlabs.find(x => x.voiceId === v.voiceId)) {
+                                this.voiceLibraryElevenlabs.push(v);
+                            }
+                        }
+                    });
+                    // Save migrated data
+                    localStorage.setItem('voiceLibrary_elevenlabs', JSON.stringify(this.voiceLibraryElevenlabs));
+                    localStorage.setItem('voiceLibrary_minimax', JSON.stringify(this.voiceLibraryMinimax));
+                    // Remove old key
+                    localStorage.removeItem('voiceLibrary');
+                    console.log('📚 Migrated old voiceLibrary to new format');
+                }
+            }
+        } catch (e) {
+            console.error('Migration error:', e);
+        }
+
+        // Combined for backward compatibility
+        this.voiceLibrary = [...this.voiceLibraryElevenlabs, ...this.voiceLibraryMinimax];
     }
-    
+
     saveVoiceLibrary() {
-        // Collect from table
-        const rows = document.querySelectorAll('#voiceLibraryBody tr');
-        this.voiceLibrary = [];
-        
-        rows.forEach((row, index) => {
+        // Save ElevenLabs library
+        const elevenlabsRows = document.querySelectorAll('#elevenlabsLibraryBody tr');
+        this.voiceLibraryElevenlabs = [];
+
+        elevenlabsRows.forEach((row, index) => {
             const inputs = row.querySelectorAll('input');
-            const id = index + 1;
-            const voiceId = inputs[0]?.value?.trim() || '';
-            const name = inputs[1]?.value?.trim() || '';
-            
-            if (voiceId) {
-                this.voiceLibrary.push({ id, voiceId, name });
+            const selects = row.querySelectorAll('select');
+            const voice = {
+                id: index + 1,
+                provider: 'elevenlabs',
+                name: inputs[0]?.value?.trim() || '',
+                voiceId: inputs[1]?.value?.trim() || '',
+                model: selects[0]?.value || 'eleven_multilingual_v2',
+                settings: {
+                    speed: parseFloat(inputs[2]?.value) || 1,
+                    stability: parseFloat(inputs[3]?.value) || 0.5,
+                    similarity: parseFloat(inputs[4]?.value) || 0.75,
+                    style: parseFloat(inputs[5]?.value) || 0,
+                    speakerBoost: inputs[6]?.checked !== false
+                }
+            };
+            if (voice.voiceId) {
+                this.voiceLibraryElevenlabs.push(voice);
             }
         });
-        
-        localStorage.setItem('voiceLibrary', JSON.stringify(this.voiceLibrary));
-        console.log('✅ Voice Library saved:', this.voiceLibrary);
-        this.showNotification('Saved!', 'success');
-        
-        // Close modal - use DOM directly
+
+        // Save Minimax library
+        const minimaxRows = document.querySelectorAll('#minimaxLibraryBody tr');
+        this.voiceLibraryMinimax = [];
+
+        minimaxRows.forEach((row, index) => {
+            const inputs = row.querySelectorAll('input');
+            const selects = row.querySelectorAll('select');
+            const voice = {
+                id: index + 1,
+                provider: 'minimax',
+                name: inputs[0]?.value?.trim() || '',
+                voiceId: inputs[1]?.value?.trim() || '',
+                model: selects[0]?.value || 'speech-02-hd',
+                settings: {
+                    speed: parseFloat(inputs[2]?.value) || 1,
+                    pitch: parseFloat(inputs[3]?.value) || 0,
+                    vol: parseFloat(inputs[4]?.value) || 1
+                }
+            };
+            if (voice.voiceId) {
+                this.voiceLibraryMinimax.push(voice);
+            }
+        });
+
+        localStorage.setItem('voiceLibrary_elevenlabs', JSON.stringify(this.voiceLibraryElevenlabs));
+        localStorage.setItem('voiceLibrary_minimax', JSON.stringify(this.voiceLibraryMinimax));
+
+        // Combined for backward compatibility
+        this.voiceLibrary = [...this.voiceLibraryElevenlabs, ...this.voiceLibraryMinimax];
+
+        console.log('✅ Voice Library saved - ElevenLabs:', this.voiceLibraryElevenlabs.length, 'Minimax:', this.voiceLibraryMinimax.length);
+        this.showNotification('Đã lưu thư viện!', 'success');
+
+        // Close modal
         const modal = document.getElementById('voiceLibraryModal');
         if (modal) modal.classList.remove('show');
     }
-    
+
     renderVoiceLibraryTable() {
-        const tbody = document.getElementById('voiceLibraryBody');
+        this.renderElevenlabsLibrary();
+        this.renderMinimaxLibrary();
+    }
+
+    renderElevenlabsLibrary() {
+        const tbody = document.getElementById('elevenlabsLibraryBody');
         if (!tbody) return;
-        
-        if (this.voiceLibrary.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td>1</td>
-                    <td><input type="text" placeholder="Voice ID..."></td>
-                    <td><input type="text" placeholder="Name..."></td>
-                    <td><button class="btn btn-sm" onclick="removeVoiceRow(this)">×</button></td>
-                </tr>
-            `;
+
+        if (!this.voiceLibraryElevenlabs || this.voiceLibraryElevenlabs.length === 0) {
+            tbody.innerHTML = '';
             return;
         }
-        
-        tbody.innerHTML = this.voiceLibrary.map((voice) => `
+
+        tbody.innerHTML = this.voiceLibraryElevenlabs.map((voice, idx) => `
             <tr>
-                <td>${voice.id}</td>
-                <td><input type="text" value="${voice.voiceId}" placeholder="Voice ID..."></td>
-                <td><input type="text" value="${voice.name || ''}" placeholder="Name..."></td>
-                <td><button class="btn btn-sm" onclick="removeVoiceRow(this)">×</button></td>
+                <td>${idx + 1}</td>
+                <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;"></td>
+                <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 160px;"></td>
+                <td>
+                    <select style="width: 110px; padding: 4px;">
+                        <option value="eleven_multilingual_v2" ${voice.model === 'eleven_multilingual_v2' ? 'selected' : ''}>Multilingual V2</option>
+                        <option value="eleven_turbo_v2_5" ${voice.model === 'eleven_turbo_v2_5' ? 'selected' : ''}>Turbo V2.5</option>
+                        <option value="eleven_flash_v2" ${voice.model === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
+                        <option value="eleven_flash_v2_5" ${voice.model === 'eleven_flash_v2_5' ? 'selected' : ''}>Flash V2.5</option>
+                        <option value="eleven_v3" ${voice.model === 'eleven_v3' ? 'selected' : ''}>Eleven V3</option>
+                    </select>
+                </td>
+                <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 60px;"></td>
+                <td><input type="number" value="${voice.settings?.stability || 0.5}" step="0.1" min="0" max="1" style="width: 60px;"></td>
+                <td><input type="number" value="${voice.settings?.similarity || 0.75}" step="0.1" min="0" max="1" style="width: 60px;"></td>
+                <td><input type="number" value="${voice.settings?.style || 0}" step="0.1" min="0" max="1" style="width: 50px;"></td>
+                <td style="text-align: center;"><input type="checkbox" ${voice.settings?.speakerBoost !== false ? 'checked' : ''}></td>
+                <td>
+                    <button class="btn btn-sm" onclick="useLibraryVoice('elevenlabs', ${idx})" title="Sử dụng"><i class="bi bi-play-fill"></i></button>
+                    <button class="btn btn-sm" onclick="removeLibraryRow('elevenlabs', this)" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    renderMinimaxLibrary() {
+        const tbody = document.getElementById('minimaxLibraryBody');
+        if (!tbody) return;
+
+        if (!this.voiceLibraryMinimax || this.voiceLibraryMinimax.length === 0) {
+            tbody.innerHTML = '';
+            return;
+        }
+
+        tbody.innerHTML = this.voiceLibraryMinimax.map((voice, idx) => `
+            <tr>
+                <td>${idx + 1}</td>
+                <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;"></td>
+                <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 160px;"></td>
+                <td>
+                    <select style="width: 110px; padding: 4px;">
+                        <option value="speech-02-hd" ${voice.model === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
+                        <option value="speech-02-turbo" ${voice.model === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
+                        <option value="speech-01-hd" ${voice.model === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
+                        <option value="speech-01-turbo" ${voice.model === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
+                    </select>
+                </td>
+                <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 60px;"></td>
+                <td><input type="number" value="${voice.settings?.pitch || 0}" step="1" min="-12" max="12" style="width: 60px;"></td>
+                <td><input type="number" value="${voice.settings?.vol || 1}" step="0.1" min="0.1" max="10" style="width: 60px;"></td>
+                <td>
+                    <button class="btn btn-sm" onclick="useLibraryVoice('minimax', ${idx})" title="Sử dụng"><i class="bi bi-play-fill"></i></button>
+                    <button class="btn btn-sm" onclick="removeLibraryRow('minimax', this)" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
+                </td>
             </tr>
         `).join('');
     }
@@ -2732,7 +2860,12 @@ function openVoiceLibrary() {
     } else {
         // Fallback to modal if not in Electron
         document.getElementById('voiceLibraryModal').classList.add('show');
+        proTool.loadVoiceLibrary();
         proTool.renderVoiceLibraryTable();
+
+        // Switch to current provider tab
+        const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
+        switchLibraryTab(currentProvider);
     }
 }
 
@@ -2744,32 +2877,160 @@ function saveVoiceLibrary() {
     proTool.saveVoiceLibrary();
 }
 
-function addVoiceRow() {
-    const tbody = document.getElementById('voiceLibraryBody');
+// Switch between library tabs
+function switchLibraryTab(provider) {
+    // Update tabs
+    document.querySelectorAll('.lib-tab').forEach(tab => {
+        if (tab.dataset.provider === provider) {
+            tab.style.color = '#fff';
+            tab.style.borderBottom = '2px solid #a855f7';
+            tab.classList.add('active');
+        } else {
+            tab.style.color = '#888';
+            tab.style.borderBottom = '2px solid transparent';
+            tab.classList.remove('active');
+        }
+    });
+
+    // Show/hide library content
+    document.getElementById('elevenlabsLibrary').style.display = provider === 'elevenlabs' ? 'block' : 'none';
+    document.getElementById('minimaxLibrary').style.display = provider === 'minimax' ? 'block' : 'none';
+}
+
+// Add new row to library
+function addLibraryRow(provider) {
+    const tbody = document.getElementById(provider === 'elevenlabs' ? 'elevenlabsLibraryBody' : 'minimaxLibraryBody');
     const rows = tbody.querySelectorAll('tr');
     const nextId = rows.length + 1;
 
     const newRow = document.createElement('tr');
-    newRow.innerHTML = `
-        <td>${nextId}</td>
-        <td><input type="text" placeholder="Voice ID..."></td>
-        <td><input type="text" placeholder="Name..."></td>
-        <td><button class="btn btn-sm" onclick="removeVoiceRow(this)">×</button></td>
-    `;
+
+    if (provider === 'elevenlabs') {
+        newRow.innerHTML = `
+            <td>${nextId}</td>
+            <td><input type="text" placeholder="Name..." style="width: 90px;"></td>
+            <td><input type="text" placeholder="Voice ID..." style="width: 160px;"></td>
+            <td>
+                <select style="width: 110px; padding: 4px;">
+                    <option value="eleven_multilingual_v2">Multilingual V2</option>
+                    <option value="eleven_turbo_v2_5">Turbo V2.5</option>
+                    <option value="eleven_flash_v2">Flash V2</option>
+                    <option value="eleven_flash_v2_5">Flash V2.5</option>
+                    <option value="eleven_v3">Eleven V3</option>
+                </select>
+            </td>
+            <td><input type="number" value="1" step="0.1" min="0.5" max="2" style="width: 60px;"></td>
+            <td><input type="number" value="0.5" step="0.1" min="0" max="1" style="width: 60px;"></td>
+            <td><input type="number" value="0.75" step="0.1" min="0" max="1" style="width: 60px;"></td>
+            <td><input type="number" value="0" step="0.1" min="0" max="1" style="width: 50px;"></td>
+            <td style="text-align: center;"><input type="checkbox" checked></td>
+            <td>
+                <button class="btn btn-sm" onclick="useLibraryVoice('elevenlabs', ${nextId - 1})" title="Sử dụng"><i class="bi bi-play-fill"></i></button>
+                <button class="btn btn-sm" onclick="removeLibraryRow('elevenlabs', this)" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
+            </td>
+        `;
+    } else {
+        newRow.innerHTML = `
+            <td>${nextId}</td>
+            <td><input type="text" placeholder="Name..." style="width: 90px;"></td>
+            <td><input type="text" placeholder="Voice ID..." style="width: 160px;"></td>
+            <td>
+                <select style="width: 110px; padding: 4px;">
+                    <option value="speech-02-hd">Speech HD 2.6</option>
+                    <option value="speech-02-turbo">Speech Turbo 2.6</option>
+                    <option value="speech-01-hd">Speech HD 2.5</option>
+                    <option value="speech-01-turbo">Speech Turbo 2.5</option>
+                </select>
+            </td>
+            <td><input type="number" value="1" step="0.1" min="0.5" max="2" style="width: 60px;"></td>
+            <td><input type="number" value="0" step="1" min="-12" max="12" style="width: 60px;"></td>
+            <td><input type="number" value="1" step="0.1" min="0.1" max="10" style="width: 60px;"></td>
+            <td>
+                <button class="btn btn-sm" onclick="useLibraryVoice('minimax', ${nextId - 1})" title="Sử dụng"><i class="bi bi-play-fill"></i></button>
+                <button class="btn btn-sm" onclick="removeLibraryRow('minimax', this)" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
+            </td>
+        `;
+    }
+
     tbody.appendChild(newRow);
 }
 
-function removeVoiceRow(btn) {
+// Remove row from library
+function removeLibraryRow(provider, btn) {
     const row = btn.closest('tr');
     const tbody = row.parentElement;
 
-    if (tbody.querySelectorAll('tr').length > 1) {
-        row.remove();
-        // Re-number IDs
-        tbody.querySelectorAll('tr').forEach((tr, idx) => {
-            tr.querySelector('td').textContent = idx + 1;
-        });
+    row.remove();
+
+    // Re-number IDs
+    tbody.querySelectorAll('tr').forEach((tr, idx) => {
+        tr.querySelector('td').textContent = idx + 1;
+    });
+}
+
+// Use voice from library
+function useLibraryVoice(provider, index) {
+    const library = provider === 'elevenlabs' ? proTool.voiceLibraryElevenlabs : proTool.voiceLibraryMinimax;
+    const voice = library[index];
+
+    if (!voice) {
+        proTool.showNotification('Voice not found!', 'error');
+        return;
     }
+
+    // Switch provider if needed
+    if (document.getElementById('providerSelect')?.value !== provider) {
+        selectProvider(provider);
+    }
+
+    // Set voice ID
+    document.getElementById('selectedVoiceId').value = voice.voiceId;
+
+    // Set model
+    if (provider === 'elevenlabs') {
+        document.getElementById('modelSelect').value = voice.model || 'eleven_multilingual_v2';
+        // Set settings
+        if (voice.settings) {
+            document.getElementById('voiceSpeed').value = voice.settings.speed || 1;
+            document.getElementById('voiceStability').value = (voice.settings.stability || 0.5) * 100;
+            document.getElementById('voiceSimilarity').value = (voice.settings.similarity || 0.75) * 100;
+            document.getElementById('voiceStyle').value = (voice.settings.style || 0) * 100;
+            document.getElementById('speakerBoost').checked = voice.settings.speakerBoost !== false;
+
+            // Update slider displays
+            updateSlider('speed');
+            updateSlider('stability');
+            updateSlider('similarity');
+            updateSlider('style');
+        }
+    } else {
+        document.getElementById('minimaxModelSelect').value = voice.model || 'speech-02-hd';
+        // Set settings
+        if (voice.settings) {
+            document.getElementById('mmVoiceSpeed').value = voice.settings.speed || 1;
+            document.getElementById('mmVoicePitch').value = voice.settings.pitch || 0;
+            document.getElementById('mmVoiceVol').value = voice.settings.vol || 1;
+
+            // Update slider displays
+            updateSlider('mmSpeed');
+            updateSlider('mmPitch');
+            updateSlider('mmVol');
+        }
+    }
+
+    closeVoiceLibrary();
+    proTool.showNotification(`Đã chọn voice: ${voice.name || voice.voiceId}`, 'success');
+}
+
+// Keep old function for backward compatibility
+function addVoiceRow() {
+    const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
+    addLibraryRow(currentProvider);
+}
+
+function removeVoiceRow(btn) {
+    const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
+    removeLibraryRow(currentProvider, btn);
 }
 
 function toggleSelectAll() {
@@ -2906,7 +3167,6 @@ function closeProjectsModal() {
 // ==================== ADD TO LIBRARY ====================
 async function addToLibrary() {
     const voiceId = document.getElementById('selectedVoiceId')?.value?.trim();
-    const model = document.getElementById('modelSelect')?.value;
     const provider = document.getElementById('providerSelect')?.value || 'elevenlabs';
 
     if (!voiceId) {
@@ -2939,36 +3199,55 @@ async function addToLibrary() {
         // Continue with voiceId as name
     }
 
-    // Get current settings
-    const voiceData = {
-        id: Date.now(),
-        voiceId: voiceId,
-        name: voiceName,
-        provider: provider,
-        model: model,
-        settings: {
-            speed: parseFloat(document.getElementById('voiceSpeed')?.value) || 1,
-            stability: parseFloat(document.getElementById('voiceStability')?.value) || 0.5,
-            similarity: parseFloat(document.getElementById('voiceSimilarity')?.value) || 0.75,
-            style: parseFloat(document.getElementById('voiceStyle')?.value) || 0,
-            speakerBoost: document.getElementById('speakerBoost')?.checked !== false
-        }
-    };
+    // Get current settings based on provider
+    let voiceData;
+
+    if (provider === 'elevenlabs') {
+        const model = document.getElementById('modelSelect')?.value || 'eleven_multilingual_v2';
+        voiceData = {
+            id: Date.now(),
+            voiceId: voiceId,
+            name: voiceName,
+            provider: provider,
+            model: model,
+            settings: {
+                speed: parseFloat(document.getElementById('voiceSpeed')?.value) || 1,
+                stability: (parseFloat(document.getElementById('voiceStability')?.value) || 50) / 100,
+                similarity: (parseFloat(document.getElementById('voiceSimilarity')?.value) || 75) / 100,
+                style: (parseFloat(document.getElementById('voiceStyle')?.value) || 0) / 100,
+                speakerBoost: document.getElementById('speakerBoost')?.checked !== false
+            }
+        };
+    } else {
+        const model = document.getElementById('minimaxModelSelect')?.value || 'speech-02-hd';
+        voiceData = {
+            id: Date.now(),
+            voiceId: voiceId,
+            name: voiceName,
+            provider: provider,
+            model: model,
+            settings: {
+                speed: parseFloat(document.getElementById('mmVoiceSpeed')?.value) || 1,
+                pitch: parseFloat(document.getElementById('mmVoicePitch')?.value) || 0,
+                vol: parseFloat(document.getElementById('mmVoiceVol')?.value) || 1
+            }
+        };
+    }
 
     console.log('📚 Adding to library:', voiceData);
 
-    // Load existing library
+    // Load existing library for the provider
+    const storageKey = provider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
     let library = [];
     try {
-        const stored = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
-        // Ensure library is always an array
+        const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
         library = Array.isArray(stored) ? stored : [];
     } catch (e) {
         library = [];
     }
 
     // Check if voiceId already exists
-    const existingIndex = library.findIndex(v => v.voiceId === voiceId && v.provider === provider);
+    const existingIndex = library.findIndex(v => v.voiceId === voiceId);
     if (existingIndex >= 0) {
         library[existingIndex] = voiceData;
         proTool.showNotification(`Đã cập nhật "${voiceName}" trong thư viện!`, 'success');
@@ -2978,12 +3257,17 @@ async function addToLibrary() {
     }
 
     // Save to localStorage
-    localStorage.setItem('voiceLibrary', JSON.stringify(library));
+    localStorage.setItem(storageKey, JSON.stringify(library));
 
-    // Also update proTool.voiceLibrary in memory
-    proTool.voiceLibrary = library;
+    // Update proTool library in memory
+    if (provider === 'elevenlabs') {
+        proTool.voiceLibraryElevenlabs = library;
+    } else {
+        proTool.voiceLibraryMinimax = library;
+    }
+    proTool.voiceLibrary = [...(proTool.voiceLibraryElevenlabs || []), ...(proTool.voiceLibraryMinimax || [])];
 
-    console.log('📚 Library saved:', library.length, 'voices');
+    console.log('📚 Library saved:', library.length, 'voices for', provider);
 }
 
 // Old modal-based add to library (kept for reference)
@@ -3012,7 +3296,7 @@ function closeAddToLibraryModal() {
 function saveToLibrary() {
     const voiceId = document.getElementById('libVoiceId')?.value?.trim();
     const voiceName = document.getElementById('libVoiceName')?.value?.trim();
-    const provider = document.getElementById('libProvider')?.value;
+    const provider = document.getElementById('libProvider')?.value || 'elevenlabs';
     const model = document.getElementById('libModel')?.value;
 
     if (!voiceId) {
@@ -3034,25 +3318,33 @@ function saveToLibrary() {
         }
     };
 
-    // Load existing library
+    // Load existing library for the provider
+    const storageKey = provider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
     let library = [];
     try {
-        const stored = JSON.parse(localStorage.getItem('voiceLibrary') || '[]');
-        // Ensure library is always an array
+        const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
         library = Array.isArray(stored) ? stored : [];
     } catch (e) {
         library = [];
     }
 
     // Check if voiceId already exists
-    const existingIndex = library.findIndex(v => v.voiceId === voiceId && v.provider === provider);
+    const existingIndex = library.findIndex(v => v.voiceId === voiceId);
     if (existingIndex >= 0) {
         library[existingIndex] = voiceData;
     } else {
         library.push(voiceData);
     }
 
-    localStorage.setItem('voiceLibrary', JSON.stringify(library));
+    localStorage.setItem(storageKey, JSON.stringify(library));
+
+    // Update proTool library in memory
+    if (provider === 'elevenlabs') {
+        proTool.voiceLibraryElevenlabs = library;
+    } else {
+        proTool.voiceLibraryMinimax = library;
+    }
+    proTool.voiceLibrary = [...(proTool.voiceLibraryElevenlabs || []), ...(proTool.voiceLibraryMinimax || [])];
 
     closeAddToLibraryModal();
     proTool.showNotification(`Đã lưu "${voiceName || voiceId}" vào thư viện!`, 'success');
