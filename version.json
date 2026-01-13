@@ -1,9 +1,9 @@
 {
-  "version": "1.8.1",
+  "version": "1.8.2",
   "changelog": [
-    "Fix folder upload in TTS",
-    "Improved folder input event handling",
-    "Add debug logs for troubleshooting"
+    "Sync sidebar font size across all pages",
+    "Remove History tab from sidebar",
+    "Reorder sidebar: Voice Cloning now under Text to Speech"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
