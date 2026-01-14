@@ -1,10 +1,9 @@
 {
-  "version": "1.9.6",
+  "version": "1.9.7",
   "changelog": [
-    "Move buttons (Library/Load/My Clones/Clone) below Voice ID",
-    "Remove Monolingual V1 model (deprecated)",
-    "Eleven V3: Stability dropdown (Creative/Natural/Robust)",
-    "Voice Library table text center aligned"
+    "V3 model: Disable Speed/Similarity/Style (auto-detect)",
+    "V3 model: Stability auto-converts to dropdown",
+    "Update ElevenLabs logo to official GitHub avatar"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

@@ -230,7 +230,7 @@
     <!-- Tabs with logos -->
     <div class="tabs">
         <button class="lib-tab active" data-provider="elevenlabs" onclick="switchTab('elevenlabs')">
-            <img src="https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99" alt="">
+            <img src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4" alt="">
             <span>ElevenLabs</span>
         </button>
         <button class="lib-tab" data-provider="minimax" onclick="switchTab('minimax')">
@@ -338,13 +338,17 @@
             tbody.innerHTML = elevenlabsVoices.map((voice, idx) => {
                 const isV3 = voice.model === 'eleven_v3';
                 const stabilityValue = voice.settings?.stability || 'natural';
+
+                // V3: Stability dropdown, disable Speed/Similarity/Style
                 const stabilityCell = isV3
                     ? `<select style="width: 75px;" onchange="updateElevenlabsSetting(${idx}, 'stability', this.value)">
                            <option value="creative" ${stabilityValue === 'creative' ? 'selected' : ''}>Creative</option>
-                           <option value="natural" ${stabilityValue === 'natural' ? 'selected' : ''}>Natural</option>
+                           <option value="natural" ${stabilityValue === 'natural' || typeof stabilityValue === 'number' ? 'selected' : ''}>Natural</option>
                            <option value="robust" ${stabilityValue === 'robust' ? 'selected' : ''}>Robust</option>
                        </select>`
                     : `<input type="number" value="${voice.settings?.stability || 0.5}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateElevenlabsSetting(${idx}, 'stability', parseFloat(this.value))">`;
+
+                const disabledStyle = isV3 ? 'opacity: 0.3; pointer-events: none;' : '';
 
                 return `
                 <tr data-idx="${idx}">
@@ -362,10 +366,10 @@
                             <option value="eleven_flash_v2" ${voice.model === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
                         </select>
                     </td>
-                    <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateElevenlabsSetting(${idx}, 'speed', parseFloat(this.value))"></td>
+                    <td style="${disabledStyle}"><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'speed', parseFloat(this.value))"></td>
                     <td>${stabilityCell}</td>
-                    <td><input type="number" value="${voice.settings?.similarity || 0.75}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateElevenlabsSetting(${idx}, 'similarity', parseFloat(this.value))"></td>
-                    <td><input type="number" value="${voice.settings?.style || 0}" step="0.1" min="0" max="1" style="width: 45px;" onchange="updateElevenlabsSetting(${idx}, 'style', parseFloat(this.value))"></td>
+                    <td style="${disabledStyle}"><input type="number" value="${voice.settings?.similarity || 0.75}" step="0.1" min="0" max="1" style="width: 55px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'similarity', parseFloat(this.value))"></td>
+                    <td style="${disabledStyle}"><input type="number" value="${voice.settings?.style || 0}" step="0.1" min="0" max="1" style="width: 45px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'style', parseFloat(this.value))"></td>
                     <td><input type="checkbox" ${voice.settings?.speakerBoost !== false ? 'checked' : ''} onchange="updateElevenlabsSetting(${idx}, 'speakerBoost', this.checked)"></td>
                     <td style="display: flex; gap: 4px; justify-content: center;">
                         <button class="btn btn-sm" onclick="previewVoice('elevenlabs', ${idx})" title="Nghe thử"><i class="bi bi-volume-up"></i></button>
