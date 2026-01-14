@@ -668,28 +668,40 @@ class ProToolManager {
 
     renderVoicesModal(voices) {
         const modalBody = document.getElementById('voicesModalBody');
-        
+
         if (!voices || voices.length === 0) {
             modalBody.innerHTML = `<div style="text-align: center; padding: 40px; color: #555;">Không có voices</div>`;
             return;
         }
-        
+
         modalBody.innerHTML = `
             <div style="margin-bottom: 12px;">
                 <input type="text" class="form-input" id="voiceSearch" placeholder="Tìm kiếm voice..." oninput="proTool.filterVoices(this.value)">
             </div>
             <div style="font-size: 12px; color: #666; margin-bottom: 10px;">${voices.length} voices</div>
             <div id="voicesList" style="max-height: 400px; overflow-y: auto;">
-                ${voices.map(voice => `
-                    <div class="voice-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #1a1a1a; cursor: pointer;" onclick="proTool.selectVoice('${voice.voice_id || voice.id}', '${voice.name}')">
+                ${voices.map(voice => {
+                    const voiceId = voice.voice_id || voice.id;
+                    const voiceName = (voice.name || 'Unknown').replace(/'/g, "\\'");
+                    const previewUrl = (voice.preview_url || voice.sample_audio || '').replace(/'/g, "\\'");
+                    const labels = voice.labels ? Object.values(voice.labels).join(' • ') : '';
+
+                    return `
+                    <div class="voice-item" style="display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid #1a1a1a; cursor: pointer;"
+                         onclick="proTool.selectVoice('${voiceId}', '${voiceName}')"
+                         onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
                         <div style="flex: 1; min-width: 0;">
                             <div style="font-size: 13px; color: #fff; font-weight: 500;">${voice.name}</div>
-                            <div style="font-size: 10px; color: #555; margin-top: 2px;">${voice.voice_id || voice.id}</div>
-                            ${voice.labels ? `<div style="font-size: 10px; color: #666; margin-top: 4px;">${Object.values(voice.labels).join(' • ')}</div>` : ''}
+                            <div style="font-size: 10px; color: #555; margin-top: 2px;">${voiceId}</div>
+                            ${labels ? `<div style="font-size: 10px; color: #666; margin-top: 4px;">${labels}</div>` : ''}
                         </div>
-                        <button class="btn btn-sm" style="flex-shrink: 0;" onclick="event.stopPropagation(); proTool.selectVoice('${voice.voice_id || voice.id}', '${voice.name}')">Chọn</button>
-                    </div>
-                `).join('')}
+                        <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                            ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); proTool.toggleVoicePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
+                            <button class="btn btn-sm" onclick="event.stopPropagation(); proTool.addVoiceToLibraryFromModal('${voiceId}', '${voiceName}', '${previewUrl}')" title="Thêm vào thư viện"><i class="bi bi-plus-lg"></i></button>
+                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); proTool.selectVoice('${voiceId}', '${voiceName}')">Chọn</button>
+                        </div>
+                    </div>`;
+                }).join('')}
             </div>
         `;
     }
@@ -887,8 +899,85 @@ class ProToolManager {
 
     playVoicePreview(url) {
         if (!url) return;
-        const audio = new Audio(url);
-        audio.play().catch(e => console.error('Preview error:', e));
+        const audio = document.getElementById('previewAudio');
+        if (audio) {
+            audio.src = url;
+            audio.play().catch(e => console.error('Preview error:', e));
+        }
+    }
+
+    toggleVoicePreview(url) {
+        if (!url) {
+            this.showNotification('Không có audio mẫu!', 'warning');
+            return;
+        }
+        const audio = document.getElementById('previewAudio');
+        if (!audio) return;
+
+        // Toggle play/pause
+        if (audio.src === url && !audio.paused) {
+            audio.pause();
+        } else {
+            audio.src = url;
+            audio.play().catch(e => {
+                console.error('Preview error:', e);
+                this.showNotification('Không thể phát audio!', 'error');
+            });
+        }
+    }
+
+    addVoiceToLibraryFromModal(voiceId, voiceName, previewUrl) {
+        const provider = this.provider;
+        const model = provider === 'elevenlabs'
+            ? (document.getElementById('modelSelect')?.value || 'eleven_multilingual_v2')
+            : (document.getElementById('minimaxModelSelect')?.value || 'speech-02-hd');
+
+        const voiceData = {
+            id: Date.now(),
+            voiceId: voiceId,
+            name: voiceName,
+            project: '',
+            provider: provider,
+            model: model,
+            preview_url: previewUrl || '',
+            settings: provider === 'elevenlabs' ? {
+                speed: 1,
+                stability: 0.5,
+                similarity: 0.75,
+                style: 0,
+                speakerBoost: true
+            } : {
+                speed: 1,
+                pitch: 0,
+                vol: 1
+            }
+        };
+
+        // Load and update library
+        const storageKey = provider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
+        let library = [];
+        try {
+            library = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        } catch (e) { library = []; }
+
+        // Check duplicate
+        if (library.find(v => v.voiceId === voiceId)) {
+            this.showNotification(`Voice "${voiceName}" đã có trong thư viện!`, 'warning');
+            return;
+        }
+
+        library.push(voiceData);
+        localStorage.setItem(storageKey, JSON.stringify(library));
+
+        // Update in memory
+        if (provider === 'elevenlabs') {
+            this.voiceLibraryElevenlabs = library;
+        } else {
+            this.voiceLibraryMinimax = library;
+        }
+        this.voiceLibrary = [...(this.voiceLibraryElevenlabs || []), ...(this.voiceLibraryMinimax || [])];
+
+        this.showNotification(`Đã thêm "${voiceName}" vào thư viện!`, 'success');
     }
 
     // ==================== FILE HANDLING ====================
@@ -1934,12 +2023,14 @@ class ProToolManager {
                 <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'name', this.value)"></td>
                 <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'voiceId', this.value)"></td>
                 <td>
-                    <select style="width: 100px; padding: 4px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'model', this.value)">
+                    <select style="width: 110px; padding: 4px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'model', this.value)">
+                        <option value="eleven_v3" ${voice.model === 'eleven_v3' ? 'selected' : ''}>Eleven V3</option>
                         <option value="eleven_multilingual_v2" ${voice.model === 'eleven_multilingual_v2' ? 'selected' : ''}>Multilingual V2</option>
                         <option value="eleven_turbo_v2_5" ${voice.model === 'eleven_turbo_v2_5' ? 'selected' : ''}>Turbo V2.5</option>
-                        <option value="eleven_flash_v2" ${voice.model === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
+                        <option value="eleven_turbo_v2" ${voice.model === 'eleven_turbo_v2' ? 'selected' : ''}>Turbo V2</option>
                         <option value="eleven_flash_v2_5" ${voice.model === 'eleven_flash_v2_5' ? 'selected' : ''}>Flash V2.5</option>
-                        <option value="eleven_v3" ${voice.model === 'eleven_v3' ? 'selected' : ''}>Eleven V3</option>
+                        <option value="eleven_flash_v2" ${voice.model === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
+                        <option value="eleven_monolingual_v1" ${voice.model === 'eleven_monolingual_v1' ? 'selected' : ''}>Monolingual V1</option>
                     </select>
                 </td>
                 <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateLibrarySetting('elevenlabs', ${idx}, 'speed', parseFloat(this.value))"></td>

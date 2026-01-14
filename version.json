@@ -1,10 +1,10 @@
 {
-  "version": "1.8.9",
+  "version": "1.9.0",
   "changelog": [
-    "Voice Library: Preview button now uses sample audio from API",
-    "Voice Library: Save preview_url when adding voice",
-    "Voice Library: Better CSS styling for select, input, checkbox",
-    "Voice Library: Proper columns for ElevenLabs & Minimax"
+    "Load Voices: Add preview button to listen voice samples",
+    "Load Voices: Add button to quickly add voice to library",
+    "Voice Library: Full 7 ElevenLabs models (V3, Multilingual V2, Turbo V2.5, Turbo V2, Flash V2.5, Flash V2, Monolingual V1)",
+    "Voice Library: Better CSS and toggle play/pause for preview"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
