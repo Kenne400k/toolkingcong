@@ -65,3 +65,4 @@ temp/
 *.sqlite3
 .claude/
 output/
+CLAUDE.md

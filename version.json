@@ -1,11 +1,9 @@
 {
-  "version": "1.9.2",
+  "version": "1.9.3",
   "changelog": [
-    "Voice Library & Load Voices: Open in separate windows instead of modals",
-    "Load Voices: Add preview (nghe thử) and add-to-library buttons",
-    "Voice Library: Tabs with provider logos (ElevenLabs/Minimax)",
-    "Voice Library: Separate storage for each provider",
-    "Voice Library: Auto-sync when adding voices from other windows"
+    "Fix UI: Match modal styles from tool.html",
+    "Voice Library & Load Voices: Correct CSS styling",
+    "Add CLAUDE.md for project documentation"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
