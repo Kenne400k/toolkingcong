@@ -1,10 +1,10 @@
 {
-  "version": "1.10.4",
+  "version": "1.10.5",
   "changelog": [
-    "Pro Tool: Super smooth animations for all UI elements",
-    "Modal open/close with scale & fade effects",
-    "Button hover with lift & glow effects",
-    "Staggered row animations, GPU accelerated"
+    "TTS: Fixed file/folder upload using Electron API",
+    "Added support for .txt, .srt, .zip files",
+    "Pro Tool: Super smooth animations",
+    "Modal/Button hover effects, GPU accelerated"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

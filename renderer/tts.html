@@ -336,11 +336,11 @@
                                         min-width: 250px; 
                                         box-shadow: 0 4px 12px rgba(0,0,0,0.4);
                                     ">
-                                        <div class="upload-option" onclick="$('#fileInput').click(); $('#uploadDropdown').hide(); updateChevron();">
+                                        <div class="upload-option" onclick="uploadFileElectron()">
                                             <i class="bi bi-file-earmark-text"></i>
-                                            <span>Tải lên tệp (.txt .zip)</span>
+                                            <span>Tải lên tệp (.txt .srt .zip)</span>
                                         </div>
-                                        <div class="upload-option" onclick="$('#folderInput').click(); $('#uploadDropdown').hide(); updateChevron();">
+                                        <div class="upload-option" onclick="uploadFolderElectron()">
                                             <i class="bi bi-folder2-open"></i>
                                             <span>Tải lên thư mục</span>
                                         </div>
@@ -368,7 +368,7 @@
                                     <span>Xóa</span>
                                 </button>
                                 
-                                <input type="file" id="fileInput" accept=".txt,.srt" multiple style="display: none;">
+                                <input type="file" id="fileInput" accept=".txt,.srt,.zip" multiple style="display: none;">
                                 <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
                                 
                                 <div id="fileNameDisplay"></div>

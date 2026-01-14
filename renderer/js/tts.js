@@ -7415,7 +7415,139 @@ function processUploadFiles(validFiles) {
         handleBulkFiles(validFiles);
     }
 }
-// ========== SINGLE FILE UPLOAD ==========
+
+// ========== ELECTRON FILE/FOLDER UPLOAD ==========
+async function uploadFileElectron() {
+    console.log('📄 [Electron] Upload file clicked');
+    $('#uploadDropdown').hide();
+    updateChevron();
+
+    // Kiểm tra giọng trước
+    if (!$('#voiceIdVal').val()) {
+        showModernConfirm(
+            'Chưa chọn giọng nói',
+            'Vui lòng chọn giọng nói trước khi tải file lên.',
+            function() { openVoiceModal(); },
+            { type: 'warning', confirmText: 'Chọn giọng', cancelText: 'Hủy' }
+        );
+        return;
+    }
+
+    try {
+        const result = await window.electronAPI.selectFiles({
+            filters: [
+                { name: 'Text Files', extensions: ['txt', 'srt', 'zip'] }
+            ],
+            properties: ['openFile', 'multiSelections']
+        });
+
+        console.log('📄 [Electron] selectFiles result:', result);
+
+        if (result && result.success && result.filePaths && result.filePaths.length > 0) {
+            // Đọc nội dung các file
+            const files = [];
+            for (const filePath of result.filePaths) {
+                try {
+                    const content = await window.electronAPI.readFile(filePath);
+                    const fileName = filePath.split(/[/\\]/).pop();
+                    files.push({
+                        name: fileName,
+                        path: filePath,
+                        content: content,
+                        size: content ? content.length : 0
+                    });
+                } catch (e) {
+                    console.error('Error reading file:', filePath, e);
+                }
+            }
+
+            if (files.length > 0) {
+                console.log('📄 [Electron] Read', files.length, 'files');
+                processElectronFiles(files);
+            }
+        }
+    } catch (error) {
+        console.error('❌ [Electron] selectFiles error:', error);
+        alert('Lỗi chọn file: ' + error.message);
+    }
+}
+
+async function uploadFolderElectron() {
+    console.log('📁 [Electron] Upload folder clicked');
+    $('#uploadDropdown').hide();
+    updateChevron();
+
+    // Kiểm tra giọng trước
+    if (!$('#voiceIdVal').val()) {
+        showModernConfirm(
+            'Chưa chọn giọng nói',
+            'Vui lòng chọn giọng nói trước khi tải folder lên.',
+            function() { openVoiceModal(); },
+            { type: 'warning', confirmText: 'Chọn giọng', cancelText: 'Hủy' }
+        );
+        return;
+    }
+
+    try {
+        const result = await window.electronAPI.selectFolder();
+        console.log('📁 [Electron] selectFolder result:', result);
+
+        if (result && result.success && result.files && result.files.length > 0) {
+            // Filter valid files
+            const validFiles = result.files.filter(f => {
+                const name = f.name.toLowerCase();
+                return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip'));
+            });
+
+            if (validFiles.length === 0) {
+                alert('Không có file hợp lệ trong thư mục!\nChỉ chấp nhận .txt, .srt, .zip');
+                return;
+            }
+
+            console.log('📁 [Electron] Found', validFiles.length, 'valid files');
+            processElectronFiles(validFiles);
+        }
+    } catch (error) {
+        console.error('❌ [Electron] selectFolder error:', error);
+        alert('Lỗi chọn thư mục: ' + error.message);
+    }
+}
+
+// Process files from Electron API
+function processElectronFiles(files) {
+    if (!files || files.length === 0) return;
+
+    console.log('📄 [Electron] Processing', files.length, 'files');
+
+    // Nếu chỉ 1 file text -> đưa vào textarea
+    if (files.length === 1) {
+        const file = files[0];
+        const name = file.name.toLowerCase();
+
+        if (name.endsWith('.txt') || name.endsWith('.srt')) {
+            // Đưa nội dung vào textarea
+            const content = file.content || '';
+            $('#inputText').val(content);
+            updateCharCount();
+            showToast(`✅ Đã tải: ${file.name}`);
+            return;
+        }
+    }
+
+    // Nhiều file -> Mở Bulk Modal
+    // Convert to File-like objects for processUploadFiles
+    const fileObjects = files.map(f => ({
+        name: f.name,
+        size: f.size || (f.content ? f.content.length : 0),
+        text: () => Promise.resolve(f.content || ''),
+        _electronFile: true,
+        _content: f.content
+    }));
+
+    processUploadFiles(fileObjects);
+}
+
+// ========== SINGLE FILE UPLOAD (HTML Input fallback) ==========
 $('#fileInput').on('change', function(e) {
     let files = e.target.files;
     if (!files || files.length === 0) return;
@@ -7423,11 +7555,11 @@ $('#fileInput').on('change', function(e) {
     // Lọc file hợp lệ
     let validFiles = Array.from(files).filter(f => {
         let name = f.name.toLowerCase();
-        return (name.endsWith('.txt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
+        return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
     });
-    
+
     if (validFiles.length === 0) {
-        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .zip < 5MB');
+        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .srt, .zip < 5MB');
         $(this).val('');
         return;
     }
@@ -7490,16 +7622,16 @@ $(document).ready(function() {
                 console.log(`  ${i+1}. ${f.name} (${(f.size/1024).toFixed(1)}KB)`);
             });
 
-            // Lọc file hợp lệ (.txt, .zip)
+            // Lọc file hợp lệ (.txt, .srt, .zip)
             let validFiles = Array.from(files).filter(f => {
                 let name = f.name.toLowerCase();
-                return (name.endsWith('.txt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
+                return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
             });
 
             console.log('📁 Valid files after filter:', validFiles.length);
 
             if (validFiles.length === 0) {
-                alert('Không có file hợp lệ trong thư mục!\nChỉ chấp nhận .txt, .zip < 5MB');
+                alert('Không có file hợp lệ trong thư mục!\nChỉ chấp nhận .txt, .srt, .zip < 5MB');
                 this.value = '';
                 return;
             }
