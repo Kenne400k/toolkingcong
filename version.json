@@ -1,8 +1,8 @@
 {
-  "version": "1.9.8",
+  "version": "1.9.9",
   "changelog": [
     "Voice Library: Stability/Similarity/Style show as percentage (%)",
-    "Convert 0-1 values to 0-100% display format"
+    "Fix percentage layout with inline-flex wrapper"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
