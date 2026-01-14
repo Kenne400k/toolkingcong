@@ -1,10 +1,10 @@
 {
-  "version": "1.8.8",
+  "version": "1.8.9",
   "changelog": [
-    "Add Project column to Voice Library",
-    "Add Preview button to Voice Library (listen before use)",
-    "Separate ElevenLabs & Minimax library with proper columns",
-    "Fix Voice Library now uses modal instead of separate window"
+    "Voice Library: Preview button now uses sample audio from API",
+    "Voice Library: Save preview_url when adding voice",
+    "Voice Library: Better CSS styling for select, input, checkbox",
+    "Voice Library: Proper columns for ElevenLabs & Minimax"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

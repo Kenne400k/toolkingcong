@@ -2986,58 +2986,63 @@ function updateLibrarySetting(provider, index, field, value) {
     }
 }
 
-// Preview voice from library - generate TTS and play
+// Preview voice from library - use preview_url or fetch from API
 let currentPreviewUrl = null;
-const previewAudio = document.getElementById('previewAudio');
 
 async function previewLibraryVoice(provider, index) {
     const library = provider === 'elevenlabs' ? proTool.voiceLibraryElevenlabs : proTool.voiceLibraryMinimax;
     const voice = library?.[index];
+    const previewAudio = document.getElementById('previewAudio');
 
     if (!voice || !voice.voiceId) {
         proTool.showNotification('Voice ID trống!', 'warning');
         return;
     }
 
-    proTool.showNotification('Đang tạo audio preview...', 'info');
+    let previewUrl = voice.preview_url || '';
 
-    try {
-        const previewText = 'Xin chào, đây là giọng nói mẫu để bạn nghe thử.';
+    // If no preview_url, try to fetch from API
+    if (!previewUrl) {
+        proTool.showNotification('Đang tìm audio mẫu...', 'info');
+        try {
+            const res = await window.electronAPI.apiRequest(
+                'https://kingcongstudio.com/ajaxs/get_resources2.php?action=search_voice_id',
+                { voice_id: voice.voiceId }
+            );
 
-        // Call API to generate TTS
-        const res = await window.electronAPI.apiRequest(
-            'https://kingcongstudio.com/ajaxs/tool2.php?action=tts',
-            {
-                text: previewText,
-                voice_id: voice.voiceId,
-                provider: provider,
-                model: voice.model,
-                speed: voice.settings?.speed || 1,
-                stability: voice.settings?.stability || 0.5,
-                similarity: voice.settings?.similarity || 0.75,
-                style: voice.settings?.style || 0,
-                boost: voice.settings?.speakerBoost !== false,
-                pitch: voice.settings?.pitch || 0,
-                vol: voice.settings?.vol || 1
+            if (res && res.status === 'success' && res.data) {
+                previewUrl = res.data.preview_url || res.data.sample_audio || '';
+                // Save for future use
+                if (previewUrl) {
+                    voice.preview_url = previewUrl;
+                }
             }
-        );
-
-        if (res && res.status === 'success' && res.audio_url) {
-            // Play audio
-            if (previewAudio) {
-                previewAudio.src = res.audio_url;
-                previewAudio.play().catch(e => {
-                    console.error('Play error:', e);
-                    proTool.showNotification('Không thể phát audio!', 'error');
-                });
-                proTool.showNotification('Đang phát...', 'success');
-            }
-        } else {
-            proTool.showNotification(res?.message || 'Lỗi tạo audio!', 'error');
+        } catch (error) {
+            console.error('Fetch preview error:', error);
         }
-    } catch (error) {
-        console.error('Preview error:', error);
-        proTool.showNotification('Lỗi: ' + error.message, 'error');
+    }
+
+    if (!previewUrl) {
+        proTool.showNotification('Không có audio mẫu cho voice này!', 'warning');
+        return;
+    }
+
+    // Toggle play/pause
+    if (currentPreviewUrl === previewUrl && previewAudio && !previewAudio.paused) {
+        previewAudio.pause();
+        currentPreviewUrl = null;
+        return;
+    }
+
+    // Play audio
+    if (previewAudio) {
+        previewAudio.src = previewUrl;
+        previewAudio.play().catch(e => {
+            console.error('Play error:', e);
+            proTool.showNotification('Không thể phát audio!', 'error');
+        });
+        currentPreviewUrl = previewUrl;
+        proTool.showNotification('Đang phát...', 'success');
     }
 }
 
@@ -3246,6 +3251,7 @@ async function addToLibrary() {
     proTool.showNotification('Đang tìm thông tin voice...', 'info');
 
     let voiceName = voiceId; // Default to voiceId if not found
+    let previewUrl = ''; // Preview URL for listening
 
     try {
         // Call API to get voice info
@@ -3258,7 +3264,8 @@ async function addToLibrary() {
 
         if (res && res.status === 'success' && res.data) {
             voiceName = res.data.name || res.data.voice_name || voiceId;
-            console.log('✅ Found voice name:', voiceName);
+            previewUrl = res.data.preview_url || res.data.sample_audio || '';
+            console.log('✅ Found voice name:', voiceName, 'preview:', previewUrl);
         } else {
             console.log('⚠️ Voice not found, using ID as name');
         }
@@ -3279,6 +3286,7 @@ async function addToLibrary() {
             project: '', // Default empty project
             provider: provider,
             model: model,
+            preview_url: previewUrl,
             settings: {
                 speed: parseFloat(document.getElementById('voiceSpeed')?.value) || 1,
                 stability: (parseFloat(document.getElementById('voiceStability')?.value) || 50) / 100,
@@ -3296,6 +3304,7 @@ async function addToLibrary() {
             project: '', // Default empty project
             provider: provider,
             model: model,
+            preview_url: previewUrl,
             settings: {
                 speed: parseFloat(document.getElementById('mmVoiceSpeed')?.value) || 1,
                 pitch: parseFloat(document.getElementById('mmVoicePitch')?.value) || 0,
