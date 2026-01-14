@@ -1,9 +1,9 @@
 {
-  "version": "1.9.4",
+  "version": "1.9.5",
   "changelog": [
-    "Fix: Swap button positions (My Clones/Clone, Library/Load)",
-    "Add tabs to Load Voices window (Mặc định/Thư viện)",
-    "Fix My Clones API using correct getClonedVoices IPC"
+    "Fix: Thư viện tab loads ElevenLabs shared voices from API",
+    "Remove local library, use shared voices instead",
+    "Add language flags and usage metrics to shared voices"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

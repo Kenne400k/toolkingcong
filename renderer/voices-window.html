@@ -262,7 +262,7 @@
 
     <script>
         let allVoices = [];
-        let libraryVoices = [];
+        let sharedVoices = [];
         let currentProvider = 'elevenlabs';
         let currentTab = 'default';
         const previewAudio = document.getElementById('previewAudio');
@@ -270,6 +270,12 @@
         const PROVIDER_LOGOS = {
             elevenlabs: 'https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99',
             minimax: 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png'
+        };
+
+        const FLAG_MAP = {
+            'en': '🇺🇸', 'vi': '🇻🇳', 'fr': '🇫🇷', 'de': '🇩🇪', 'es': '🇪🇸',
+            'it': '🇮🇹', 'pt': '🇵🇹', 'ru': '🇷🇺', 'ja': '🇯🇵', 'ko': '🇰🇷',
+            'zh': '🇨🇳', 'ar': '🇸🇦', 'hi': '🇮🇳', 'th': '🇹🇭', 'id': '🇮🇩'
         };
 
         function getQueryParam(name) {
@@ -286,13 +292,19 @@
             if (tab === 'default') {
                 renderVoices(allVoices);
             } else if (tab === 'library') {
-                loadLibraryVoices();
+                loadSharedVoices();
             }
         }
 
         async function init() {
             currentProvider = getQueryParam('provider') || 'elevenlabs';
             document.getElementById('providerLogo').src = PROVIDER_LOGOS[currentProvider] || PROVIDER_LOGOS.elevenlabs;
+
+            // Hide library tab for non-elevenlabs providers
+            const libraryTab = document.querySelector('.voice-tab[data-tab="library"]');
+            if (currentProvider !== 'elevenlabs') {
+                libraryTab.style.display = 'none';
+            }
 
             // Load default voices
             await loadDefaultVoices();
@@ -319,46 +331,73 @@
             }
         }
 
-        function loadLibraryVoices() {
-            const storageKey = currentProvider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
+        async function loadSharedVoices() {
+            document.getElementById('voicesList').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading ElevenLabs shared voices...
+                </div>
+            `;
+
             try {
-                libraryVoices = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            } catch(e) {
-                libraryVoices = [];
-            }
+                const res = await window.electronAPI.apiRequest(
+                    'https://kingcongstudio.com/ajaxs/get_voices.php?v=' + Date.now(),
+                    {}
+                );
 
-            if (libraryVoices.length === 0) {
-                document.getElementById('countInfo').textContent = '';
-                document.getElementById('voicesList').innerHTML = `
-                    <div class="empty-state">
-                        <i class="bi bi-collection"></i>
-                        <p>Chưa có voice nào trong thư viện</p>
-                        <p style="font-size: 11px; margin-top: 8px;">Thêm voice từ tab "Mặc định"</p>
-                    </div>
-                `;
-                return;
+                if (res && res.status === 'success' && res.data && res.data.length > 0) {
+                    sharedVoices = res.data;
+                    renderSharedVoices(sharedVoices);
+                } else {
+                    document.getElementById('countInfo').textContent = '';
+                    document.getElementById('voicesList').innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-collection"></i>
+                            <p>Không có shared voices</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Load shared voices error:', error);
+                document.getElementById('voicesList').innerHTML = `<div class="loading">Lỗi: ${error.message}</div>`;
             }
+        }
 
-            document.getElementById('countInfo').textContent = `${libraryVoices.length} voices trong thư viện`;
-            document.getElementById('voicesList').innerHTML = libraryVoices.map(voice => {
-                const voiceId = voice.voiceId || voice.voice_id || voice.id;
+        function renderSharedVoices(voices) {
+            document.getElementById('countInfo').textContent = `${voices.length} shared voices`;
+            document.getElementById('voicesList').innerHTML = voices.map(voice => {
+                const voiceId = voice.voice_id || voice.id;
                 const voiceName = escapeHtml(voice.name || 'Unknown');
                 const previewUrl = (voice.preview_url || '').replace(/'/g, "\\'");
-                const project = voice.project ? `<span style="color: #a855f7;">[${escapeHtml(voice.project)}]</span> ` : '';
+                const desc = escapeHtml(voice.description || '');
+                const langCode = (voice.language || 'en').split('-')[0].toLowerCase();
+                const flag = FLAG_MAP[langCode] || '🌐';
+                const usage = voice.usage_1y ? formatMetric(voice.usage_1y) : '';
+                const cloned = voice.cloned ? formatMetric(voice.cloned) : '';
 
                 return `
                 <div class="voice-item" onclick="selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">
                     <div class="info">
-                        <div class="name">${project}${voiceName}</div>
+                        <div class="name">${flag} ${voiceName}</div>
                         <div class="id">${voiceId}</div>
-                        <div class="labels">${voice.model || ''}</div>
+                        <div class="labels">
+                            ${desc ? `<span>${desc.substring(0, 50)}${desc.length > 50 ? '...' : ''}</span>` : ''}
+                            ${usage ? `<span style="margin-left: 8px;"><i class="bi bi-lightning-charge-fill"></i> ${usage}</span>` : ''}
+                            ${cloned ? `<span style="margin-left: 8px;"><i class="bi bi-people-fill"></i> ${cloned}</span>` : ''}
+                        </div>
                     </div>
                     <div class="actions">
                         ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
-                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); useLibraryVoice(${libraryVoices.indexOf(voice)})">Dùng</button>
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">Chọn</button>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function formatMetric(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
         }
 
         function renderVoices(voices) {
@@ -384,7 +423,6 @@
                     </div>
                     <div class="actions">
                         ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
-                        <button class="btn btn-sm" onclick="event.stopPropagation(); addToLibrary('${voiceId}', '${escapeAttr(voice.name)}', '${previewUrl}')" title="Thêm vào thư viện"><i class="bi bi-plus-lg"></i></button>
                         <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">Chọn</button>
                     </div>
                 </div>`;
@@ -393,30 +431,21 @@
 
         function filterVoices(query) {
             query = query.toLowerCase();
-            const voices = currentTab === 'library' ? libraryVoices : allVoices;
+            const voices = currentTab === 'library' ? sharedVoices : allVoices;
             const filtered = voices.filter(v => {
                 const name = (v.name || '').toLowerCase();
                 const id = (v.voice_id || v.voiceId || v.id || '').toLowerCase();
-                return name.includes(query) || id.includes(query);
+                const desc = (v.description || '').toLowerCase();
+                return name.includes(query) || id.includes(query) || desc.includes(query);
             });
 
             if (currentTab === 'library') {
-                // Re-render library with filter
-                const container = document.getElementById('voicesList');
                 if (filtered.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><p>Không tìm thấy voice</p></div>';
+                    document.getElementById('voicesList').innerHTML = '<div class="empty-state"><p>Không tìm thấy voice</p></div>';
+                    document.getElementById('countInfo').textContent = '0 voices';
                     return;
                 }
-                // Simple approach - just hide non-matching items
-                const items = container.querySelectorAll('.voice-item');
-                items.forEach((item, idx) => {
-                    const voice = libraryVoices[idx];
-                    if (voice) {
-                        const name = (voice.name || '').toLowerCase();
-                        const id = (voice.voiceId || '').toLowerCase();
-                        item.style.display = (name.includes(query) || id.includes(query)) ? 'flex' : 'none';
-                    }
-                });
+                renderSharedVoices(filtered);
             } else {
                 renderVoices(filtered);
             }
@@ -430,58 +459,6 @@
                 previewAudio.src = url;
                 previewAudio.play().catch(e => console.error('Play error:', e));
             }
-        }
-
-        async function addToLibrary(voiceId, voiceName, previewUrl) {
-            const storageKey = currentProvider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
-            let library = [];
-            try {
-                library = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            } catch(e) { library = []; }
-
-            if (library.find(v => v.voiceId === voiceId)) {
-                alert('Voice đã có trong thư viện!');
-                return;
-            }
-
-            const newVoice = {
-                id: Date.now(),
-                voiceId: voiceId,
-                name: voiceName,
-                provider: currentProvider,
-                project: '',
-                model: currentProvider === 'elevenlabs' ? 'eleven_multilingual_v2' : 'speech-02-hd',
-                preview_url: previewUrl,
-                settings: currentProvider === 'elevenlabs'
-                    ? { speed: 1, stability: 0.5, similarity: 0.75, style: 0, speakerBoost: true }
-                    : { speed: 1, pitch: 0, vol: 1 }
-            };
-
-            library.push(newVoice);
-            localStorage.setItem(storageKey, JSON.stringify(library));
-            libraryVoices = library;
-
-            if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
-                window.electronAPI.sendVoiceLibrary({ action: 'added', provider: currentProvider, voice: newVoice });
-            }
-
-            alert(`Đã thêm "${voiceName}" vào thư viện!`);
-        }
-
-        function useLibraryVoice(idx) {
-            const voice = libraryVoices[idx];
-            if (!voice) return;
-
-            // Send voice with settings to parent
-            if (window.opener && !window.opener.closed) {
-                window.opener.postMessage({ type: 'useVoiceFromLibrary', voice: voice }, '*');
-            }
-
-            if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
-                window.electronAPI.sendVoiceLibrary({ action: 'use', voice: voice });
-            }
-
-            setTimeout(() => window.close(), 300);
         }
 
         async function selectVoice(voiceId, voiceName) {
