@@ -2514,17 +2514,27 @@ class ProToolManager {
     async loadBackupHistory() {
         const backupBody = document.getElementById('backupBody');
         backupBody.innerHTML = `<div style="padding: 40px; text-align: center; color: #666;">
-            <div class="spinner-border spinner-border-sm" style="width: 2rem; height: 2rem; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <div style="width: 2rem; height: 2rem; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
             <p style="margin-top: 10px;">Đang tải...</p>
         </div>`;
 
         try {
+            // Dùng API giống Lịch Sử Chi Tiết trong TTS
             const response = await window.electronAPI.apiRequest(
                 'https://kingcongstudio.com/ajaxs/tts3.php',
-                { action: 'history', page: 1 }
+                {
+                    action: 'get_history_detailed_v2',
+                    limit: 50,
+                    page: 1
+                }
             );
 
-            if (response.success && response.tasks && response.tasks.length > 0) {
+            console.log('📥 Backup History Response:', response);
+
+            if (response.status === 'success' && response.data && response.data.length > 0) {
+                this.renderBackupHistory(response.data);
+            } else if (response.success && response.tasks && response.tasks.length > 0) {
+                // Fallback cho response cũ
                 this.renderBackupHistory(response.tasks);
             } else {
                 backupBody.innerHTML = `<div style="padding: 40px; text-align: center; color: #666;">
@@ -2533,6 +2543,7 @@ class ProToolManager {
                 </div>`;
             }
         } catch (error) {
+            console.error('❌ Load backup history error:', error);
             backupBody.innerHTML = `<div style="padding: 40px; text-align: center; color: #ef4444;">
                 <i class="bi bi-exclamation-circle" style="font-size: 48px; display: block; margin-bottom: 10px;"></i>
                 <p>Lỗi khi tải lịch sử</p>
@@ -2543,10 +2554,6 @@ class ProToolManager {
     
     renderBackupHistory(tasks) {
         const backupBody = document.getElementById('backupBody');
-
-        // Lấy thông tin từ Voice Library và màn hình chính
-        const currentVoiceId = document.getElementById('selectedVoiceId')?.value || '';
-        const currentProvider = this.provider || 'elevenlabs';
 
         // Tìm voice info trong library
         const findVoiceInfo = (voiceId) => {
@@ -2571,7 +2578,7 @@ class ProToolManager {
             return 'https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99';
         };
 
-        // Helper: format thời gian
+        // Helper: format thời gian audio
         const formatTime = (seconds) => {
             if (!seconds || isNaN(seconds)) return '--:--';
             const mins = Math.floor(seconds / 60);
@@ -2579,27 +2586,58 @@ class ProToolManager {
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         };
 
-        // Helper: format ngày giờ
+        // Helper: format ngày giờ (giống TTS)
         const formatDateTime = (dateStr) => {
             if (!dateStr) return '-';
-            const d = new Date(dateStr);
+
+            // Parse nhiều format khác nhau
+            let d;
+
+            // Format: DD/MM/YYYY HH:mm:ss
+            const match1 = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+            if (match1) {
+                const [_, day, month, year, hour, minute, second] = match1;
+                d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second || 0));
+            }
+
+            // Format: YYYY-MM-DD HH:mm:ss
+            if (!d || isNaN(d.getTime())) {
+                const match2 = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+                if (match2) {
+                    const [_, year, month, day, hour, minute, second] = match2;
+                    d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute), parseInt(second || 0));
+                }
+            }
+
+            // Fallback: try native parsing
+            if (!d || isNaN(d.getTime())) {
+                d = new Date(dateStr);
+            }
+
             if (isNaN(d.getTime())) return dateStr;
             return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')} ${d.getDate()}/${d.getMonth() + 1}`;
         };
 
         let html = '';
         tasks.forEach((task, index) => {
-            const taskId = task.id || task.task_id || '';
+            // Lấy task_id (ưu tiên task_id, sau đó id)
+            const taskId = task.task_id || task.id || '';
+            if (!taskId) return; // Skip nếu không có ID
+
             const status = (task.status || '').toLowerCase();
-            const text = task.text || task.input_text || task.text_input || '';
+            // Lấy text (ưu tiên text_input từ API mới)
+            const text = task.text_input || task.text || task.input_text || '';
             const provider = task.provider || 'elevenlabs';
             const voiceId = task.voice_id || task.voiceId || '';
             const voiceInfo = findVoiceInfo(voiceId);
             const project = task.project || task.project_name || voiceInfo.project || '';
             const voiceName = task.voice_name || voiceInfo.name || '';
             const creditCost = task.credit_cost || 0;
-            const audioUrl = task.result_url || task.audio_url || '';
-            const duration = task.duration || 0;
+            // Lấy audio URL (ưu tiên audio_url từ API mới)
+            const audioUrl = task.audio_url || task.result_url || '';
+            const srtUrl = task.srt_url || '';
+            const jsonUrl = task.json_url || '';
+            const duration = task.duration || (task.metadata ? task.metadata.duration : 0) || 0;
             const providerLogo = getProviderLogo(provider);
             const safeText = this.escapeHtml(text.substring(0, 200));
 
@@ -2610,7 +2648,7 @@ class ProToolManager {
             if (status === 'done') {
                 statusBadge = `<span class="bk-status-badge bk-badge-done">Xong</span>`;
 
-                // Player với download dropdown
+                // Player với download dropdown (giống TTS)
                 const downloadDropdown = `
                     <div class="bk-download-wrapper">
                         <button class="bk-download-btn" onclick="toggleBkDownloadMenu(event, '${taskId}')" title="Tải xuống">
@@ -2618,6 +2656,7 @@ class ProToolManager {
                         </button>
                         <div class="bk-download-menu" id="bk-download-menu-${taskId}">
                             <div class="bk-download-header">Tải xuống (hết hạn sau 72 giờ)</div>
+                            <!-- Audio -->
                             ${audioUrl ? `
                                 <a href="${audioUrl}" download class="bk-download-item">
                                     <i class="bi bi-music-note-beamed"></i>
@@ -2626,6 +2665,26 @@ class ProToolManager {
                                 <div class="bk-download-item bk-download-disabled">
                                     <i class="bi bi-music-note-beamed"></i>
                                     <span>Audio</span>
+                                </div>`}
+                            <!-- SRT -->
+                            ${srtUrl ? `
+                                <a href="${srtUrl}" download class="bk-download-item">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <span>Phụ đề (SRT)</span>
+                                </a>` : `
+                                <div class="bk-download-item bk-download-disabled">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <span>Phụ đề (SRT)</span>
+                                </div>`}
+                            <!-- JSON -->
+                            ${jsonUrl ? `
+                                <a href="${jsonUrl}" download class="bk-download-item">
+                                    <i class="bi bi-file-earmark-code"></i>
+                                    <span>Phụ đề (JSON)</span>
+                                </a>` : `
+                                <div class="bk-download-item bk-download-disabled">
+                                    <i class="bi bi-file-earmark-code"></i>
+                                    <span>Phụ đề (JSON)</span>
                                 </div>`}
                         </div>
                     </div>
