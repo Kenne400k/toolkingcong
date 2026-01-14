@@ -199,25 +199,25 @@
                 <nav class="flex flex-col gap-1 flex-1">
                     <a class="nav-link flex items-center gap-3 font-medium text-dim" style="font-size: 13px;" data-page="dashboard" href="dashboard.html">
                         <span class="material-symbols-outlined" style="font-size: 20px;">dashboard</span>
-                        <span>Dashboard</span>
+                        <span data-i18n="dashboard">Dashboard</span>
                     </a>
                     <a class="nav-link active flex items-center gap-3 font-medium" style="font-size: 13px;" data-page="tts" href="tts.html">
                         <span class="material-symbols-outlined" style="font-size: 20px;">record_voice_over</span>
-                        <span>Text to Speech</span>
+                        <span data-i18n="text_to_speech">Text to Speech</span>
                     </a>
                     <a class="nav-link flex items-center gap-3 font-medium text-dim" style="font-size: 13px;" data-page="voice-cloning" href="voice-cloning.html">
                         <span class="material-symbols-outlined" style="font-size: 20px;">mic</span>
-                        <span>Voice Cloning</span>
+                        <span data-i18n="voice_cloning">Voice Cloning</span>
                     </a>
                     <a class="nav-link flex items-center gap-3 font-medium text-dim" style="font-size: 13px;" data-page="tool" href="tool.html">
                         <span class="material-symbols-outlined" style="font-size: 20px;">construction</span>
-                        <span>Pro Tool</span>
+                        <span data-i18n="pro_tool">Pro Tool</span>
                     </a>
 
                     <div class="mt-auto pt-4 border-t border-custom">
                         <a class="nav-link flex items-center gap-3 font-medium text-dim" style="font-size: 13px;" id="logout-btn">
                             <span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
-                            <span>Logout</span>
+                            <span data-i18n="logout">Logout</span>
                         </a>
                     </div>
                 </nav>
@@ -245,7 +245,7 @@
                     <div class="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg border border-custom">
                         <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
                         <span class="text-sm font-semibold text-white" id="userCredits">0</span>
-                        <span class="text-xs text-dim">Credits</span>
+                        <span class="text-xs text-dim" data-i18n="credits">Credits</span>
                     </div>
                     <span class="text-sm text-dim hidden sm:block" id="header-email">Loading...</span>
                 </div>
@@ -272,8 +272,8 @@
                     ">
                         <div style="text-align: center;">
                             <div class="spinner-border" style="width: 50px; height: 50px; color: #667eea;"></div>
-                            <div style="color: #fff; font-size: 16px; font-weight: 600; margin-top: 20px;">Đang tải...</div>
-                            <div style="color: #888; font-size: 13px; margin-top: 8px;">Vui lòng đợi trong giây lát</div>
+                            <div style="color: #fff; font-size: 16px; font-weight: 600; margin-top: 20px;" data-i18n="tts_loading">Đang tải...</div>
+                            <div style="color: #888; font-size: 13px; margin-top: 8px;" data-i18n="tts_wait_moment">Vui lòng đợi trong giây lát</div>
                         </div>
                     </div>
 
@@ -282,30 +282,30 @@
                         <div id="inputLoader" class="loading-overlay">
                             <div style="text-align:center; color:#fff;">
                                 <span class="spinner-border spinner-border-sm"></span>
-                                <div style="margin-top:10px; font-size:14px;">Đang xử lý...</div>
+                                <div style="margin-top:10px; font-size:14px;" data-i18n="tts_processing">Đang xử lý...</div>
                             </div>
                         </div>
                         
                         <div class="textarea-wrapper">
                             <div class="textarea-inner">
-                                <textarea id="txtInput" class="tts-textarea" placeholder=""></textarea>
+                                <textarea id="txtInput" class="tts-textarea" data-i18n-placeholder="tts_enter_text" placeholder=""></textarea>
                                 
                                 <div id="emptyState" class="empty-state">
-                                    <div class="es-title">Nhập văn bản của bạn tại đây.</div>
-                                    <div class="es-subtitle">Không giới hạn ký tự văn bản.</div>
+                                    <div class="es-title" data-i18n="tts_enter_text">Nhập văn bản của bạn tại đây.</div>
+                                    <div class="es-subtitle" data-i18n="tts_no_limit">Không giới hạn ký tự văn bản.</div>
                                     
                                     <div class="es-tips" id="emptyTips">
                                         <div class="es-tip">
                                             <i class="bi bi-flag-fill" style="color: var(--error);"></i>
-                                            <span>Tiếng Việt nên sử dụng <b>Minimax</b></span>
+                                            <span data-i18n="tts_tip_minimax">Tiếng Việt nên sử dụng <b>Minimax</b></span>
                                         </div>
                                         <div class="es-tip">
                                             <i class="bi bi-lightbulb-fill" style="color: var(--warning);"></i>
-                                            <span>💡 <code class="es-code">&lt;break time="0.5s" /&gt;</code> để nghỉ 0.5 giây</span>
+                                            <span data-i18n="tts_tip_break">💡 <code class="es-code">&lt;break time="0.5s" /&gt;</code> để nghỉ 0.5 giây</span>
                                         </div>
                                         <div class="es-tip">
                                             <i class="bi bi-folder-fill" style="color: #3b82f6;"></i>
-                                            <span>📁 Kéo thả tệp <b>.txt, .srt</b> vào đây</span>
+                                            <span data-i18n="tts_tip_drag">📁 Kéo thả tệp <b>.txt, .srt</b> vào đây</span>
                                         </div>
                                     </div>
                                 </div>
@@ -318,7 +318,7 @@
                                 <div style="position: relative;">
                                     <button class="upload-btn" onclick="toggleUploadDropdown()" id="uploadDropdownBtn">
                                         <i class="bi bi-upload"></i>
-                                        Tải lên
+                                        <span data-i18n="tts_upload">Tải lên</span>
                                         <i class="bi bi-chevron-up" id="uploadChevron" style="font-size: 10px; margin-left: 4px;"></i>
                                     </button>
                                     
@@ -338,11 +338,11 @@
                                     ">
                                         <div class="upload-option" onclick="uploadFileElectron()">
                                             <i class="bi bi-file-earmark-text"></i>
-                                            <span>Tải lên tệp (.txt .srt .zip)</span>
+                                            <span data-i18n="tts_upload_file">Tải lên tệp (.txt .srt .zip)</span>
                                         </div>
                                         <div class="upload-option" onclick="uploadFolderElectron()">
                                             <i class="bi bi-folder2-open"></i>
-                                            <span>Tải lên thư mục</span>
+                                            <span data-i18n="tts_upload_folder">Tải lên thư mục</span>
                                         </div>
                                     </div>
                                 </div>
@@ -363,9 +363,10 @@
                                             gap: 6px; 
                                             transition: all 0.2s;
                                         "
+                                        data-i18n-title="tts_clear_title"
                                         title="Xóa toàn bộ văn bản">
                                     <i class="bi bi-trash" style="font-size: 14px;"></i>
-                                    <span>Xóa</span>
+                                    <span data-i18n="tts_clear">Xóa</span>
                                 </button>
                                 
                                 <input type="file" id="fileInput" accept=".txt,.srt,.zip" multiple style="display: none;">
@@ -386,7 +387,7 @@
                                 " id="charDisplay">
                                     <i class="bi bi-file-text" style="font-size: 14px; color: #888;"></i>
                                     <span id="charCount" style="color: #fff;">0</span>
-                                    <span style="font-size: 11px; color: #666;">ký tự</span>
+                                    <span style="font-size: 11px; color: #666;" data-i18n="vc_chars">ký tự</span>
                                 </div>
                                 
                                 <span style="color: #333;">|</span>
@@ -416,11 +417,11 @@
                                         min-width: 200px;
                                         color: #fff;
                                     ">
-                                        <div style="font-size: 11px; color: #888; margin-bottom: 4px;">Bao gồm phí xử lý</div>
-                                        <div style="font-size: 12px; color: #ccc;">
+                                        <div style="font-size: 11px; color: #888; margin-bottom: 4px;" data-i18n="tts_fee_info">Bao gồm phí xử lý</div>
+                                        <div style="font-size: 12px; color: #ccc;" data-i18n="tts_fee_processing">
                                             • Bao gồm phí xử lý: <span style="color: #fff; font-weight: 600;">x1.12</span>
                                         </div>
-                                        <div style="font-size: 12px; color: #ccc; margin-top: 2px;" id="srtFeeInfo">
+                                        <div style="font-size: 12px; color: #ccc; margin-top: 2px;" id="srtFeeInfo" data-i18n="tts_fee_srt">
                                             • Định dạng SRT đắt hơn: <span style="color: #fff; font-weight: 600;">x1.2</span>
                                         </div>
                                     </div>
@@ -444,11 +445,11 @@
                             <div style="display: flex; gap: 8px;">
                                 <button class="tab-btn active" id="btnSettings" onclick="switchTab('settings')">
                                     <i class="bi bi-sliders"></i>
-                                    <span class="tab-text">Cài đặt</span>
+                                    <span class="tab-text" data-i18n="tts_settings">Cài đặt</span>
                                 </button>
                                 <button class="tab-btn" id="btnHistory" onclick="switchTab('history')">
                                     <i class="bi bi-clock-history"></i>
-                                    <span class="tab-text">Lịch sử</span>
+                                    <span class="tab-text" data-i18n="tts_history">Lịch sử</span>
                                 </button>
                             </div>
                             
@@ -467,7 +468,7 @@
                                         <img src="https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99" class="provider-logo" alt="ElevenLabs">
                                         <div class="provider-info">
                                             <div class="provider-name">Elevenlabs</div>
-                                            <div class="provider-desc">Giọng đọc tự nhiên và nhiều người dùng hơn.</div>
+                                            <div class="provider-desc" data-i18n="tts_provider_eleven_desc">Giọng đọc tự nhiên và nhiều người dùng hơn.</div>
                                         </div>
                                         <i class="bi bi-check-lg check-icon"></i>
                                     </div>
@@ -476,7 +477,7 @@
                                         <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png" class="provider-logo" alt="Minimax">
                                         <div class="provider-info">
                                             <div class="provider-name">Minimax</div>
-                                            <div class="provider-desc">Nói tốt tiếng Việt. Có thể sử dụng giọng nhân bản.</div>
+                                            <div class="provider-desc" data-i18n="tts_provider_minimax_desc">Nói tốt tiếng Việt. Có thể sử dụng giọng nhân bản.</div>
                                         </div>
                                         <i class="bi bi-check-lg check-icon"></i>
                                     </div>
@@ -486,19 +487,19 @@
                             <div id="historyActions" style="display: none; gap: 8px;">
                                 <button class="tab-btn" onclick="refreshHistory()" style="background: #1a1a1a; border: 1px solid #333; color: #fff;">
                                     <i class="bi bi-arrow-clockwise"></i>
-                                    <span class="tab-text">Làm mới</span>
+                                    <span class="tab-text" data-i18n="tts_refresh">Làm mới</span>
                                 </button>
                                 
                                 <button class="tab-btn" onclick="openDetailedHistory()" style="background: #1a1a1a; border: 1px solid #333; color: #fff;">
                                     <i class="bi bi-list-columns-reverse"></i>
-                                    <span class="tab-text">Chi tiết</span>
+                                    <span class="tab-text" data-i18n="tts_details">Chi tiết</span>
                                 </button>
                             </div>
                         </div>
 
                         <div id="viewSettings" class="sidebar-content show">
                             <div class="setting-group">
-                                <label>Chọn giọng nói</label>
+                                <label data-i18n="tts_select_voice">Chọn giọng nói</label>
                                 <div id="voiceSelectorBtn" onclick="openVoiceModal()" style="
                                     display: flex; 
                                     align-items: center; 
@@ -509,7 +510,7 @@
                                     border-radius: 8px; 
                                     cursor: pointer;">
 
-                                    <div id="selectedVoiceName" style="font-weight: 500; color: #fff;">Chọn giọng nói...</div>
+                                    <div id="selectedVoiceName" style="font-weight: 500; color: #fff;" data-i18n="tts_select_voice">Chọn giọng nói...</div>
 
                                     <div id="minimax-badge" style="font-size: 11px; display: none;"></div>
 
@@ -520,10 +521,10 @@
 
                             <div id="minimax-settings">
                                 <div class="setting-group">
-                                    <label>Chọn ngôn ngữ</label>
+                                    <label data-i18n="vc_select_language">Chọn ngôn ngữ</label>
                                     <div class="lang-selector-wrapper" style="position: relative;">
                                         <div class="lang-selector-dropdown" onclick="toggleLangDropdown()">
-                                            <span id="selectedLang">Tự xác định</span>
+                                            <span id="selectedLang" data-i18n="vc_auto_detect">Tự xác định</span>
                                             <i class="bi bi-chevron-down" id="langDropdownIcon"></i>
                                         </div>
                                                         
@@ -557,7 +558,7 @@
                                 </div>
 
                                 <div class="setting-group">
-                                    <label>Chọn mô hình ngôn ngữ</label>
+                                    <label data-i18n="tts_select_model">Chọn mô hình ngôn ngữ</label>
                                     <div style="position: relative;">
                                         <div class="custom-select" id="minimaxModelBtn" onclick="toggleMinimaxModelDropdown()" style="cursor: pointer;">
                                             <span id="selectedMinimaxModel">Speech HD 2.6</span>
@@ -568,17 +569,17 @@
                                 </div>
                                 
                                 <div class="slider-container">
-                                    <div class="slider-header"><span>Tốc độ: <span id="speedVal">1.00</span></span></div>
+                                    <div class="slider-header"><span data-i18n="tts_speed">Tốc độ</span>: <span id="speedVal">1.00</span></div>
                                     <input type="range" id="speed" min="0.5" max="2.0" step="0.01" value="1.0">
                                 </div>
                                 
                                 <div class="slider-container">
-                                    <div class="slider-header"><span>Cao độ: <span id="pitchVal">0</span></span></div>
+                                    <div class="slider-header"><span data-i18n="tts_pitch">Cao độ</span>: <span id="pitchVal">0</span></div>
                                     <input type="range" id="pitch" min="-12" max="12" step="1" value="0">
                                 </div>
                                 
                                 <div class="slider-container">
-                                    <div class="slider-header"><span>Âm lượng: <span id="volVal">1.00</span></span></div>
+                                    <div class="slider-header"><span data-i18n="tts_volume">Âm lượng</span>: <span id="volVal">1.00</span></div>
                                     <input type="range" id="vol" min="0.01" max="10.0" step="0.01" value="1.0">
                                 </div>
                             </div>
@@ -586,36 +587,36 @@
                             <div id="elevenlabs-settings" class="hidden">
                                 <div class="setting-group">
                                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                        <label>Chọn mô hình ngôn ngữ</label>
+                                        <label data-i18n="tts_select_model">Chọn mô hình ngôn ngữ</label>
                                     </div>
                                     <div class="custom-select" id="elevenModelBtn" onclick="showModelDetails()" style="cursor: pointer;">
-                                        <span id="selectedModelName">Đang tải...</span>
+                                        <span id="selectedModelName" data-i18n="tts_loading">Đang tải...</span>
                                         <i class="bi bi-chevron-right" style="margin-left: auto; font-size: 14px;"></i>
                                     </div>
                                 </div>
                                 
                                 <div class="slider-container" id="slider-speed">
-                                    <div class="slider-header"><span>Tốc độ: <span id="elevenSpeedVal">1.00</span></span></div>
+                                    <div class="slider-header"><span data-i18n="tts_speed">Tốc độ</span>: <span id="elevenSpeedVal">1.00</span></div>
                                     <input type="range" id="elevenSpeed" min="0.7" max="1.2" step="0.01" value="1.0">
                                 </div>
                                 
                                 <div class="slider-container" id="slider-stability">
-                                    <div class="slider-header"><span>Độ ổn định: <span id="stabilityVal">50%</span></span></div>
+                                    <div class="slider-header"><span data-i18n="tts_stability">Độ ổn định</span>: <span id="stabilityVal">50%</span></div>
                                     <input type="range" id="stability" min="0" max="100" step="1" value="50">
                                 </div>
                                 
                                 <div class="slider-container" id="slider-similarity">
-                                    <div class="slider-header"><span>Độ tương đồng: <span id="similarityVal">75%</span></span></div>
+                                    <div class="slider-header"><span data-i18n="tts_similarity">Độ tương đồng</span>: <span id="similarityVal">75%</span></div>
                                     <input type="range" id="similarity" min="0" max="100" step="1" value="75">
                                 </div>
                                 
                                 <div class="slider-container" id="slider-style">
-                                    <div class="slider-header"><span>Phóng đại phong cách: <span id="styleVal">0%</span></span></div>
+                                    <div class="slider-header"><span data-i18n="tts_style_exaggeration">Phóng đại phong cách</span>: <span id="styleVal">0%</span></div>
                                     <input type="range" id="style" min="0" max="100" step="1" value="0">
                                 </div>
                                 
                                 <div class="toggle-row" id="toggle-boost">
-                                    <div>Tăng cường giọng nói</div>
+                                    <div data-i18n="tts_voice_boost">Tăng cường giọng nói</div>
                                     <label class="toggle-switch">
                                         <input type="checkbox" id="boostCheck" checked>
                                         <span class="toggle-slider"></span>
@@ -632,12 +633,12 @@
                                             <span class="toggle-slider"></span>
                                         </label>
                                         <div style="line-height: 1.2;">
-                                            <div style="font-size: 13px; color: #eee; font-weight: 500;">Phụ đề</div>
-                                            <div class="badge-cost" id="elevenlabs-badge" style="margin: 0; display: inline-block;">+15% phí</div>
+                                            <div style="font-size: 13px; color: #eee; font-weight: 500;" data-i18n="tts_subtitles">Phụ đề</div>
+                                            <div class="badge-cost" id="elevenlabs-badge" style="margin: 0; display: inline-block;" data-i18n="tts_subtitle_fee">+15% phí</div>
                                         </div>
                                     </div>
                                     <button class="reset-btn" onclick="resetCurrentSettings()" style="width: auto; margin: 0; padding: 8px 14px; background: #1a1a1a; border-color: #333;">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+                                        <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="tts_reset">Đặt lại</span>
                                     </button>
                                 </div>
                             </div>
@@ -651,12 +652,12 @@
                                             <span class="toggle-slider"></span>
                                         </label>
                                         <div style="line-height: 1.2;">
-                                            <div style="font-size: 13px; color: #eee; font-weight: 500;">Phụ đề</div>
-                                            <div class="badge-cost" style="margin: 0; display: inline-block;">+15% phí</div>
+                                            <div style="font-size: 13px; color: #eee; font-weight: 500;" data-i18n="tts_subtitles">Phụ đề</div>
+                                            <div class="badge-cost" style="margin: 0; display: inline-block;" data-i18n="tts_subtitle_fee">+15% phí</div>
                                         </div>
                                     </div>
                                     <button class="reset-btn" onclick="resetCurrentSettings()" style="width: auto; margin: 0; padding: 8px 14px; background: #1a1a1a; border-color: #333;">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+                                        <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="tts_reset">Đặt lại</span>
                                     </button>
                                 </div>
                             </div>
@@ -664,14 +665,14 @@
                             <!-- BUTTON TẠO GIỌNG NÓI -->
                             <button id="btnProcess" class="btn-generate" onclick="startTTS()">
                                 <i class="bi bi-magic"></i>
-                                <span>Tạo Giọng Nói</span>
+                                <span data-i18n="tts_generate">Tạo Giọng Nói</span>
                             </button>
                         </div>
 
                         <!-- Model Details Sidebar (ElevenLabs) -->
                         <div id="modelSidebar" class="model-details-sidebar">
                             <div class="md-header">
-                                <span class="md-title">Thông tin Mô hình</span>
+                                <span class="md-title" data-i18n="tts_model_info">Thông tin Mô hình</span>
                                 <i class="bi bi-x-lg md-close" onclick="hideModelDetails()"></i>
                             </div>
                             <div class="md-content" id="mdContent"></div>
@@ -681,10 +682,10 @@
                         <div id="viewHistory" class="sidebar-content">
                             <div id="historyListContainer"></div>
                             <div id="loadingMore" class="loading-more">
-                                <div class="spinner"></div> Đang tải...
+                                <div class="spinner"></div> <span data-i18n="tts_history_loading">Đang tải...</span>
                             </div>
                             <div id="noMoreData" class="no-more-data">
-                                <i class="bi bi-check-circle"></i> Đã hiển thị toàn bộ lịch sử
+                                <i class="bi bi-check-circle"></i> <span data-i18n="tts_history_end">Đã hiển thị toàn bộ lịch sử</span>
                             </div>
                         </div>
                     </div>
@@ -702,20 +703,20 @@
             <!-- Header -->
             <div class="vm-header">
                 <div class="vm-tabs">
-                    <div class="vm-tab" data-tab="default" onclick="switchVoiceTab('default')">
+                    <div class="vm-tab" data-tab="default" onclick="switchVoiceTab('default')" data-i18n="tts_vmodal_default">
                         Mặc định
                     </div>
                     <div class="vm-tab" data-tab="cloned" id="tabCloned" onclick="switchVoiceTab('cloned')" style="display: none;">
                         <i class="bi bi-mic-fill"></i>
-                        Giọng nhân bản
+                        <span data-i18n="tts_vmodal_cloned">Giọng nhân bản</span>
                     </div>
                     <div class="vm-tab active" data-tab="library" onclick="switchVoiceTab('library')">
                         <i class="bi bi-collection"></i>
-                        Thư viện giọng nói
+                        <span data-i1ban="tts_vmodal_library">Thư viện giọng nói</span>
                     </div>
                     <div class="vm-tab" data-tab="favorites" onclick="switchVoiceTab('favorites')">
                         <i class="bi bi-heart-fill"></i>
-                        Yêu thích
+                        <span data-i18n="tts_vmodal_favorites">Yêu thích</span>
                     </div>
                 </div>
                 <i class="bi bi-x-lg vm-close" onclick="closeVoiceModal()"></i>
@@ -725,7 +726,7 @@
                 <!-- Search Input -->
                 <div class="vm-search-wrapper" style="flex: 1;">
                     <i class="bi bi-search"></i>
-                    <input type="text" class="vm-search-input" placeholder="Tìm kiếm giọng đọc..." id="voiceSearch" onkeyup="filterVoices()">
+                    <input type="text" class="vm-search-input" data-i18n-placeholder="tts_vmodal_search" placeholder="Tìm kiếm giọng đọc..." id="voiceSearch" onkeyup="filterVoices()">
                 </div>
                 
                 <!-- Sort Dropdown -->
@@ -733,22 +734,22 @@
                     <button class="dropdown-btn" onclick="toggleSortDropdown(event)" style="height: 42px; background: #1a1a1a; border: 1px solid #333; color: #fff; display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 12px; border-radius: 8px; cursor: pointer;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <i class="bi bi-sort-down" style="color: #888;"></i> 
-                            <span id="currentSortLabel" style="font-size: 13px; font-weight: 500;">Dùng nhiều nhất</span>
+                            <span id="currentSortLabel" style="font-size: 13px; font-weight: 500;" data-i18n="tts_vmodal_sort_most_used">Dùng nhiều nhất</span>
                         </div>
                         <i class="bi bi-chevron-down dropdown-arrow" id="sortArrow" style="font-size: 10px; color: #666;"></i>
                     </button>
                     
                     <div class="dropdown-menu" id="sortMenu" style="display: none;">
-                        <div class="dropdown-item" onclick="applySort(event, 'trending', 'Xu hướng')">
+                        <div class="dropdown-item" onclick="applySort(event, 'trending', 'Xu hướng')" data-i18n="tts_vmodal_sort_trending">
                             Xu hướng
                         </div>
-                        <div class="dropdown-item active" onclick="applySort(event, 'newest', 'Mới nhất')">
+                        <div class="dropdown-item active" onclick="applySort(event, 'newest', 'Mới nhất')" data-i18n="tts_vmodal_sort_newest">
                             Mới nhất
                         </div>
-                        <div class="dropdown-item" onclick="applySort(event, 'most_used', 'Dùng nhiều nhất')">
+                        <div class="dropdown-item" onclick="applySort(event, 'most_used', 'Dùng nhiều nhất')" data-i18n="tts_vmodal_sort_most_used">
                             Dùng nhiều nhất
                         </div>
-                        <div class="dropdown-item" onclick="applySort(event, 'chars', 'Ký tự được tạo')">
+                        <div class="dropdown-item" onclick="applySort(event, 'chars', 'Ký tự được tạo')" data-i18n="tts_vmodal_sort_chars">
                             Ký tự được tạo
                         </div>
                     </div>
@@ -759,18 +760,18 @@
             <div class="vm-filters-bar">
                 <!-- FILTER 1: NGÔN NGỮ -->
                 <div class="filter-group custom-dropdown filter-dropdown-enhanced">
-                    <label class="filter-label">Ngôn ngữ</label>
+                    <label class="filter-label" data-i18n="tts_vmodal_filter_lang">Ngôn ngữ</label>
                     <input type="hidden" id="filterLang" value=""> 
                     
                     <div class="filter-btn-wrapper">
                         <button class="dropdown-btn btn-Lang" onclick="toggleDropdown(event, '#menuLang')" style="width: 160px; justify-content: space-between;">
-                            <span id="labelLang">Tất cả</span>
+                            <span id="labelLang" data-i18n="tts_vmodal_all">Tất cả</span>
                             <i class="bi bi-chevron-down dropdown-arrow"></i>
                         </button>
                     </div>
 
                     <div class="filter-dropdown-menu" id="menuLang" style="width: 200px;">
-                        <div class="dropdown-item" onclick="selectFilter('Lang', '', 'Tất cả')">Tất cả</div>
+                        <div class="dropdown-item" onclick="selectFilter('Lang', '', 'Tất cả')" data-i18n="tts_vmodal_all">Tất cả</div>
                         <div class="dropdown-item" onclick="selectFilter('Lang', 'en', '🇺🇸 English')">🇺🇸 English</div>
                         <div class="dropdown-item" onclick="selectFilter('Lang', 'vi', '🇻🇳 Vietnamese')">🇻🇳 Vietnamese</div>
                         <div class="dropdown-item" onclick="selectFilter('Lang', 'ja', '🇯🇵 Japanese')">🇯🇵 Japanese</div>
@@ -781,45 +782,45 @@
 
                 <!-- FILTER 2: GIỚI TÍNH -->
                 <div class="filter-group custom-dropdown filter-dropdown-enhanced">
-                    <label class="filter-label">Giới tính</label>
+                    <label class="filter-label" data-i18n="tts_vmodal_filter_gender">Giới tính</label>
                     <input type="hidden" id="filterGender" value="">
                     
                     <div class="filter-btn-wrapper">
                         <button class="dropdown-btn btn-Gender" onclick="toggleDropdown(event, '#menuGender')" style="width: 120px; justify-content: space-between;">
-                            <span id="labelGender">Tất cả</span>
+                            <span id="labelGender" data-i18n="tts_vmodal_all">Tất cả</span>
                             <i class="bi bi-chevron-down dropdown-arrow"></i>
                         </button>
                     </div>
 
                     <div class="filter-dropdown-menu" id="menuGender" style="width: 120px;">
-                        <div class="dropdown-item" onclick="selectFilter('Gender', '', 'Tất cả')">Tất cả</div>
-                        <div class="dropdown-item" onclick="selectFilter('Gender', 'male', 'Nam')">Nam</div>
-                        <div class="dropdown-item" onclick="selectFilter('Gender', 'female', 'Nữ')">Nữ</div>
+                        <div class="dropdown-item" onclick="selectFilter('Gender', '', 'Tất cả')" data-i18n="tts_vmodal_all">Tất cả</div>
+                        <div class="dropdown-item" onclick="selectFilter('Gender', 'male', 'Nam')" data-i18n="tts_vmodal_male">Nam</div>
+                        <div class="dropdown-item" onclick="selectFilter('Gender', 'female', 'Nữ')" data-i18n="tts_vmodal_female">Nữ</div>
                     </div>
                 </div>
 
                 <!-- FILTER 3: ĐỘ TUỔI -->
                 <div class="filter-group custom-dropdown filter-dropdown-enhanced">
-                    <label class="filter-label">Độ tuổi</label>
+                    <label class="filter-label" data-i18n="tts_vmodal_filter_age">Độ tuổi</label>
                     <input type="hidden" id="filterAge" value="">
                     
                     <div class="filter-btn-wrapper">
                         <button class="dropdown-btn btn-Age" onclick="toggleDropdown(event, '#menuAge')" style="width: 130px; justify-content: space-between;">
-                            <span id="labelAge">Tất cả</span>
+                            <span id="labelAge" data-i18n="tts_vmodal_all">Tất cả</span>
                             <i class="bi bi-chevron-down dropdown-arrow"></i>
                         </button>
                     </div>
 
                     <div class="filter-dropdown-menu" id="menuAge" style="width: 130px;">
-                        <div class="dropdown-item" onclick="selectFilter('Age', '', 'Tất cả')">Tất cả</div>
-                        <div class="dropdown-item" onclick="selectFilter('Age', 'young', 'Trẻ')">Trẻ</div>
-                        <div class="dropdown-item" onclick="selectFilter('Age', 'middle_aged', 'Trung niên')">Trung niên</div>
-                        <div class="dropdown-item" onclick="selectFilter('Age', 'old', 'Lớn tuổi')">Lớn tuổi</div>
+                        <div class="dropdown-item" onclick="selectFilter('Age', '', 'Tất cả')" data-i18n="tts_vmodal_all">Tất cả</div>
+                        <div class="dropdown-item" onclick="selectFilter('Age', 'young', 'Trẻ')" data-i18n="tts_vmodal_young">Trẻ</div>
+                        <div class="dropdown-item" onclick="selectFilter('Age', 'middle_aged', 'Trung niên')" data-i18n="tts_vmodal_middle_aged">Trung niên</div>
+                        <div class="dropdown-item" onclick="selectFilter('Age', 'old', 'Lớn tuổi')" data-i18n="tts_vmodal_old">Lớn tuổi</div>
                     </div>
                 </div>
 
                 <!-- NÚT RESET -->
-                <button class="filter-reset-btn" onclick="resetFilters()" title="Đặt lại" style="margin-left: auto;">
+                <button class="filter-reset-btn" onclick="resetFilters()" data-i18n-title="tts_reset" title="Đặt lại" style="margin-left: auto;">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -828,7 +829,7 @@
             <div class="vm-grid" id="voiceGrid">
                 <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px;">
                     <div class="spinner-border" style="width: 40px; height: 40px; color: #667eea;"></div>
-                    <p style="color:#888; margin-top:20px; font-size:14px;">Đang tải danh sách giọng...</p>
+                    <p style="color:#888; margin-top:20px; font-size:14px;" data-i18n="tts_vmodal_loading">Đang tải danh sách giọng...</p>
                 </div>
             </div>
         </div>
@@ -838,15 +839,15 @@
     <div id="deleteModal" class="custom-modal-overlay" style="display: none;">
         <div class="delete-modal-box">
             <div class="dm-header">
-                <h3>Xóa tác vụ</h3>
+                <h3 data-i18n="tts_del_task_title">Xóa tác vụ</h3>
                 <i class="bi bi-x-lg" onclick="closeDeleteModal()"></i>
             </div>
             
-            <p class="dm-warning">
+            <p class="dm-warning" data-i18n="tts_del_task_warn">
                 Bạn có chắc chắn muốn xóa tác vụ này? Hành động này không thể hoàn tác.
             </p>
             
-            <p class="dm-note" id="dmNote">
+            <p class="dm-note" id="dmNote" data-i18n="tts_del_task_note">
                 Nếu tác vụ bị treo quá 24h sẽ được hoàn tín dụng.
             </p>
 
@@ -855,9 +856,9 @@
             </div>
 
             <div class="dm-footer">
-                <button class="btn-cancel" onclick="closeDeleteModal()">Hủy</button>
+                <button class="btn-cancel" onclick="closeDeleteModal()" data-i18n="tts_del_task_cancel">Hủy</button>
                 <button class="btn-confirm-delete" id="btnConfirmDelete">
-                    <i class="bi bi-trash"></i> Xóa
+                    <i class="bi bi-trash"></i> <span data-i18n="tts_del_task_confirm">Xóa</span>
                 </button>
             </div>
         </div>
@@ -867,12 +868,12 @@
     <div id="detailedHistoryModal" class="dh-modal-overlay" style="display: none;">
         <div class="dh-modal-content">
             <div class="dh-header">
-                <h3>Lịch sử</h3>
+                <h3 data-i18n="tts_history_modal_title">Lịch sử</h3>
                 
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="dh-header-btn dh-refresh-with-text" onclick="refreshDetailedHistory()" title="Làm mới dữ liệu">
+                    <button class="dh-header-btn dh-refresh-with-text" onclick="refreshDetailedHistory()" data-i18n-title="tts_history_modal_refresh" title="Làm mới dữ liệu">
                         <i class="bi bi-arrow-clockwise" id="dhRefreshIcon"></i>
-                        <span>Làm mới</span>
+                        <span data-i18n="tts_history_modal_refresh">Làm mới</span>
                     </button>
 
                     <button class="dh-header-btn" onclick="closeDetailedHistory()" title="Đóng">
@@ -888,13 +889,13 @@
                 
                 <div class="dh-actions-group">
                     <button class="dh-btn-action" id="btnBulkDelete" onclick="bulkDelete()" disabled>
-                        Xóa (<span>0</span>)
+                        <span data-i18n="tts_history_modal_delete">Xóa</span> (<span>0</span>)
                     </button>
                     <button class="dh-btn-action" id="btnBulkDownloadAudio" onclick="bulkDownload('audio')" disabled>
-                        Tải xuống (<span>0</span>) Audio
+                        <span data-i18n="tts_history_modal_download_audio">Tải xuống Audio</span> (<span>0</span>)
                     </button>
                     <button class="dh-btn-action" id="btnBulkDownloadSrt" onclick="bulkDownload('srt')" disabled>
-                        Tải xuống (<span>0</span>) SRT
+                        <span data-i18n="tts_history_modal_download_srt">Tải xuống SRT</span> (<span>0</span>)
                     </button>
                 </div>
             </div>
@@ -902,7 +903,7 @@
             <div class="dh-list-body" id="detailedHistoryList">
                 <div style="text-align:center; padding: 50px; color: #666;">
                     <div class="spinner-border text-primary" role="status"></div>
-                    <div style="margin-top:10px">Đang tải dữ liệu...</div>
+                    <div style="margin-top:10px" data-i18n="tts_history_modal_loading">Đang tải dữ liệu...</div>
                 </div>
             </div>
         </div>
@@ -925,8 +926,8 @@
     ">
         <div style="text-align: center; pointer-events: auto;">
             <i class="bi bi-cloud-upload" style="font-size: 80px; color: #667eea; display: block; margin-bottom: 20px;"></i>
-            <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Thả tệp vào đây</h2>
-            <p style="font-size: 16px; color: #888;">Hỗ trợ .txt, .srt, .zip</p>
+            <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;" data-i18n="tts_drop_overlay_title">Thả tệp vào đây</h2>
+            <p style="font-size: 16px; color: #888;" data-i18n="tts_drop_overlay_desc">Hỗ trợ .txt, .srt, .zip</p>
         </div>
     </div>
 
@@ -935,28 +936,63 @@
         window.isElevenLabsDown = false;
         window.isMinimaxDown = false;
         window.isBackupEligible = true;
-        window.jsLang = {
-            selectVoice: 'Chọn giọng nói...',
-            processing: 'Đang xử lý',
-            done: 'Hoàn thành',
-            failed: 'Thất bại',
-            timeout: 'Timeout',
-            queued: 'Hàng đợi',
-            noVoicesFound: 'Không tìm thấy giọng nói',
-            clearFilters: 'Xóa bộ lọc',
-            searching: 'Đang tìm kiếm...',
-            notFound: 'Không tìm thấy',
-            deleteConfirm: 'Bạn có chắc chắn muốn xóa?',
-            deleteSuccess: 'Đã xóa thành công',
-            selectVoiceFirst: 'Vui lòng chọn giọng nói trước!',
-            enterText: 'Vui lòng nhập văn bản!',
-            copied: 'Đã copy!',
-            addedToFavorites: 'Đã thêm vào yêu thích',
-            removedFromFavorites: 'Đã xóa khỏi yêu thích',
-        };
+        // This object will be populated by i18n
+        window.jsLang = {};
     </script>
-
     <script src="js/i18n.js"></script>
+    <script>
+        // Dynamically build the jsLang object after i18n has loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.jsLang = {
+                selectVoice: i18n.t('js_select_voice'),
+                processing: i18n.t('js_processing'),
+                done: i18n.t('js_done'),
+                failed: i18n.t('js_failed'),
+                timeout: i18n.t('js_timeout'),
+                queued: i18n.t('js_queued'),
+                noVoicesFound: i18n.t('js_no_voices_found'),
+                clearFilters: i18n.t('js_clear_filters'),
+                searching: i18n.t('js_searching'),
+                notFound: i18n.t('js_not_found'),
+                deleteConfirm: i18n.t('js_delete_confirm'),
+                deleteSuccess: i18n.t('js_delete_success'),
+                selectVoiceFirst: i18n.t('js_select_voice_first'),
+                enterText: i18n.t('js_enter_text'),
+                copied: i18n.t('js_copied'),
+                addedToFavorites: i18n.t('js_added_to_favorites'),
+                removedFromFavorites: i18n.t('js_removed_from_favorites'),
+            };
+            // Also apply translations initially, as i18n.init() might run before this
+            i18n.applyTranslations();
+        });
+
+        // Override the toggle function to re-apply jsLang as well
+        const originalToggleAppLanguage = window.toggleAppLanguage;
+        window.toggleAppLanguage = function() {
+            originalToggleAppLanguage(); // Call the original function from i18n.js
+            
+            // Re-populate jsLang with the new language
+            window.jsLang = {
+                selectVoice: i18n.t('js_select_voice'),
+                processing: i18n.t('js_processing'),
+                done: i18n.t('js_done'),
+                failed: i18n.t('js_failed'),
+                timeout: i18n.t('js_timeout'),
+                queued: i18n.t('js_queued'),
+                noVoicesFound: i18n.t('js_no_voices_found'),
+                clearFilters: i18n.t('js_clear_filters'),
+                searching: i18n.t('js_searching'),
+                notFound: i18n.t('js_not_found'),
+                deleteConfirm: i18n.t('js_delete_confirm'),
+                deleteSuccess: i18n.t('js_delete_success'),
+                selectVoiceFirst: i18n.t('js_select_voice_first'),
+                enterText: i18n.t('js_enter_text'),
+                copied: i18n.t('js_copied'),
+                addedToFavorites: i18n.t('js_added_to_favorites'),
+                removedFromFavorites: i18n.t('js_removed_from_favorites'),
+            };
+        }
+    </script>
     <script src="js/api-handler.js"></script>
     <script src="js/shared-ui.js"></script>
     <script src="js/tts.js"></script>

@@ -1,10 +1,9 @@
 {
-  "version": "1.10.5",
+  "version": "1.10.6",
   "changelog": [
-    "TTS: Fixed file/folder upload using Electron API",
-    "Added support for .txt, .srt, .zip files",
-    "Pro Tool: Super smooth animations",
-    "Modal/Button hover effects, GPU accelerated"
+    "i18n: Full internationalization for Dashboard and TTS pages",
+    "Fix: Correctly handle .srt file uploads",
+    "Fix: Resolve crash when uploading folders"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

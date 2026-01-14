@@ -371,7 +371,7 @@
                     <div class="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg border border-custom">
                         <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
                         <span class="text-sm font-semibold text-white" id="header-credits">0</span>
-                        <span class="text-xs text-dim">Credits</span>
+                        <span class="text-xs text-dim" data-i18n="credits">Credits</span>
                     </div>
                     <span class="text-sm text-dim hidden sm:block" id="header-email">Loading...</span>
                 </div>
@@ -384,7 +384,7 @@
                 <div class="flex items-center justify-center h-full" id="loading-state">
                     <div class="flex flex-col items-center gap-4">
                         <div class="loading-spinner"></div>
-                        <p class="text-dim text-sm">Loading dashboard...</p>
+                        <p class="text-dim text-sm" data-i18n="db_loading">Loading dashboard...</p>
                     </div>
                 </div>
                 
@@ -394,12 +394,12 @@
                     <!-- Welcome Section -->
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                         <div>
-                            <h1 class="text-2xl font-bold text-white mb-1">Welcome back, <span id="welcome-name">User</span></h1>
-                            <p class="text-dim text-sm">Here's what's happening with your voice projects today.</p>
+                            <h1 class="text-2xl font-bold text-white mb-1"><span data-i18n="db_welcome">Welcome back,</span> <span id="welcome-name">User</span></h1>
+                            <p class="text-dim text-sm" data-i18n="db_tagline">Here's what's happening with your voice projects today.</p>
                         </div>
                         <button class="bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all hover:scale-105" id="create-task-btn">
                             <span class="material-symbols-outlined text-lg">add</span>
-                            New Task
+                            <span data-i18n="db_new_task">New Task</span>
                         </button>
                     </div>
                     
@@ -414,7 +414,7 @@
                                 </div>
                             </div>
                             <h3 class="text-3xl font-bold text-white mb-1" id="stat-total-tasks">0</h3>
-                            <p class="text-dim text-xs font-medium">Total Tasks</p>
+                            <p class="text-dim text-xs font-medium" data-i18n="db_total_tasks">Total Tasks</p>
                         </div>
                         
                         <!-- Credits -->
@@ -425,7 +425,7 @@
                                 </div>
                             </div>
                             <h3 class="text-3xl font-bold text-white mb-1" id="stat-credits">0</h3>
-                            <p class="text-dim text-xs font-medium">Credits Remaining</p>
+                            <p class="text-dim text-xs font-medium" data-i18n="db_credits_remaining">Credits Remaining</p>
                         </div>
                         
                         <!-- Pending -->
@@ -436,7 +436,7 @@
                                 </div>
                             </div>
                             <h3 class="text-3xl font-bold text-white mb-1" id="stat-pending">0</h3>
-                            <p class="text-dim text-xs font-medium">Pending Tasks</p>
+                            <p class="text-dim text-xs font-medium" data-i18n="db_pending_tasks">Pending Tasks</p>
                         </div>
                         
                         <!-- Success Rate -->
@@ -447,7 +447,7 @@
                                 </div>
                             </div>
                             <h3 class="text-3xl font-bold text-white mb-1" id="stat-success-rate">0%</h3>
-                            <p class="text-dim text-xs font-medium">Success Rate</p>
+                            <p class="text-dim text-xs font-medium" data-i18n="db_success_rate">Success Rate</p>
                         </div>
                     </div>
                     
@@ -455,24 +455,24 @@
                     <div class="gradient-border">
                         <div class="gradient-border-inner">
                             <div class="p-5 border-b border-custom flex items-center justify-between">
-                                <h3 class="text-base font-semibold text-white">Recent Tasks</h3>
-                                <button class="text-sm text-primary font-medium hover:text-primary/80 transition-colors" id="view-all-btn">View All</button>
+                                <h3 class="text-base font-semibold text-white" data-i18n="db_recent_tasks">Recent Tasks</h3>
+                                <button class="text-sm text-primary font-medium hover:text-primary/80 transition-colors" id="view-all-btn" data-i18n="db_view_all">View All</button>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="data-table">
                                     <thead>
                                         <tr class="text-dim text-xs uppercase tracking-wider">
-                                            <th class="px-6 py-4 font-medium text-left">Task ID</th>
-                                            <th class="px-6 py-4 font-medium text-left">Text Preview</th>
-                                            <th class="px-6 py-4 font-medium text-left">Voice</th>
-                                            <th class="px-6 py-4 font-medium text-left">Status</th>
-                                            <th class="px-6 py-4 font-medium text-left">Cost</th>
-                                            <th class="px-6 py-4 font-medium text-right">Date</th>
+                                            <th class="px-6 py-4 font-medium text-left" data-i18n="db_tbl_id">Task ID</th>
+                                            <th class="px-6 py-4 font-medium text-left" data-i18n="db_tbl_preview">Text Preview</th>
+                                            <th class="px-6 py-4 font-medium text-left" data-i18n="db_tbl_voice">Voice</th>
+                                            <th class="px-6 py-4 font-medium text-left" data-i18n="db_tbl_status">Status</th>
+                                            <th class="px-6 py-4 font-medium text-left" data-i18n="db_tbl_cost">Cost</th>
+                                            <th class="px-6 py-4 font-medium text-right" data-i18n="db_tbl_date">Date</th>
                                         </tr>
                                     </thead>
                                     <tbody class="text-sm" id="recent-tasks-body">
                                         <tr>
-                                            <td colspan="6" class="px-6 py-8 text-center text-dim">
+                                            <td colspan="6" class="px-6 py-8 text-center text-dim" data-i18n="db_tbl_loading">
                                                 Loading tasks...
                                             </td>
                                         </tr>

@@ -142,50 +142,10 @@ let detailedHistoryAllData = [];
 // Lưu tất cả data đã load
 let pendingUploadFiles = null;
 // ========== LANGUAGE SUPPORT ==========
-const currentLang = document.documentElement.lang || 'vi';
+// The jsTranslations object is now created dynamically in tts.html
+// after i18n.js has loaded, using i18n.t() to populate window.jsLang.
+// This ensures all strings are sourced from the central translation file.
 
-const langStrings = {
-    vi: {
-        selectVoice: 'Chọn giọng nói...',
-        processing: 'Đang xử lý',
-        done: 'Hoàn thành',
-        failed: 'Thất bại',
-        timeout: 'Timeout',
-        queued: 'Hàng đợi',
-        noVoicesFound: 'Không tìm thấy giọng nói',
-        clearFilters: 'Xóa bộ lọc',
-        searching: 'Đang tìm kiếm...',
-        notFound: 'Không tìm thấy',
-        deleteConfirm: 'Bạn có chắc chắn muốn xóa?',
-        deleteSuccess: 'Đã xóa thành công',
-        selectVoiceFirst: 'Vui lòng chọn giọng nói trước!',
-        enterText: 'Vui lòng nhập văn bản!',
-        copied: 'Đã copy!',
-        addedToFavorites: 'Đã thêm vào yêu thích',
-        removedFromFavorites: 'Đã xóa khỏi yêu thích',
-    },
-    en: {
-        selectVoice: 'Select voice...',
-        processing: 'Processing',
-        done: 'Done',
-        failed: 'Failed',
-        timeout: 'Timeout',
-        queued: 'Queued',
-        noVoicesFound: 'No voices found',
-        clearFilters: 'Clear filters',
-        searching: 'Searching...',
-        notFound: 'Not found',
-        deleteConfirm: 'Are you sure you want to delete?',
-        deleteSuccess: 'Deleted successfully',
-        selectVoiceFirst: 'Please select a voice first!',
-        enterText: 'Please enter text!',
-        copied: 'Copied!',
-        addedToFavorites: 'Added to favorites',
-        removedFromFavorites: 'Removed from favorites',
-    }
-};
-
-const jsTranslations = langStrings[currentLang];
 
 // ========== HELPER: PARSE CUSTOM DATE FORMAT ==========
 function parseCustomDateTime(dateStr) {
@@ -7248,11 +7208,11 @@ $(document).on('drop', function(e) {
 function handleGlobalDrop(files) {
     let validFiles = files.filter(f => {
         let name = f.name.toLowerCase();
-        return (name.endsWith('.txt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
+        return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
     });
     
     if (validFiles.length === 0) {
-        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .zip < 5MB');
+        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .srt, .zip < 5MB');
         return;
     }
     
@@ -7493,19 +7453,38 @@ async function uploadFolderElectron() {
         console.log('📁 [Electron] selectFolder result:', result);
 
         if (result && result.success && result.files && result.files.length > 0) {
-            // Filter valid files
-            const validFiles = result.files.filter(f => {
-                const name = f.name.toLowerCase();
-                return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip'));
+            // Filter valid files based on the path string
+            const validFilePaths = result.files.filter(filePath => {
+                const name = filePath.toLowerCase();
+                return name.endsWith('.txt') || name.endsWith('.srt');
             });
 
-            if (validFiles.length === 0) {
-                alert('Không có file hợp lệ trong thư mục!\nChỉ chấp nhận .txt, .srt, .zip');
+            if (validFilePaths.length === 0) {
+                alert('Không có file .txt hoặc .srt hợp lệ trong thư mục!');
                 return;
             }
 
-            console.log('📁 [Electron] Found', validFiles.length, 'valid files');
-            processElectronFiles(validFiles);
+            console.log('📁 [Electron] Found', validFilePaths.length, 'valid files');
+
+            // Map the paths to file objects with content
+            const filesForProcessing = [];
+            for (const filePath of validFilePaths) {
+                try {
+                    const fileData = await window.electronAPI.readFile(filePath);
+                    filesForProcessing.push({
+                        name: fileData.fileName,
+                        path: fileData.filePath,
+                        content: fileData.content,
+                        size: fileData.content ? fileData.content.length : 0
+                    });
+                } catch (e) {
+                    console.error('Error reading file from folder:', filePath, e);
+                }
+            }
+            
+            if(filesForProcessing.length > 0){
+                processElectronFiles(filesForProcessing);
+            }
         }
     } catch (error) {
         console.error('❌ [Electron] selectFolder error:', error);
@@ -7893,13 +7872,13 @@ async function handleBulkFiles(files) {
     
     let validFiles = files.filter(f => {
         let name = f.name.toLowerCase();
-        return (name.endsWith('.txt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
+        return (name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip')) && f.size < 5 * 1024 * 1024;
     });
     
     console.log('✅ Valid files after filter:', validFiles.length);
     
     if (validFiles.length === 0) {
-        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .zip < 5MB');
+        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .srt, .zip < 5MB');
         return;
     }
     

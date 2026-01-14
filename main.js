@@ -228,7 +228,7 @@ function createMainWindow() {
       webSecurity: true,
       devTools: process.env.NODE_ENV !== 'production' // 🔒 Disable DevTools in production
     },
-    icon: path.join(__dirname, 'icon.png'),
+    icon: path.join(__dirname, 'image/kingcong.jpg'),
     backgroundColor: '#101322'
   });
 
