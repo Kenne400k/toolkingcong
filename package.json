@@ -1,6 +1,6 @@
 {
   "name": "kingcong-tts-tool",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "description": "Text-to-Speech Desktop Tool for KingCong Studio",
   "main": "main.js",
   "scripts": {

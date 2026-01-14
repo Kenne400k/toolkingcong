@@ -160,7 +160,7 @@
 
         .voice-table th, .voice-table td {
             padding: 8px 6px;
-            text-align: left;
+            text-align: center;
             border-bottom: 1px solid var(--border);
             font-size: 11px;
         }
@@ -335,35 +335,45 @@
                 return;
             }
 
-            tbody.innerHTML = elevenlabsVoices.map((voice, idx) => `
+            tbody.innerHTML = elevenlabsVoices.map((voice, idx) => {
+                const isV3 = voice.model === 'eleven_v3';
+                const stabilityValue = voice.settings?.stability || 'natural';
+                const stabilityCell = isV3
+                    ? `<select style="width: 75px;" onchange="updateElevenlabsSetting(${idx}, 'stability', this.value)">
+                           <option value="creative" ${stabilityValue === 'creative' ? 'selected' : ''}>Creative</option>
+                           <option value="natural" ${stabilityValue === 'natural' ? 'selected' : ''}>Natural</option>
+                           <option value="robust" ${stabilityValue === 'robust' ? 'selected' : ''}>Robust</option>
+                       </select>`
+                    : `<input type="number" value="${voice.settings?.stability || 0.5}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateElevenlabsSetting(${idx}, 'stability', parseFloat(this.value))">`;
+
+                return `
                 <tr data-idx="${idx}">
                     <td>${idx + 1}</td>
                     <td><input type="text" value="${voice.project || ''}" placeholder="Project..." style="width: 70px;" onchange="updateElevenlabsVoice(${idx}, 'project', this.value)"></td>
                     <td><input type="text" value="${escapeHtml(voice.name || '')}" placeholder="Name..." style="width: 90px;" onchange="updateElevenlabsVoice(${idx}, 'name', this.value)"></td>
                     <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateElevenlabsVoice(${idx}, 'voiceId', this.value)"></td>
                     <td>
-                        <select style="width: 110px;" onchange="updateElevenlabsVoice(${idx}, 'model', this.value)">
+                        <select style="width: 110px;" onchange="updateElevenlabsVoice(${idx}, 'model', this.value); renderElevenlabsLibrary();">
                             <option value="eleven_v3" ${voice.model === 'eleven_v3' ? 'selected' : ''}>Eleven V3</option>
                             <option value="eleven_multilingual_v2" ${voice.model === 'eleven_multilingual_v2' ? 'selected' : ''}>Multilingual V2</option>
                             <option value="eleven_turbo_v2_5" ${voice.model === 'eleven_turbo_v2_5' ? 'selected' : ''}>Turbo V2.5</option>
                             <option value="eleven_turbo_v2" ${voice.model === 'eleven_turbo_v2' ? 'selected' : ''}>Turbo V2</option>
                             <option value="eleven_flash_v2_5" ${voice.model === 'eleven_flash_v2_5' ? 'selected' : ''}>Flash V2.5</option>
                             <option value="eleven_flash_v2" ${voice.model === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
-                            <option value="eleven_monolingual_v1" ${voice.model === 'eleven_monolingual_v1' ? 'selected' : ''}>Monolingual V1</option>
                         </select>
                     </td>
                     <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateElevenlabsSetting(${idx}, 'speed', parseFloat(this.value))"></td>
-                    <td><input type="number" value="${voice.settings?.stability || 0.5}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateElevenlabsSetting(${idx}, 'stability', parseFloat(this.value))"></td>
+                    <td>${stabilityCell}</td>
                     <td><input type="number" value="${voice.settings?.similarity || 0.75}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateElevenlabsSetting(${idx}, 'similarity', parseFloat(this.value))"></td>
                     <td><input type="number" value="${voice.settings?.style || 0}" step="0.1" min="0" max="1" style="width: 45px;" onchange="updateElevenlabsSetting(${idx}, 'style', parseFloat(this.value))"></td>
-                    <td style="text-align: center;"><input type="checkbox" ${voice.settings?.speakerBoost !== false ? 'checked' : ''} onchange="updateElevenlabsSetting(${idx}, 'speakerBoost', this.checked)"></td>
-                    <td style="display: flex; gap: 4px;">
+                    <td><input type="checkbox" ${voice.settings?.speakerBoost !== false ? 'checked' : ''} onchange="updateElevenlabsSetting(${idx}, 'speakerBoost', this.checked)"></td>
+                    <td style="display: flex; gap: 4px; justify-content: center;">
                         <button class="btn btn-sm" onclick="previewVoice('elevenlabs', ${idx})" title="Nghe thử"><i class="bi bi-volume-up"></i></button>
                         <button class="btn btn-sm" onclick="useVoice('elevenlabs', ${idx})" title="Sử dụng"><i class="bi bi-check-lg"></i></button>
                         <button class="btn btn-sm" onclick="removeVoice('elevenlabs', ${idx})" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         }
 
         function renderMinimaxLibrary() {

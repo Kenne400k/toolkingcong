@@ -1,9 +1,10 @@
 {
-  "version": "1.9.5",
+  "version": "1.9.6",
   "changelog": [
-    "Fix: Thư viện tab loads ElevenLabs shared voices from API",
-    "Remove local library, use shared voices instead",
-    "Add language flags and usage metrics to shared voices"
+    "Move buttons (Library/Load/My Clones/Clone) below Voice ID",
+    "Remove Monolingual V1 model (deprecated)",
+    "Eleven V3: Stability dropdown (Creative/Natural/Robust)",
+    "Voice Library table text center aligned"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
