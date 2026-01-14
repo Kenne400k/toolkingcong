@@ -1,7 +1,7 @@
 {
-  "version": "1.10.1",
+  "version": "1.10.2",
   "changelog": [
-    "Pro Tool: Backup modal redesigned (similar to TTS History)",
+    "Backup: Renamed title, show full Voice ID with copy button",
     "Use same API as TTS (get_history_detailed_v2)",
     "Added 3 columns: Project, Voice ID, Voice Name",
     "Added bulk select, download (Audio/SRT/JSON), delete"

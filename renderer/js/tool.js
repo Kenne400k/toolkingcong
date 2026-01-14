@@ -2757,7 +2757,14 @@ class ProToolManager {
                 </div>
 
                 <div class="bk-project" title="${project}">${project || '-'}</div>
-                <div class="bk-voice-id" title="${voiceId}">${voiceId ? voiceId.substring(0, 12) + '...' : '-'}</div>
+                <div class="bk-voice-id">
+                    ${voiceId ? `
+                        <span class="bk-voice-id-text" title="${voiceId}" onclick="copyBkVoiceId('${voiceId}')">${voiceId}</span>
+                        <button class="bk-copy-btn" onclick="copyBkVoiceId('${voiceId}')" title="Copy Voice ID">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    ` : '-'}
+                </div>
                 <div class="bk-voice-name" title="${voiceName}">${voiceName || '-'}</div>
 
                 ${statusBadge}
@@ -4142,6 +4149,23 @@ function deleteAllBackupTasks() {
     }
 
     proTool.deleteAllBackupTasks();
+}
+
+// Copy Voice ID to clipboard
+function copyBkVoiceId(voiceId) {
+    navigator.clipboard.writeText(voiceId).then(() => {
+        proTool.showNotification(`Đã copy: ${voiceId}`, 'success');
+    }).catch(err => {
+        console.error('Copy failed:', err);
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = voiceId;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        proTool.showNotification(`Đã copy: ${voiceId}`, 'success');
+    });
 }
 
 // Toggle download dropdown menu

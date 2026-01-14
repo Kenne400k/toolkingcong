@@ -732,7 +732,11 @@
 
         /* Project/Voice columns */
         .bk-project { width: 80px; font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bk-voice-id { width: 100px; font-size: 11px; color: #4ade80; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-voice-id { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+        .bk-voice-id-text { color: #4ade80; font-family: monospace; cursor: pointer; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-voice-id-text:hover { color: #86efac; text-decoration: underline; }
+        .bk-copy-btn { background: none; border: none; color: #666; cursor: pointer; padding: 2px; font-size: 12px; }
+        .bk-copy-btn:hover { color: #4ade80; }
         .bk-voice-name { width: 100px; font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Status Badge */
@@ -1309,7 +1313,7 @@
         <div class="bk-modal-content">
             <!-- Header -->
             <div class="bk-header">
-                <h3><i class="bi bi-clock-history"></i> Lịch Sử Chi Tiết</h3>
+                <h3><i class="bi bi-clock-history"></i> Backup</h3>
                 <span class="bk-close" onclick="closeBackup()"><i class="bi bi-x-lg"></i></span>
             </div>
 
