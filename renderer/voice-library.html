@@ -346,9 +346,11 @@
                            <option value="natural" ${stabilityValue === 'natural' || typeof stabilityValue === 'number' ? 'selected' : ''}>Natural</option>
                            <option value="robust" ${stabilityValue === 'robust' ? 'selected' : ''}>Robust</option>
                        </select>`
-                    : `<input type="number" value="${voice.settings?.stability || 0.5}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateElevenlabsSetting(${idx}, 'stability', parseFloat(this.value))">`;
+                    : `<input type="number" value="${Math.round((voice.settings?.stability || 0.5) * 100)}" step="5" min="0" max="100" style="width: 45px;" onchange="updateElevenlabsSetting(${idx}, 'stability', parseFloat(this.value) / 100)">%`;
 
                 const disabledStyle = isV3 ? 'opacity: 0.3; pointer-events: none;' : '';
+                const similarityPct = Math.round((voice.settings?.similarity || 0.75) * 100);
+                const stylePct = Math.round((voice.settings?.style || 0) * 100);
 
                 return `
                 <tr data-idx="${idx}">
@@ -368,8 +370,8 @@
                     </td>
                     <td style="${disabledStyle}"><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'speed', parseFloat(this.value))"></td>
                     <td>${stabilityCell}</td>
-                    <td style="${disabledStyle}"><input type="number" value="${voice.settings?.similarity || 0.75}" step="0.1" min="0" max="1" style="width: 55px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'similarity', parseFloat(this.value))"></td>
-                    <td style="${disabledStyle}"><input type="number" value="${voice.settings?.style || 0}" step="0.1" min="0" max="1" style="width: 45px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'style', parseFloat(this.value))"></td>
+                    <td style="${disabledStyle}"><input type="number" value="${similarityPct}" step="5" min="0" max="100" style="width: 45px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'similarity', parseFloat(this.value) / 100)">%</td>
+                    <td style="${disabledStyle}"><input type="number" value="${stylePct}" step="5" min="0" max="100" style="width: 40px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'style', parseFloat(this.value) / 100)">%</td>
                     <td><input type="checkbox" ${voice.settings?.speakerBoost !== false ? 'checked' : ''} onchange="updateElevenlabsSetting(${idx}, 'speakerBoost', this.checked)"></td>
                     <td style="display: flex; gap: 4px; justify-content: center;">
                         <button class="btn btn-sm" onclick="previewVoice('elevenlabs', ${idx})" title="Nghe thử"><i class="bi bi-volume-up"></i></button>

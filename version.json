@@ -1,9 +1,8 @@
 {
-  "version": "1.9.7",
+  "version": "1.9.8",
   "changelog": [
-    "V3 model: Disable Speed/Similarity/Style (auto-detect)",
-    "V3 model: Stability auto-converts to dropdown",
-    "Update ElevenLabs logo to official GitHub avatar"
+    "Voice Library: Stability/Similarity/Style show as percentage (%)",
+    "Convert 0-1 values to 0-100% display format"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
