@@ -2502,90 +2502,220 @@ class ProToolManager {
     // ==================== BACKUP/HISTORY ====================
 
     async openBackup() {
-        // Open in separate window
-        if (window.electronAPI && window.electronAPI.openBackupWindow) {
-            window.electronAPI.openBackupWindow();
-            return;
-        }
-
-        // Fallback to modal
-        document.getElementById('backupModal').classList.add('show');
+        // Show modal with new style
+        document.getElementById('backupModal').style.display = 'flex';
         await this.loadBackupHistory();
     }
-    
+
     closeBackup() {
-        document.getElementById('backupModal').classList.remove('show');
+        document.getElementById('backupModal').style.display = 'none';
     }
     
     async loadBackupHistory() {
         const backupBody = document.getElementById('backupBody');
-        backupBody.innerHTML = `
-            <div class="empty-state">
-                <i class="bi bi-hourglass"></i>
-                <h4>Đang tải...</h4>
-            </div>
-        `;
-        
+        backupBody.innerHTML = `<div style="padding: 40px; text-align: center; color: #666;">
+            <div class="spinner-border spinner-border-sm" style="width: 2rem; height: 2rem; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <p style="margin-top: 10px;">Đang tải...</p>
+        </div>`;
+
         try {
             const response = await window.electronAPI.apiRequest(
                 'https://kingcongstudio.com/ajaxs/tts3.php',
                 { action: 'history', page: 1 }
             );
-            
-            if (response.success && response.tasks) {
+
+            if (response.success && response.tasks && response.tasks.length > 0) {
                 this.renderBackupHistory(response.tasks);
             } else {
-                backupBody.innerHTML = `
-                    <div class="empty-state">
-                        <i class="bi bi-inbox"></i>
-                        <h4>Không có lịch sử</h4>
-                    </div>
-                `;
+                backupBody.innerHTML = `<div style="padding: 40px; text-align: center; color: #666;">
+                    <i class="bi bi-inbox" style="font-size: 48px; display: block; margin-bottom: 10px;"></i>
+                    <p>Không có lịch sử</p>
+                </div>`;
             }
         } catch (error) {
-            backupBody.innerHTML = `
-                <div class="empty-state">
-                    <i class="bi bi-exclamation-circle"></i>
-                    <h4>Lỗi khi tải lịch sử</h4>
-                    <p>${error.message}</p>
-                </div>
-            `;
+            backupBody.innerHTML = `<div style="padding: 40px; text-align: center; color: #ef4444;">
+                <i class="bi bi-exclamation-circle" style="font-size: 48px; display: block; margin-bottom: 10px;"></i>
+                <p>Lỗi khi tải lịch sử</p>
+                <p style="font-size: 11px; color: #888;">${error.message}</p>
+            </div>`;
         }
     }
     
     renderBackupHistory(tasks) {
         const backupBody = document.getElementById('backupBody');
 
-        backupBody.innerHTML = `
-            <table class="task-table" style="font-size: 12px;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Content</th>
-                        <th>Project</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${tasks.map(task => `
-                        <tr>
-                            <td style="color: #444; font-size: 10px;">${(task.id || task.task_id || '').substring(0, 8)}</td>
-                            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                ${this.escapeHtml((task.text || task.input_text || '').substring(0, 50))}
-                            </td>
-                            <td style="color: #888; font-size: 11px;">${this.escapeHtml(task.project || task.project_name || '-')}</td>
-                            <td><span class="status ${task.status?.toLowerCase()}">${this.getStatusText(task.status?.toLowerCase())}</span></td>
-                            <td style="color: #555; font-size: 11px;">${task.created_at || task.date || '-'}</td>
-                            <td>
-                                ${task.result_url ? `<button class="btn btn-sm" onclick="proTool.downloadToBackup('${task.result_url}', '${(task.id || task.task_id || 'audio').substring(0, 8)}.mp3')" title="Download to Backup"><i class="bi bi-download"></i></button>` : ''}
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
+        // Lấy thông tin từ Voice Library và màn hình chính
+        const currentVoiceId = document.getElementById('selectedVoiceId')?.value || '';
+        const currentProvider = this.provider || 'elevenlabs';
+
+        // Tìm voice info trong library
+        const findVoiceInfo = (voiceId) => {
+            if (!voiceId) return { project: '', name: '' };
+
+            // Tìm trong ElevenLabs library
+            let voice = (this.voiceLibraryElevenlabs || []).find(v => v.voiceId === voiceId);
+            if (voice) return { project: voice.project || '', name: voice.name || '' };
+
+            // Tìm trong Minimax library
+            voice = (this.voiceLibraryMinimax || []).find(v => v.voiceId === voiceId);
+            if (voice) return { project: voice.project || '', name: voice.name || '' };
+
+            return { project: '', name: '' };
+        };
+
+        // Helper: lấy provider logo
+        const getProviderLogo = (provider) => {
+            if (provider === 'minimax') {
+                return 'https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png';
+            }
+            return 'https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99';
+        };
+
+        // Helper: format thời gian
+        const formatTime = (seconds) => {
+            if (!seconds || isNaN(seconds)) return '--:--';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        // Helper: format ngày giờ
+        const formatDateTime = (dateStr) => {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')} ${d.getDate()}/${d.getMonth() + 1}`;
+        };
+
+        let html = '';
+        tasks.forEach((task, index) => {
+            const taskId = task.id || task.task_id || '';
+            const status = (task.status || '').toLowerCase();
+            const text = task.text || task.input_text || task.text_input || '';
+            const provider = task.provider || 'elevenlabs';
+            const voiceId = task.voice_id || task.voiceId || '';
+            const voiceInfo = findVoiceInfo(voiceId);
+            const project = task.project || task.project_name || voiceInfo.project || '';
+            const voiceName = task.voice_name || voiceInfo.name || '';
+            const creditCost = task.credit_cost || 0;
+            const audioUrl = task.result_url || task.audio_url || '';
+            const duration = task.duration || 0;
+            const providerLogo = getProviderLogo(provider);
+            const safeText = this.escapeHtml(text.substring(0, 200));
+
+            let statusBadge = '';
+            let contentArea = '';
+            let creditLabel = 'Tín dụng sử dụng';
+
+            if (status === 'done') {
+                statusBadge = `<span class="bk-status-badge bk-badge-done">Xong</span>`;
+
+                // Player với download dropdown
+                const downloadDropdown = `
+                    <div class="bk-download-wrapper">
+                        <button class="bk-download-btn" onclick="toggleBkDownloadMenu(event, '${taskId}')" title="Tải xuống">
+                            <i class="bi bi-download"></i>
+                        </button>
+                        <div class="bk-download-menu" id="bk-download-menu-${taskId}">
+                            <div class="bk-download-header">Tải xuống (hết hạn sau 72 giờ)</div>
+                            ${audioUrl ? `
+                                <a href="${audioUrl}" download class="bk-download-item">
+                                    <i class="bi bi-music-note-beamed"></i>
+                                    <span>Audio</span>
+                                </a>` : `
+                                <div class="bk-download-item bk-download-disabled">
+                                    <i class="bi bi-music-note-beamed"></i>
+                                    <span>Audio</span>
+                                </div>`}
+                        </div>
+                    </div>
+                `;
+
+                contentArea = `
+                    <div class="bk-player">
+                        <button class="bk-play-btn" onclick="playBkAudio('${taskId}', '${audioUrl}')" ${!audioUrl ? 'disabled' : ''}>
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <div class="bk-progress-track" onclick="seekBkAudio(event, '${taskId}')">
+                            <div class="bk-progress-bar" id="bk-progress-${taskId}"></div>
+                        </div>
+                        <div class="bk-timer" id="bk-timer-${taskId}">0:00 / ${formatTime(duration)}</div>
+                        <div class="bk-actions-group">
+                            ${downloadDropdown}
+                            <button class="bk-delete-btn" onclick="deleteBkTask('${taskId}', '${safeText}', '${status}', ${creditCost})" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (status === 'failed') {
+                statusBadge = `<span class="bk-status-badge bk-badge-error">Lỗi</span>`;
+                creditLabel = 'Đã hoàn trả';
+                const errorMsg = task.error_message || 'Lỗi không xác định';
+                contentArea = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div class="bk-status-text bk-text-error">
+                            <i class="bi bi-exclamation-circle"></i> ${errorMsg}
+                        </div>
+                        <button class="bk-delete-btn" onclick="deleteBkTask('${taskId}', '${safeText}', '${status}', ${creditCost})" title="Xóa">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+            } else if (['queued', 'pending', 'processing', 'doing'].includes(status)) {
+                statusBadge = `<span class="bk-status-badge bk-badge-processing">Đang xử lý</span>`;
+                creditLabel = 'Tín dụng đóng băng';
+                const progress = task.progress || 0;
+                contentArea = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div class="bk-status-text bk-text-processing">
+                            <div style="width: 1rem; height: 1rem; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <span>Xử lý ${progress}%</span>
+                        </div>
+                        <button class="bk-delete-btn" onclick="deleteBkTask('${taskId}', '${safeText}', '${status}', ${creditCost})" title="Xóa">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            html += `
+            <div class="bk-row" id="bk-row-${taskId}" data-task-id="${taskId}">
+                <div class="bk-checkbox-wrapper">
+                    <input type="checkbox" class="bk-item-checkbox" value="${taskId}"
+                        data-audio="${audioUrl}"
+                        onchange="updateBkBulkActions()">
+                </div>
+
+                <div class="bk-info">
+                    <div class="bk-time">
+                        ${formatDateTime(task.created_at)}
+                        <img src="${providerLogo}" class="bk-provider-icon" alt="${provider}">
+                    </div>
+                    <div class="bk-text-preview" title="${safeText}">
+                        ${safeText || 'N/A'}
+                    </div>
+                </div>
+
+                <div class="bk-project" title="${project}">${project || '-'}</div>
+                <div class="bk-voice-id" title="${voiceId}">${voiceId ? voiceId.substring(0, 12) + '...' : '-'}</div>
+                <div class="bk-voice-name" title="${voiceName}">${voiceName || '-'}</div>
+
+                ${statusBadge}
+
+                <div class="bk-content-area">
+                    ${contentArea}
+                </div>
+
+                <div class="bk-credits">
+                    <span class="bk-credits-val">${creditCost}</span>
+                    <span class="bk-credits-label">${creditLabel}</span>
+                </div>
+            </div>
+            `;
+        });
+
+        backupBody.innerHTML = html;
     }
     
     async refreshBackup() {
@@ -3476,6 +3606,23 @@ function closeVoicesModal() {
     proTool.closeVoicesModal();
 }
 
+// Backup/History
+function openBackup() {
+    proTool.openBackup();
+}
+
+function closeBackup() {
+    proTool.closeBackup();
+}
+
+function refreshBackup() {
+    proTool.refreshBackup();
+}
+
+function openOutputFolder() {
+    proTool.openOutputFolder();
+}
+
 // Project Management
 function saveProject() {
     proTool.saveProject();
@@ -3925,12 +4072,210 @@ async function deleteClonedVoice(voiceId, voiceName) {
 }
 
 // ==================== BACKUP FUNCTIONS ====================
+
+// Audio player state for backup modal
+let bkCurrentAudio = null;
+let bkCurrentTaskId = null;
+
 function deleteAllBackupTasks() {
     if (!confirm('Xóa tất cả tasks trong backup? Hành động này không thể hoàn tác!')) {
         return;
     }
 
     proTool.deleteAllBackupTasks();
+}
+
+// Toggle download dropdown menu
+function toggleBkDownloadMenu(event, taskId) {
+    event.stopPropagation();
+
+    const menuId = `#bk-download-menu-${taskId}`;
+    const $menu = $(menuId);
+
+    // Close all other menus
+    $('.bk-download-menu').not($menu).hide();
+
+    // Toggle current menu
+    $menu.toggle();
+}
+
+// Close dropdown when clicking outside
+$(document).on('click', function(e) {
+    if (!$(e.target).closest('.bk-download-wrapper').length) {
+        $('.bk-download-menu').hide();
+    }
+});
+
+// Play audio in backup modal
+function playBkAudio(taskId, audioUrl) {
+    if (!audioUrl) return;
+
+    const btn = document.querySelector(`#bk-row-${taskId} .bk-play-btn`);
+    const progressBar = document.getElementById(`bk-progress-${taskId}`);
+    const timer = document.getElementById(`bk-timer-${taskId}`);
+
+    // If clicking same audio that's playing, toggle pause/play
+    if (bkCurrentTaskId === taskId && bkCurrentAudio) {
+        if (bkCurrentAudio.paused) {
+            bkCurrentAudio.play();
+            btn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+        } else {
+            bkCurrentAudio.pause();
+            btn.innerHTML = '<i class="bi bi-play-fill"></i>';
+        }
+        return;
+    }
+
+    // Stop previous audio
+    if (bkCurrentAudio) {
+        bkCurrentAudio.pause();
+        const prevBtn = document.querySelector(`#bk-row-${bkCurrentTaskId} .bk-play-btn`);
+        if (prevBtn) prevBtn.innerHTML = '<i class="bi bi-play-fill"></i>';
+    }
+
+    // Create new audio
+    bkCurrentAudio = new Audio(audioUrl);
+    bkCurrentTaskId = taskId;
+
+    bkCurrentAudio.play();
+    btn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+
+    // Update progress
+    bkCurrentAudio.ontimeupdate = () => {
+        if (bkCurrentAudio.duration) {
+            const percent = (bkCurrentAudio.currentTime / bkCurrentAudio.duration) * 100;
+            progressBar.style.width = percent + '%';
+            timer.textContent = formatBkTime(bkCurrentAudio.currentTime) + ' / ' + formatBkTime(bkCurrentAudio.duration);
+        }
+    };
+
+    // On end
+    bkCurrentAudio.onended = () => {
+        btn.innerHTML = '<i class="bi bi-play-fill"></i>';
+        progressBar.style.width = '0%';
+        bkCurrentTaskId = null;
+    };
+}
+
+// Seek audio
+function seekBkAudio(event, taskId) {
+    if (bkCurrentTaskId !== taskId || !bkCurrentAudio) return;
+
+    const track = event.currentTarget;
+    const rect = track.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    bkCurrentAudio.currentTime = percent * bkCurrentAudio.duration;
+}
+
+// Format time helper
+function formatBkTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '--:--';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Delete task from backup
+function deleteBkTask(taskId, textPreview, status, creditCost) {
+    if (!confirm(`Xóa task này?\n\n"${textPreview.substring(0, 100)}..."`)) return;
+
+    // Call delete API
+    window.electronAPI.apiRequest(
+        'https://kingcongstudio.com/ajaxs/tts3.php',
+        {
+            action: status === 'done' || status === 'failed' ? 'delete_history' : 'cancel_task',
+            task_id: taskId
+        }
+    ).then(response => {
+        if (response.success || response.status === 'success') {
+            // Remove row from UI
+            const row = document.getElementById(`bk-row-${taskId}`);
+            if (row) row.remove();
+            proTool.showNotification('Đã xóa task', 'success');
+        } else {
+            proTool.showNotification(response.message || 'Lỗi xóa task', 'error');
+        }
+    }).catch(error => {
+        proTool.showNotification('Lỗi: ' + error.message, 'error');
+    });
+}
+
+// Update bulk action buttons
+function updateBkBulkActions() {
+    const checkboxes = document.querySelectorAll('.bk-item-checkbox:checked');
+    const count = checkboxes.length;
+
+    document.getElementById('bkSelectedCount').textContent = count;
+    document.getElementById('bkSelectedCount2').textContent = count;
+    document.getElementById('bkBulkDownload').disabled = count === 0;
+    document.getElementById('bkBulkDelete').disabled = count === 0;
+}
+
+// Bulk download
+async function bulkDownloadBackup() {
+    const checkboxes = document.querySelectorAll('.bk-item-checkbox:checked');
+    if (checkboxes.length === 0) {
+        proTool.showNotification('Chưa chọn task nào!', 'warning');
+        return;
+    }
+
+    proTool.showNotification(`Đang tải ${checkboxes.length} file...`, 'info');
+
+    let successCount = 0;
+    for (const cb of checkboxes) {
+        const audioUrl = cb.dataset.audio;
+        if (audioUrl) {
+            try {
+                const fileName = cb.value.substring(0, 8) + '.mp3';
+                const result = await window.electronAPI.downloadFile({
+                    url: audioUrl,
+                    fileName: fileName,
+                    subfolder: 'Backup'
+                });
+                if (result && result.success) successCount++;
+            } catch (e) {
+                console.error('Download error:', e);
+            }
+        }
+    }
+
+    proTool.showNotification(`Đã tải ${successCount}/${checkboxes.length} file`, 'success');
+}
+
+// Bulk delete
+async function bulkDeleteBackup() {
+    const checkboxes = document.querySelectorAll('.bk-item-checkbox:checked');
+    if (checkboxes.length === 0) {
+        proTool.showNotification('Chưa chọn task nào!', 'warning');
+        return;
+    }
+
+    if (!confirm(`Xóa ${checkboxes.length} tasks đã chọn?`)) return;
+
+    proTool.showNotification(`Đang xóa ${checkboxes.length} tasks...`, 'info');
+
+    let successCount = 0;
+    for (const cb of checkboxes) {
+        try {
+            const response = await window.electronAPI.apiRequest(
+                'https://kingcongstudio.com/ajaxs/tts3.php',
+                {
+                    action: 'delete_history',
+                    task_id: cb.value
+                }
+            );
+            if (response.success || response.status === 'success') {
+                successCount++;
+                const row = document.getElementById(`bk-row-${cb.value}`);
+                if (row) row.remove();
+            }
+        } catch (e) {
+            console.error('Delete error:', e);
+        }
+    }
+
+    proTool.showNotification(`Đã xóa ${successCount}/${checkboxes.length} tasks`, 'success');
+    updateBkBulkActions();
 }
 
 // Add CSS animation

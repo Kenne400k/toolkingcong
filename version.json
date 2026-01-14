@@ -1,8 +1,10 @@
 {
-  "version": "1.9.9",
+  "version": "1.10.0",
   "changelog": [
-    "Voice Library: Stability/Similarity/Style show as percentage (%)",
-    "Fix percentage layout with inline-flex wrapper"
+    "Pro Tool: Backup modal redesigned (similar to TTS History)",
+    "Added 3 columns: Project, Voice ID, Voice Name",
+    "Added bulk select, bulk download, bulk delete",
+    "Added audio player with progress bar"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

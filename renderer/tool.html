@@ -640,6 +640,149 @@
             font-family: monospace;
             color: #fff;
         }
+
+        /* =================== BACKUP MODAL (Giống Lịch Sử Chi Tiết) =================== */
+        .bk-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bk-modal-content {
+            background: #000000;
+            width: 95%;
+            max-width: 1200px;
+            height: 85vh;
+            border: 1px solid #333;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        /* Header */
+        .bk-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bk-header h3 { margin: 0; color: #fff; font-size: 18px; font-weight: 700; }
+        .bk-close { color: #888; cursor: pointer; font-size: 20px; }
+        .bk-close:hover { color: #fff; }
+
+        /* Toolbar */
+        .bk-toolbar {
+            padding: 12px 20px;
+            border-bottom: 1px solid #222;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .bk-btn-action {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #ddd;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .bk-btn-action:hover:not(:disabled) { border-color: #666; background: #222; }
+        .bk-btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+        .bk-btn-action span { font-weight: 700; }
+
+        /* List Body */
+        .bk-list-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            background: #050505;
+        }
+
+        /* Row Item */
+        .bk-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid #1a1a1a;
+            gap: 16px;
+            transition: background 0.15s;
+        }
+        .bk-row:hover { background: #111; }
+
+        /* Checkbox */
+        .bk-checkbox-wrapper input { width: 16px; height: 16px; cursor: pointer; accent-color: #667eea; }
+
+        /* Info column */
+        .bk-info { width: 240px; display: flex; flex-direction: column; gap: 4px; }
+        .bk-time { font-size: 12px; font-family: monospace; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .bk-provider-icon { width: 14px; height: 14px; border-radius: 50%; }
+        .bk-text-preview { font-size: 12px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Project/Voice columns */
+        .bk-project { width: 80px; font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-voice-id { width: 100px; font-size: 11px; color: #4ade80; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-voice-name { width: 100px; font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Status Badge */
+        .bk-status-badge {
+            width: 80px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .bk-badge-done { background: #fff; color: #000; }
+        .bk-badge-processing { background: #333; color: #fff; border: 1px solid #555; }
+        .bk-badge-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+
+        /* Content Area */
+        .bk-content-area { flex: 1; display: flex; align-items: center; gap: 12px; }
+
+        /* Player Mini */
+        .bk-player { flex: 1; display: flex; align-items: center; gap: 10px; }
+        .bk-play-btn { background: transparent; border: 1px solid #fff; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; }
+        .bk-progress-track { flex: 1; height: 4px; background: #333; border-radius: 2px; position: relative; cursor: pointer; }
+        .bk-progress-bar { height: 100%; background: #666; width: 0%; border-radius: 2px; }
+        .bk-timer { font-size: 11px; color: #888; font-family: monospace; }
+
+        /* Error/Processing Text */
+        .bk-status-text { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+        .bk-text-error { color: #ef4444; }
+        .bk-text-processing { color: #a855f7; }
+
+        /* Actions */
+        .bk-actions-group { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+        .bk-delete-btn { color: #666; cursor: pointer; font-size: 16px; background: none; border: none; }
+        .bk-delete-btn:hover { color: #ef4444; }
+
+        /* Download Dropdown */
+        .bk-download-wrapper { position: relative; display: inline-block; }
+        .bk-download-btn { background: transparent; border: 1px solid #444; color: #fff; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+        .bk-download-btn:hover { background: #222; border-color: #667eea; }
+        .bk-download-menu { position: absolute; top: calc(100% + 5px); right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; min-width: 200px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; overflow: hidden; display: none; }
+        .bk-download-header { padding: 10px 12px; background: #222; border-bottom: 1px solid #333; font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; }
+        .bk-download-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #fff; text-decoration: none; font-size: 13px; transition: all 0.2s; cursor: pointer; }
+        .bk-download-item:hover { background: #222; }
+        .bk-download-item i { font-size: 16px; width: 20px; text-align: center; }
+        .bk-download-item.bk-download-disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+        /* Credits column */
+        .bk-credits { text-align: right; width: 100px; }
+        .bk-credits-val { display: block; font-size: 13px; font-weight: 700; color: #fff; }
+        .bk-credits-label { display: block; font-size: 10px; color: #888; }
     </style>
 </head>
 
@@ -1161,25 +1304,38 @@
         </div>
     </div>
     
-    <!-- Backup Modal -->
-    <div class="modal" id="backupModal">
-        <div class="modal-box" style="max-width: 1000px; max-height: 85vh;">
-            <div class="modal-header">
-                <h3><i class="bi bi-clock-history"></i> Backup / History</h3>
-                <button class="modal-close" onclick="closeBackup()">×</button>
+    <!-- Backup Modal - Giống Lịch Sử Chi Tiết -->
+    <div class="bk-modal-overlay" id="backupModal" style="display: none;">
+        <div class="bk-modal-content">
+            <!-- Header -->
+            <div class="bk-header">
+                <h3><i class="bi bi-clock-history"></i> Lịch Sử Chi Tiết</h3>
+                <span class="bk-close" onclick="closeBackup()"><i class="bi bi-x-lg"></i></span>
             </div>
-            <div class="modal-body" id="backupBody" style="padding: 0;">
-                <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
+
+            <!-- Toolbar -->
+            <div class="bk-toolbar">
+                <button class="bk-btn-action" onclick="refreshBackup()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+                <button class="bk-btn-action" id="bkBulkDownload" onclick="bulkDownloadBackup()" disabled>
+                    <i class="bi bi-download"></i> Tải xuống (<span id="bkSelectedCount">0</span>)
+                </button>
+                <button class="bk-btn-action" id="bkBulkDelete" onclick="bulkDeleteBackup()" disabled style="color: #ef4444;">
+                    <i class="bi bi-trash"></i> Xóa (<span id="bkSelectedCount2">0</span>)
+                </button>
+                <div style="flex: 1;"></div>
+                <button class="bk-btn-action" onclick="openOutputFolder()">
+                    <i class="bi bi-folder2-open"></i> Mở thư mục
+                </button>
+                <button class="bk-btn-action" onclick="deleteAllBackupTasks()" style="color: #f55;">
+                    <i class="bi bi-trash"></i> Xóa tất cả
+                </button>
             </div>
-            <div class="modal-footer" style="justify-content: space-between;">
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn" onclick="refreshBackup()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-                    <button class="btn" onclick="deleteAllBackupTasks()" style="color: #f55;"><i class="bi bi-trash"></i> Delete All</button>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn" onclick="openOutputFolder()"><i class="bi bi-folder2-open"></i> Open Folder</button>
-                    <button class="btn" onclick="closeBackup()">Close</button>
-                </div>
+
+            <!-- List Body -->
+            <div class="bk-list-body" id="backupBody">
+                <div style="text-align: center; padding: 40px; color: #555;">Đang tải...</div>
             </div>
         </div>
     </div>
