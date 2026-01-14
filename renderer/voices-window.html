@@ -48,7 +48,11 @@
             gap: 10px;
         }
 
-        .header h1 i { color: var(--primary); }
+        .header h1 img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
 
         .search-box {
             width: 100%;
@@ -83,7 +87,11 @@
         .btn:active { transform: scale(0.98); }
         .btn-primary { background: #fff; color: #000; border: none; }
         .btn-primary:hover { background: #e5e5e5; }
+        .btn-success { background: #10b981; color: #fff; border: none; }
+        .btn-success:hover { background: #059669; }
         .btn-sm { padding: 6px 10px; font-size: 11px; }
+        .btn-play { background: #a855f7; color: #fff; border: none; }
+        .btn-play:hover { background: #9333ea; }
 
         .voice-list {
             max-height: calc(100vh - 200px);
@@ -130,6 +138,12 @@
             margin-top: 4px;
         }
 
+        .voice-item .actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
         .empty-state {
             text-align: center;
             padding: 60px 40px;
@@ -168,7 +182,7 @@
             margin-bottom: 12px;
         }
 
-        .actions {
+        .footer-actions {
             display: flex;
             gap: 10px;
             margin-top: 16px;
@@ -176,15 +190,42 @@
             border-top: 1px solid var(--border);
             justify-content: flex-end;
         }
+
+        /* Audio element hidden */
+        #previewAudio {
+            display: none;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <h1><i class="bi bi-cloud-download"></i> <span id="titleProvider">Server Voices</span></h1>
+        <h1 id="titleHeader">
+            <img id="providerLogo" src="" alt="">
+            <span id="titleText">Server Voices</span>
+        </h1>
     </div>
 
-    <input type="text" class="search-box" id="searchInput" placeholder="Search voices..." oninput="filterVoices(this.value)">
+    <input type="text" class="search-box" id="searchInput" placeholder="Tìm kiếm voice..." oninput="filterVoices(this.value)">
 
     <div id="countInfo" class="count-info"></div>
 
@@ -195,13 +236,24 @@
         </div>
     </div>
 
-    <div class="actions">
-        <button class="btn" onclick="window.close()">Close</button>
+    <div class="footer-actions">
+        <button class="btn" onclick="window.close()">Đóng</button>
     </div>
+
+    <!-- Hidden audio element for preview -->
+    <audio id="previewAudio"></audio>
 
     <script>
         let allVoices = [];
         let currentProvider = 'elevenlabs';
+        let currentPreviewUrl = null;
+        const previewAudio = document.getElementById('previewAudio');
+
+        // Provider logos
+        const PROVIDER_LOGOS = {
+            elevenlabs: 'https://storage.googleapis.com/eleven-public-prod/images/logo.png',
+            minimax: 'https://filecdn.minimax.chat/_next/static/media/logo-mini.4f15b46e.svg'
+        };
 
         // Get provider from URL query
         function getQueryParam(name) {
@@ -211,13 +263,17 @@
 
         async function loadVoices() {
             currentProvider = getQueryParam('provider') || 'elevenlabs';
-            document.getElementById('titleProvider').textContent = currentProvider === 'elevenlabs' ? 'ElevenLabs Voices' : 'Minimax Voices';
+
+            // Update header
+            const titleText = currentProvider === 'elevenlabs' ? 'ElevenLabs Voices' : 'Minimax Voices';
+            document.getElementById('titleText').textContent = titleText;
+            document.getElementById('providerLogo').src = PROVIDER_LOGOS[currentProvider] || '';
 
             const container = document.getElementById('voiceList');
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    Loading voices...
+                    Đang tải voices...
                 </div>
             `;
 
@@ -235,8 +291,8 @@
                         container.innerHTML = `
                             <div class="empty-state">
                                 <i class="bi bi-mic"></i>
-                                <h4>No voices found</h4>
-                                <p style="font-size: 12px; margin-top: 8px;">No voices available for ${currentProvider}</p>
+                                <h4>Không có voices</h4>
+                                <p style="font-size: 12px; margin-top: 8px;">Không có voices cho ${currentProvider}</p>
                             </div>
                         `;
                     }
@@ -244,7 +300,7 @@
                     container.innerHTML = `
                         <div class="empty-state">
                             <i class="bi bi-exclamation-circle"></i>
-                            <h4>Error loading voices</h4>
+                            <h4>Lỗi tải voices</h4>
                         </div>
                     `;
                 }
@@ -253,7 +309,7 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="bi bi-exclamation-circle"></i>
-                        <h4>Error</h4>
+                        <h4>Lỗi</h4>
                         <p style="font-size: 12px; margin-top: 8px; color: #f55;">${error.message}</p>
                     </div>
                 `;
@@ -264,18 +320,34 @@
             const container = document.getElementById('voiceList');
             document.getElementById('countInfo').textContent = `${voices.length} voices`;
 
-            container.innerHTML = voices.map(voice => `
-                <div class="voice-item" onclick="selectVoice('${voice.voice_id || voice.id}', '${escapeHtml(voice.name)}')">
+            container.innerHTML = voices.map(voice => {
+                const voiceId = voice.voice_id || voice.id;
+                const voiceName = escapeHtml(voice.name || 'Unknown');
+                const previewUrl = voice.preview_url || voice.sample_audio || '';
+                const labels = voice.labels ? Object.values(voice.labels).join(' • ') : '';
+
+                return `
+                <div class="voice-item" onclick="selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">
                     <div class="info">
-                        <div class="name">${escapeHtml(voice.name)}</div>
-                        <div class="id">${voice.voice_id || voice.id}</div>
-                        ${voice.labels ? `<div class="labels">${Object.values(voice.labels).join(' - ')}</div>` : ''}
+                        <div class="name">${voiceName}</div>
+                        <div class="id">${voiceId}</div>
+                        ${labels ? `<div class="labels">${escapeHtml(labels)}</div>` : ''}
                     </div>
-                    <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voice.voice_id || voice.id}', '${escapeHtml(voice.name)}')">
-                        Select
-                    </button>
+                    <div class="actions">
+                        ${previewUrl ? `
+                            <button class="btn btn-sm btn-play" onclick="event.stopPropagation(); togglePreview('${escapeAttr(previewUrl)}')" title="Nghe thử">
+                                <i class="bi bi-play-fill"></i>
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-success" onclick="event.stopPropagation(); addToLibrary('${voiceId}', '${escapeAttr(voice.name)}', '${escapeAttr(previewUrl)}')" title="Thêm vào thư viện">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">
+                            Chọn
+                        </button>
+                    </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function filterVoices(query) {
@@ -289,6 +361,74 @@
             renderVoices(filtered);
         }
 
+        // Toggle preview audio
+        function togglePreview(url) {
+            if (!url) {
+                showNotification('Không có audio mẫu!', 'warning');
+                return;
+            }
+
+            // If same URL is playing, pause it
+            if (currentPreviewUrl === url && !previewAudio.paused) {
+                previewAudio.pause();
+                currentPreviewUrl = null;
+                return;
+            }
+
+            // Play new audio
+            previewAudio.src = url;
+            previewAudio.play().catch(e => {
+                console.error('Play error:', e);
+                showNotification('Không thể phát audio!', 'error');
+            });
+            currentPreviewUrl = url;
+            showNotification('Đang phát...', 'info');
+        }
+
+        // Add voice to library
+        async function addToLibrary(voiceId, voiceName, previewUrl) {
+            // Load existing library
+            const storageKey = currentProvider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
+            let library = [];
+
+            try {
+                const saved = localStorage.getItem(storageKey);
+                if (saved) library = JSON.parse(saved);
+            } catch(e) {
+                library = [];
+            }
+
+            // Check if already exists
+            if (library.find(v => v.voiceId === voiceId)) {
+                showNotification('Voice đã có trong thư viện!', 'warning');
+                return;
+            }
+
+            // Create new voice entry
+            const newVoice = {
+                id: Date.now(),
+                voiceId: voiceId,
+                name: voiceName,
+                provider: currentProvider,
+                project: '',
+                model: currentProvider === 'elevenlabs' ? 'eleven_multilingual_v2' : 'speech-02-hd',
+                preview_url: previewUrl,
+                settings: currentProvider === 'elevenlabs'
+                    ? { speed: 1.0, stability: 0.5, similarity: 0.75, style: 0, speakerBoost: true }
+                    : { speed: 1.0, pitch: 0, vol: 1.0 }
+            };
+
+            library.push(newVoice);
+            localStorage.setItem(storageKey, JSON.stringify(library));
+
+            // Notify main window that library was updated
+            if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
+                window.electronAPI.sendVoiceLibrary({ action: 'added', provider: currentProvider, voice: newVoice });
+            }
+
+            showNotification(`Đã thêm "${voiceName}" vào thư viện!`, 'success');
+        }
+
         async function selectVoice(voiceId, voiceName) {
             // Send to main window via IPC
             if (window.electronAPI && window.electronAPI.selectVoiceFromWindow) {
@@ -300,7 +440,7 @@
                 window.opener.postMessage({ type: 'voiceSelected', voiceId: voiceId }, '*');
             }
 
-            showNotification(`Selected: ${voiceName}`, 'success');
+            showNotification(`Đã chọn: ${voiceName}`, 'success');
 
             // Close after short delay
             setTimeout(() => window.close(), 500);
@@ -312,23 +452,18 @@
             return div.innerHTML;
         }
 
+        function escapeAttr(text) {
+            return (text || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        }
+
         function showNotification(message, type = 'info') {
             const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                border-radius: 8px;
-                color: white;
-                font-size: 14px;
-                z-index: 9999;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            `;
+            toast.className = 'toast';
 
             const colors = {
                 success: '#4ade80',
                 error: '#ef4444',
+                warning: '#fbbf24',
                 info: '#667eea'
             };
 
@@ -338,6 +473,13 @@
 
             setTimeout(() => toast.remove(), 2000);
         }
+
+        // Stop audio when window closes
+        window.addEventListener('beforeunload', () => {
+            if (previewAudio) {
+                previewAudio.pause();
+            }
+        });
 
         // Initialize
         loadVoices();

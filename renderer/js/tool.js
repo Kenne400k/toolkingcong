@@ -218,11 +218,45 @@ class ProToolManager {
     // Listen for voice library updates from new window
     setupVoiceLibraryListener() {
         if (window.electronAPI && window.electronAPI.onVoiceLibraryUpdated) {
-            window.electronAPI.onVoiceLibraryUpdated((voices) => {
-                console.log('📚 Voice Library updated:', voices);
-                this.voiceLibrary = voices;
-                localStorage.setItem('voiceLibrary', JSON.stringify(voices));
-                this.showNotification(`Đã lưu ${voices.length} voices`, 'success');
+            window.electronAPI.onVoiceLibraryUpdated((data) => {
+                console.log('📚 Voice Library updated via IPC:', data);
+
+                // Handle new format with separate providers
+                if (data.elevenlabs || data.minimax) {
+                    if (data.elevenlabs) {
+                        this.voiceLibraryElevenlabs = data.elevenlabs;
+                        localStorage.setItem('voiceLibrary_elevenlabs', JSON.stringify(data.elevenlabs));
+                    }
+                    if (data.minimax) {
+                        this.voiceLibraryMinimax = data.minimax;
+                        localStorage.setItem('voiceLibrary_minimax', JSON.stringify(data.minimax));
+                    }
+                    this.voiceLibrary = [...(this.voiceLibraryElevenlabs || []), ...(this.voiceLibraryMinimax || [])];
+                    this.showNotification(`Voice library đã được cập nhật`, 'success');
+                }
+                // Handle voice added from voices-window
+                else if (data.action === 'added' && data.voice) {
+                    const provider = data.provider || data.voice.provider || 'elevenlabs';
+                    const storageKey = provider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
+
+                    if (provider === 'elevenlabs') {
+                        if (!this.voiceLibraryElevenlabs.find(v => v.voiceId === data.voice.voiceId)) {
+                            this.voiceLibraryElevenlabs.push(data.voice);
+                            localStorage.setItem(storageKey, JSON.stringify(this.voiceLibraryElevenlabs));
+                        }
+                    } else {
+                        if (!this.voiceLibraryMinimax.find(v => v.voiceId === data.voice.voiceId)) {
+                            this.voiceLibraryMinimax.push(data.voice);
+                            localStorage.setItem(storageKey, JSON.stringify(this.voiceLibraryMinimax));
+                        }
+                    }
+                    this.voiceLibrary = [...(this.voiceLibraryElevenlabs || []), ...(this.voiceLibraryMinimax || [])];
+                    this.showNotification(`Đã thêm "${data.voice.name}" vào thư viện`, 'success');
+                }
+                // Handle use voice action
+                else if (data.action === 'use' && data.voice) {
+                    this.applyVoiceFromLibrary(data.voice);
+                }
             });
         }
 
@@ -238,10 +272,18 @@ class ProToolManager {
         // Also listen for postMessage from popup window
         window.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'voiceLibraryUpdated') {
-                console.log('📚 Voice Library updated via postMessage:', event.data.voices);
-                this.voiceLibrary = event.data.voices;
-                localStorage.setItem('voiceLibrary', JSON.stringify(event.data.voices));
-                this.showNotification(`Đã lưu ${event.data.voices.length} voices`, 'success');
+                console.log('📚 Voice Library updated via postMessage:', event.data);
+                // Handle new format with separate providers
+                if (event.data.elevenlabs) {
+                    this.voiceLibraryElevenlabs = event.data.elevenlabs;
+                    localStorage.setItem('voiceLibrary_elevenlabs', JSON.stringify(event.data.elevenlabs));
+                }
+                if (event.data.minimax) {
+                    this.voiceLibraryMinimax = event.data.minimax;
+                    localStorage.setItem('voiceLibrary_minimax', JSON.stringify(event.data.minimax));
+                }
+                this.voiceLibrary = [...(this.voiceLibraryElevenlabs || []), ...(this.voiceLibraryMinimax || [])];
+                this.showNotification(`Voice library đã được cập nhật`, 'success');
             }
 
             // Listen for voice selection via postMessage
@@ -613,7 +655,13 @@ class ProToolManager {
     
     // Load voices from server - mở cửa sổ riêng
     async loadVoicesFromServer() {
-        // Show modal
+        // Open separate window
+        if (window.electronAPI && window.electronAPI.openVoicesWindow) {
+            window.electronAPI.openVoicesWindow(this.provider);
+            return;
+        }
+
+        // Fallback to modal
         document.getElementById('voicesModal').classList.add('show');
 
         // Update tabs visibility based on provider
@@ -3059,14 +3107,17 @@ function resetVoiceSettings() {
 }
 
 function openVoiceLibrary() {
-    // Always use modal (no longer opening separate window)
-    document.getElementById('voiceLibraryModal').classList.add('show');
-    proTool.loadVoiceLibrary();
-    proTool.renderVoiceLibraryTable();
-
-    // Switch to current provider tab
-    const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
-    switchLibraryTab(currentProvider);
+    // Open separate window
+    if (window.electronAPI && window.electronAPI.openVoiceLibrary) {
+        window.electronAPI.openVoiceLibrary();
+    } else {
+        // Fallback to modal
+        document.getElementById('voiceLibraryModal').classList.add('show');
+        proTool.loadVoiceLibrary();
+        proTool.renderVoiceLibraryTable();
+        const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
+        switchLibraryTab(currentProvider);
+    }
 }
 
 function closeVoiceLibrary() {

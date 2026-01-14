@@ -825,6 +825,12 @@ ipcMain.handle('save-voice-library', async (event, voices) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('voice-library-updated', voices);
   }
+
+  // Also send to voice library window if open
+  if (voiceLibraryWindow && !voiceLibraryWindow.isDestroyed()) {
+    voiceLibraryWindow.webContents.send('voice-library-updated', voices);
+  }
+
   return { success: true };
 });
 

@@ -1,10 +1,11 @@
 {
-  "version": "1.9.1",
+  "version": "1.9.2",
   "changelog": [
-    "Load Voices: Add 'My Clones' tab for Minimax provider",
-    "Load Voices: Load cloned voices from API (tts3.php)",
-    "Voice Library: Use provider logos instead of icons in tabs",
-    "Voice Library: Dynamic tabs based on provider (Library for 11Labs, My Clones for Minimax)"
+    "Voice Library & Load Voices: Open in separate windows instead of modals",
+    "Load Voices: Add preview (nghe thử) and add-to-library buttons",
+    "Voice Library: Tabs with provider logos (ElevenLabs/Minimax)",
+    "Voice Library: Separate storage for each provider",
+    "Voice Library: Auto-sync when adding voices from other windows"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

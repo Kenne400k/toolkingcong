@@ -50,6 +50,54 @@
 
         .header h1 i { color: var(--primary); }
 
+        /* Tab navigation with logos */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: transparent;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: #111;
+            border-color: #333;
+        }
+
+        .tab-btn.active {
+            background: #111;
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .tab-btn img {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .info-box {
             background: #111;
             border: 1px solid var(--border);
@@ -69,7 +117,7 @@
         }
 
         .table-container {
-            max-height: calc(100vh - 220px);
+            max-height: calc(100vh - 280px);
             overflow: auto;
             border: 1px solid var(--border);
             border-radius: 6px;
@@ -124,12 +172,11 @@
             background: #050505;
         }
 
-        .input-voiceid { width: 200px; }
+        .input-voiceid { width: 180px; }
         .input-name { width: 100px; }
         .input-project { width: 80px; }
-        .input-model { width: 130px; }
+        .input-model { width: 120px; }
         .input-num { width: 55px; text-align: center; }
-        .input-provider { width: 90px; }
 
         .btn {
             padding: 7px 12px;
@@ -154,6 +201,8 @@
         .btn-success:hover { background: #059669; }
         .btn-danger { color: #f55; }
         .btn-danger:hover { background: rgba(255, 85, 85, 0.1); border-color: #f55; }
+        .btn-play { background: #a855f7; color: #fff; border: none; }
+        .btn-play:hover { background: #9333ea; }
         .btn-sm { padding: 4px 7px; font-size: 10px; }
 
         .actions {
@@ -185,6 +234,25 @@
             display: block;
             margin-top: 2px;
         }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 
@@ -194,40 +262,88 @@
         <span style="font-size: 11px; color: #555;">Quản lý giọng nói</span>
     </div>
 
+    <!-- Tab Navigation with Provider Logos -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="elevenlabs" onclick="switchTab('elevenlabs')">
+            <img src="https://storage.googleapis.com/eleven-public-prod/images/logo.png" alt="11Labs">
+            ElevenLabs
+        </button>
+        <button class="tab-btn" data-tab="minimax" onclick="switchTab('minimax')">
+            <img src="https://filecdn.minimax.chat/_next/static/media/logo-mini.4f15b46e.svg" alt="Minimax">
+            Minimax
+        </button>
+    </div>
+
     <div class="info-box">
         <strong>Hướng dẫn:</strong> Lưu Voice ID cùng settings. Dùng <code>#1</code> <code>#2</code> <code>#3</code> ở đầu dòng để chỉ định giọng.
         <span style="color: #f59e0b;">Model V3 chỉ hỗ trợ Stability.</span>
     </div>
 
-    <div class="table-container">
-        <table class="voice-table" id="voiceTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Provider</th>
-                    <th>Voice ID</th>
-                    <th>Name</th>
-                    <th>Project</th>
-                    <th>Model</th>
-                    <th>Speed</th>
-                    <th>Stability</th>
-                    <th>Similarity</th>
-                    <th>Style</th>
-                    <th>Boost</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="voiceTableBody">
-                <!-- Rows will be added dynamically -->
-            </tbody>
-        </table>
+    <!-- ElevenLabs Tab Content -->
+    <div id="tab-elevenlabs" class="tab-content active">
+        <div class="table-container">
+            <table class="voice-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Project</th>
+                        <th>Name</th>
+                        <th>Voice ID</th>
+                        <th>Model</th>
+                        <th>Speed</th>
+                        <th>Stability</th>
+                        <th>Similarity</th>
+                        <th>Style</th>
+                        <th>Boost</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="elevenlabsTableBody">
+                </tbody>
+            </table>
+        </div>
+        <div class="actions">
+            <div class="actions-left">
+                <button class="btn" onclick="addVoiceRow('elevenlabs')">
+                    <i class="bi bi-plus"></i> Thêm Voice
+                </button>
+            </div>
+        </div>
     </div>
 
+    <!-- Minimax Tab Content -->
+    <div id="tab-minimax" class="tab-content">
+        <div class="table-container">
+            <table class="voice-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Project</th>
+                        <th>Name</th>
+                        <th>Voice ID</th>
+                        <th>Model</th>
+                        <th>Speed</th>
+                        <th>Pitch</th>
+                        <th>Volume</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="minimaxTableBody">
+                </tbody>
+            </table>
+        </div>
+        <div class="actions">
+            <div class="actions-left">
+                <button class="btn" onclick="addVoiceRow('minimax')">
+                    <i class="bi bi-plus"></i> Thêm Voice
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
     <div class="actions">
         <div class="actions-left">
-            <button class="btn" onclick="addVoiceRow()">
-                <i class="bi bi-plus"></i> Thêm Voice
-            </button>
             <button class="btn btn-danger" onclick="clearAll()">
                 <i class="bi bi-trash"></i> Xóa tất cả
             </button>
@@ -240,15 +356,24 @@
         </div>
     </div>
 
+    <!-- Hidden audio element for preview -->
+    <audio id="previewAudio"></audio>
+
     <script>
-        let voices = [];
+        let elevenlabsVoices = [];
+        let minimaxVoices = [];
+        let currentTab = 'elevenlabs';
+        let currentPreviewUrl = null;
+        const previewAudio = document.getElementById('previewAudio');
 
         const ELEVENLABS_MODELS = [
+            { id: 'eleven_v3', name: 'Eleven V3' },
             { id: 'eleven_multilingual_v2', name: 'Multilingual V2' },
             { id: 'eleven_turbo_v2_5', name: 'Turbo V2.5' },
-            { id: 'eleven_flash_v2', name: 'Flash V2' },
+            { id: 'eleven_turbo_v2', name: 'Turbo V2' },
             { id: 'eleven_flash_v2_5', name: 'Flash V2.5' },
-            { id: 'eleven_v3', name: 'Eleven V3 (Alpha)' }
+            { id: 'eleven_flash_v2', name: 'Flash V2' },
+            { id: 'eleven_monolingual_v1', name: 'Monolingual V1' }
         ];
 
         const MINIMAX_MODELS = [
@@ -264,52 +389,100 @@
 
         // Load voices from localStorage on init
         function init() {
-            const saved = localStorage.getItem('voiceLibrary');
-            if (saved) {
+            // Load ElevenLabs voices
+            const savedElevenlabs = localStorage.getItem('voiceLibrary_elevenlabs');
+            if (savedElevenlabs) {
                 try {
-                    voices = JSON.parse(saved);
+                    elevenlabsVoices = JSON.parse(savedElevenlabs);
                 } catch(e) {
-                    voices = [];
+                    elevenlabsVoices = [];
+                }
+            }
+
+            // Load Minimax voices
+            const savedMinimax = localStorage.getItem('voiceLibrary_minimax');
+            if (savedMinimax) {
+                try {
+                    minimaxVoices = JSON.parse(savedMinimax);
+                } catch(e) {
+                    minimaxVoices = [];
                 }
             }
 
             // Ensure at least one empty row
-            if (voices.length === 0) {
-                voices = [createEmptyVoice()];
+            if (elevenlabsVoices.length === 0) {
+                elevenlabsVoices = [createEmptyVoice('elevenlabs')];
+            }
+            if (minimaxVoices.length === 0) {
+                minimaxVoices = [createEmptyVoice('minimax')];
             }
 
-            renderTable();
+            renderElevenlabsTable();
+            renderMinimaxTable();
         }
 
-        function createEmptyVoice() {
-            return {
-                id: Date.now(),
-                voiceId: '',
-                name: '',
-                provider: 'elevenlabs',
-                project: '',
-                model: 'eleven_multilingual_v2',
-                settings: {
-                    speed: 1.0,
-                    stability: 0.5,
-                    similarity: 0.75,
-                    style: 0,
-                    speakerBoost: true,
-                    // Minimax settings
-                    pitch: 0,
-                    volume: 1.0
+        function createEmptyVoice(provider) {
+            if (provider === 'elevenlabs') {
+                return {
+                    id: Date.now(),
+                    voiceId: '',
+                    name: '',
+                    provider: 'elevenlabs',
+                    project: '',
+                    model: 'eleven_multilingual_v2',
+                    preview_url: '',
+                    settings: {
+                        speed: 1.0,
+                        stability: 0.5,
+                        similarity: 0.75,
+                        style: 0,
+                        speakerBoost: true
+                    }
+                };
+            } else {
+                return {
+                    id: Date.now(),
+                    voiceId: '',
+                    name: '',
+                    provider: 'minimax',
+                    project: '',
+                    model: 'speech-02-hd',
+                    preview_url: '',
+                    settings: {
+                        speed: 1.0,
+                        pitch: 0,
+                        vol: 1.0
+                    }
+                };
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tab) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
                 }
-            };
+            });
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if (content.id === `tab-${tab}`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
         }
 
-        function renderTable() {
-            const tbody = document.getElementById('voiceTableBody');
-            tbody.innerHTML = voices.map((voice, index) => {
-                const isElevenlabs = voice.provider === 'elevenlabs';
+        function renderElevenlabsTable() {
+            const tbody = document.getElementById('elevenlabsTableBody');
+            tbody.innerHTML = elevenlabsVoices.map((voice, index) => {
                 const isV3 = isModelV3(voice.model);
-                const models = isElevenlabs ? ELEVENLABS_MODELS : MINIMAX_MODELS;
-
-                // Get current values
                 const speed = voice.settings?.speed ?? 1.0;
                 const stability = voice.settings?.stability ?? 0.5;
                 const similarity = voice.settings?.similarity ?? 0.75;
@@ -320,35 +493,26 @@
                 <tr data-index="${index}">
                     <td style="color: #666; text-align: center; width: 30px;">${index + 1}</td>
                     <td>
-                        <select class="input-provider" onchange="updateProvider(${index}, this.value)">
-                            <option value="elevenlabs" ${voice.provider === 'elevenlabs' ? 'selected' : ''}>ElevenLabs</option>
-                            <option value="minimax" ${voice.provider === 'minimax' ? 'selected' : ''}>Minimax</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" class="input-voiceid"
-                               value="${escapeHtml(voice.voiceId || '')}"
-                               placeholder="Voice ID..."
-                               onchange="updateVoice(${index}, 'voiceId', this.value)">
+                        <input type="text" class="input-project"
+                               value="${escapeHtml(voice.project || '')}"
+                               placeholder="Project..."
+                               onchange="updateElevenlabsVoice(${index}, 'project', this.value)">
                     </td>
                     <td>
                         <input type="text" class="input-name"
                                value="${escapeHtml(voice.name || '')}"
                                placeholder="Tên..."
-                               onchange="updateVoice(${index}, 'name', this.value)">
+                               onchange="updateElevenlabsVoice(${index}, 'name', this.value)">
                     </td>
                     <td>
-                        <input type="text" class="input-project"
-                               value="${escapeHtml(voice.project || '')}"
-                               placeholder="Project..."
-                               onchange="updateVoice(${index}, 'project', this.value)">
+                        <input type="text" class="input-voiceid"
+                               value="${escapeHtml(voice.voiceId || '')}"
+                               placeholder="Voice ID..."
+                               onchange="updateElevenlabsVoice(${index}, 'voiceId', this.value)">
                     </td>
                     <td>
-                        <select class="input-model" onchange="updateModel(${index}, this.value)" ${!isElevenlabs ? 'style="display:none;"' : ''}>
+                        <select class="input-model" onchange="updateElevenlabsModel(${index}, this.value)">
                             ${ELEVENLABS_MODELS.map(m => `<option value="${m.id}" ${voice.model === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
-                        </select>
-                        <select class="input-model" onchange="updateModel(${index}, this.value)" ${isElevenlabs ? 'style="display:none;"' : ''}>
-                            ${MINIMAX_MODELS.map(m => `<option value="${m.id}" ${voice.model === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
                         </select>
                     </td>
                     <td>
@@ -356,39 +520,42 @@
                                value="${speed}"
                                step="0.1" min="0.5" max="2"
                                ${isV3 ? 'disabled title="V3 không hỗ trợ Speed"' : ''}
-                               onchange="updateSetting(${index}, 'speed', parseFloat(this.value))">
+                               onchange="updateElevenlabsSetting(${index}, 'speed', parseFloat(this.value))">
                     </td>
                     <td>
                         <input type="number" class="input-num"
                                value="${stability}"
                                step="0.05" min="0" max="1"
-                               onchange="updateSetting(${index}, 'stability', parseFloat(this.value))">
+                               onchange="updateElevenlabsSetting(${index}, 'stability', parseFloat(this.value))">
                     </td>
                     <td>
                         <input type="number" class="input-num"
                                value="${similarity}"
                                step="0.05" min="0" max="1"
                                ${isV3 ? 'disabled title="V3 không hỗ trợ Similarity"' : ''}
-                               onchange="updateSetting(${index}, 'similarity', parseFloat(this.value))">
+                               onchange="updateElevenlabsSetting(${index}, 'similarity', parseFloat(this.value))">
                     </td>
                     <td>
                         <input type="number" class="input-num"
                                value="${style}"
                                step="0.05" min="0" max="1"
                                ${isV3 ? 'disabled title="V3 không hỗ trợ Style"' : ''}
-                               onchange="updateSetting(${index}, 'style', parseFloat(this.value))">
+                               onchange="updateElevenlabsSetting(${index}, 'style', parseFloat(this.value))">
                     </td>
                     <td class="checkbox-cell">
                         <input type="checkbox"
                                ${speakerBoost ? 'checked' : ''}
                                ${isV3 ? 'disabled title="V3 không hỗ trợ Speaker Boost"' : ''}
-                               onchange="updateSetting(${index}, 'speakerBoost', this.checked)">
+                               onchange="updateElevenlabsSetting(${index}, 'speakerBoost', this.checked)">
                     </td>
                     <td style="text-align: center;">
-                        <button class="btn btn-sm btn-success" onclick="useVoice(${index})" title="Sử dụng">
+                        <button class="btn btn-sm btn-play" onclick="previewVoice('elevenlabs', ${index})" title="Nghe thử">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="useVoice('elevenlabs', ${index})" title="Sử dụng">
                             <i class="bi bi-check-lg"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="removeVoice(${index})" title="Xóa">
+                        <button class="btn btn-sm btn-danger" onclick="removeVoice('elevenlabs', ${index})" title="Xóa">
                             <i class="bi bi-x"></i>
                         </button>
                     </td>
@@ -396,65 +563,200 @@
             `}).join('');
         }
 
-        function addVoiceRow() {
-            voices.push(createEmptyVoice());
-            renderTable();
+        function renderMinimaxTable() {
+            const tbody = document.getElementById('minimaxTableBody');
+            tbody.innerHTML = minimaxVoices.map((voice, index) => {
+                const speed = voice.settings?.speed ?? 1.0;
+                const pitch = voice.settings?.pitch ?? 0;
+                const vol = voice.settings?.vol ?? 1.0;
 
-            // Focus on the new row's Voice ID input
-            setTimeout(() => {
-                const inputs = document.querySelectorAll('#voiceTableBody tr:last-child input.input-voiceid');
-                if (inputs[0]) inputs[0].focus();
-            }, 50);
+                return `
+                <tr data-index="${index}">
+                    <td style="color: #666; text-align: center; width: 30px;">${index + 1}</td>
+                    <td>
+                        <input type="text" class="input-project"
+                               value="${escapeHtml(voice.project || '')}"
+                               placeholder="Project..."
+                               onchange="updateMinimaxVoice(${index}, 'project', this.value)">
+                    </td>
+                    <td>
+                        <input type="text" class="input-name"
+                               value="${escapeHtml(voice.name || '')}"
+                               placeholder="Tên..."
+                               onchange="updateMinimaxVoice(${index}, 'name', this.value)">
+                    </td>
+                    <td>
+                        <input type="text" class="input-voiceid"
+                               value="${escapeHtml(voice.voiceId || '')}"
+                               placeholder="Voice ID..."
+                               onchange="updateMinimaxVoice(${index}, 'voiceId', this.value)">
+                    </td>
+                    <td>
+                        <select class="input-model" onchange="updateMinimaxVoice(${index}, 'model', this.value)">
+                            ${MINIMAX_MODELS.map(m => `<option value="${m.id}" ${voice.model === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="input-num"
+                               value="${speed}"
+                               step="0.1" min="0.5" max="2"
+                               onchange="updateMinimaxSetting(${index}, 'speed', parseFloat(this.value))">
+                    </td>
+                    <td>
+                        <input type="number" class="input-num"
+                               value="${pitch}"
+                               step="1" min="-12" max="12"
+                               onchange="updateMinimaxSetting(${index}, 'pitch', parseInt(this.value))">
+                    </td>
+                    <td>
+                        <input type="number" class="input-num"
+                               value="${vol}"
+                               step="0.1" min="0.1" max="10"
+                               onchange="updateMinimaxSetting(${index}, 'vol', parseFloat(this.value))">
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-sm btn-play" onclick="previewVoice('minimax', ${index})" title="Nghe thử">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="useVoice('minimax', ${index})" title="Sử dụng">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="removeVoice('minimax', ${index})" title="Xóa">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
         }
 
-        function updateVoice(index, field, value) {
-            if (voices[index]) {
-                voices[index][field] = value;
-            }
-        }
-
-        function updateProvider(index, value) {
-            if (voices[index]) {
-                voices[index].provider = value;
-                // Reset model when switching provider
-                if (value === 'elevenlabs') {
-                    voices[index].model = 'eleven_multilingual_v2';
-                } else {
-                    voices[index].model = 'speech-02-hd';
-                }
-                renderTable();
-            }
-        }
-
-        function updateModel(index, value) {
-            if (voices[index]) {
-                voices[index].model = value;
-                renderTable(); // Re-render to update disabled states
-            }
-        }
-
-        function updateSetting(index, field, value) {
-            if (voices[index]) {
-                if (!voices[index].settings) {
-                    voices[index].settings = {};
-                }
-                voices[index].settings[field] = value;
-            }
-        }
-
-        function removeVoice(index) {
-            if (voices.length <= 1) {
-                voices = [createEmptyVoice()];
+        function addVoiceRow(provider) {
+            if (provider === 'elevenlabs') {
+                elevenlabsVoices.push(createEmptyVoice('elevenlabs'));
+                renderElevenlabsTable();
             } else {
-                voices.splice(index, 1);
+                minimaxVoices.push(createEmptyVoice('minimax'));
+                renderMinimaxTable();
             }
-            renderTable();
         }
 
-        function useVoice(index) {
+        // ElevenLabs update functions
+        function updateElevenlabsVoice(index, field, value) {
+            if (elevenlabsVoices[index]) {
+                elevenlabsVoices[index][field] = value;
+            }
+        }
+
+        function updateElevenlabsModel(index, value) {
+            if (elevenlabsVoices[index]) {
+                elevenlabsVoices[index].model = value;
+                renderElevenlabsTable(); // Re-render to update disabled states
+            }
+        }
+
+        function updateElevenlabsSetting(index, field, value) {
+            if (elevenlabsVoices[index]) {
+                if (!elevenlabsVoices[index].settings) {
+                    elevenlabsVoices[index].settings = {};
+                }
+                elevenlabsVoices[index].settings[field] = value;
+            }
+        }
+
+        // Minimax update functions
+        function updateMinimaxVoice(index, field, value) {
+            if (minimaxVoices[index]) {
+                minimaxVoices[index][field] = value;
+            }
+        }
+
+        function updateMinimaxSetting(index, field, value) {
+            if (minimaxVoices[index]) {
+                if (!minimaxVoices[index].settings) {
+                    minimaxVoices[index].settings = {};
+                }
+                minimaxVoices[index].settings[field] = value;
+            }
+        }
+
+        // Preview voice
+        async function previewVoice(provider, index) {
+            const voices = provider === 'elevenlabs' ? elevenlabsVoices : minimaxVoices;
             const voice = voices[index];
+
             if (!voice || !voice.voiceId) {
-                alert('Voice ID is empty!');
+                showNotification('Voice ID trống!', 'warning');
+                return;
+            }
+
+            let previewUrl = voice.preview_url || '';
+
+            // If no preview_url, try to fetch from API
+            if (!previewUrl) {
+                showNotification('Đang tìm audio mẫu...', 'info');
+                try {
+                    const res = await window.electronAPI.apiRequest(
+                        'https://kingcongstudio.com/ajaxs/get_resources2.php?action=search_voice_id',
+                        { voice_id: voice.voiceId }
+                    );
+
+                    if (res && res.status === 'success' && res.data) {
+                        previewUrl = res.data.preview_url || res.data.sample_audio || '';
+                        // Save for future use
+                        if (previewUrl) {
+                            voice.preview_url = previewUrl;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Fetch preview error:', error);
+                }
+            }
+
+            if (!previewUrl) {
+                showNotification('Không có audio mẫu cho voice này!', 'warning');
+                return;
+            }
+
+            // Toggle play/pause
+            if (currentPreviewUrl === previewUrl && previewAudio && !previewAudio.paused) {
+                previewAudio.pause();
+                currentPreviewUrl = null;
+                return;
+            }
+
+            // Play audio
+            previewAudio.src = previewUrl;
+            previewAudio.play().catch(e => {
+                console.error('Play error:', e);
+                showNotification('Không thể phát audio!', 'error');
+            });
+            currentPreviewUrl = previewUrl;
+            showNotification('Đang phát...', 'info');
+        }
+
+        function removeVoice(provider, index) {
+            if (provider === 'elevenlabs') {
+                if (elevenlabsVoices.length <= 1) {
+                    elevenlabsVoices = [createEmptyVoice('elevenlabs')];
+                } else {
+                    elevenlabsVoices.splice(index, 1);
+                }
+                renderElevenlabsTable();
+            } else {
+                if (minimaxVoices.length <= 1) {
+                    minimaxVoices = [createEmptyVoice('minimax')];
+                } else {
+                    minimaxVoices.splice(index, 1);
+                }
+                renderMinimaxTable();
+            }
+        }
+
+        function useVoice(provider, index) {
+            const voices = provider === 'elevenlabs' ? elevenlabsVoices : minimaxVoices;
+            const voice = voices[index];
+
+            if (!voice || !voice.voiceId) {
+                showNotification('Voice ID trống!', 'warning');
                 return;
             }
 
@@ -474,40 +776,87 @@
                 window.electronAPI.sendVoiceLibrary({ action: 'use', voice: voice });
             }
 
-            alert(`Đang sử dụng: ${voice.name || voice.voiceId}`);
+            showNotification(`Đang sử dụng: ${voice.name || voice.voiceId}`, 'success');
         }
 
         function clearAll() {
             if (confirm('Xóa tất cả voices trong thư viện?')) {
-                voices = [createEmptyVoice()];
-                renderTable();
+                if (currentTab === 'elevenlabs') {
+                    elevenlabsVoices = [createEmptyVoice('elevenlabs')];
+                    renderElevenlabsTable();
+                } else {
+                    minimaxVoices = [createEmptyVoice('minimax')];
+                    renderMinimaxTable();
+                }
             }
         }
 
         function saveAndClose() {
             // Filter out empty rows
-            const validVoices = voices.filter(v => v.voiceId && v.voiceId.trim());
+            const validElevenlabs = elevenlabsVoices.filter(v => v.voiceId && v.voiceId.trim());
+            const validMinimax = minimaxVoices.filter(v => v.voiceId && v.voiceId.trim());
 
-            // Save to localStorage
-            localStorage.setItem('voiceLibrary', JSON.stringify(validVoices));
+            // Save to localStorage (separate keys)
+            localStorage.setItem('voiceLibrary_elevenlabs', JSON.stringify(validElevenlabs));
+            localStorage.setItem('voiceLibrary_minimax', JSON.stringify(validMinimax));
 
             // Notify parent window
             if (window.opener && !window.opener.closed) {
-                window.opener.postMessage({ type: 'voiceLibraryUpdated', voices: validVoices }, '*');
+                window.opener.postMessage({
+                    type: 'voiceLibraryUpdated',
+                    elevenlabs: validElevenlabs,
+                    minimax: validMinimax
+                }, '*');
             }
 
             // Also use IPC if available
-            if (window.electronAPI) {
-                window.electronAPI.sendVoiceLibrary(validVoices);
+            if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
+                window.electronAPI.sendVoiceLibrary({
+                    elevenlabs: validElevenlabs,
+                    minimax: validMinimax
+                });
             }
 
-            window.close();
+            showNotification('Đã lưu thành công!', 'success');
+            setTimeout(() => window.close(), 500);
         }
 
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text || '';
             return div.innerHTML;
+        }
+
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+
+            const colors = {
+                success: '#4ade80',
+                error: '#ef4444',
+                warning: '#fbbf24',
+                info: '#667eea'
+            };
+
+            toast.style.background = colors[type] || colors.info;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // Listen for voice library updates from other windows
+        if (window.electronAPI && window.electronAPI.onVoiceLibraryUpdated) {
+            window.electronAPI.onVoiceLibraryUpdated((data) => {
+                console.log('Voice library updated from other window:', data);
+                if (data.provider === 'elevenlabs' && data.voice) {
+                    elevenlabsVoices.push(data.voice);
+                    renderElevenlabsTable();
+                } else if (data.provider === 'minimax' && data.voice) {
+                    minimaxVoices.push(data.voice);
+                    renderMinimaxTable();
+                }
+            });
         }
 
         // Initialize
