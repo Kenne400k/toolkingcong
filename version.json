@@ -1,9 +1,9 @@
 {
-  "version": "1.10.2",
+  "version": "1.10.3",
   "changelog": [
-    "Backup: Renamed title, show full Voice ID with copy button",
+    "Voice Library: Hide spinner buttons on number inputs",
+    "Backup: Show full Voice ID with copy button",
     "Use same API as TTS (get_history_detailed_v2)",
-    "Added 3 columns: Project, Voice ID, Voice Name",
     "Added bulk select, download (Audio/SRT/JSON), delete"
   ],
   "forceUpdate": false,
