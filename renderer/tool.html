@@ -775,6 +775,17 @@
                                 <option value="speech-01-turbo">Speech Turbo 2.5</option>
                             </select>
                         </div>
+                        <!-- Voice Clone buttons - only for Minimax -->
+                        <div id="voiceCloneSection" style="display: none; margin-top: 8px;">
+                            <div class="btn-group">
+                                <button class="btn" onclick="openClonedVoicesModal()">
+                                    <i class="bi bi-collection-play"></i> My Clones
+                                </button>
+                                <button class="btn" onclick="openVoiceCloneModal()">
+                                    <i class="bi bi-mic"></i> Clone
+                                </button>
+                            </div>
+                        </div>
                         <div class="btn-group" style="margin-top: 8px;">
                             <button class="btn" onclick="openVoiceLibrary()">
                                 <i class="bi bi-collection"></i> Library
@@ -782,17 +793,6 @@
                             <button class="btn" onclick="loadVoicesFromServer()">
                                 <i class="bi bi-cloud-download"></i> Load
                             </button>
-                        </div>
-                        <!-- Voice Clone button - only for Minimax -->
-                        <div id="voiceCloneSection" style="display: none; margin-top: 8px;">
-                            <div class="btn-group">
-                                <button class="btn" onclick="openVoiceCloneModal()">
-                                    <i class="bi bi-mic"></i> Clone
-                                </button>
-                                <button class="btn" onclick="openClonedVoicesModal()">
-                                    <i class="bi bi-collection-play"></i> My Clones
-                                </button>
-                            </div>
                         </div>
                     </div>
                     

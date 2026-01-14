@@ -213,18 +213,13 @@
             `;
 
             try {
-                const response = await window.electronAPI.apiRequest(
-                    'https://kingcongstudio.com/ajaxs/tts3.php',
-                    {
-                        action: 'get_cloned_voices',
-                        provider: 'minimax'
-                    }
-                );
+                // Use getClonedVoices IPC (calls voice_cloning3.php with action=list_clones)
+                const response = await window.electronAPI.getClonedVoices();
 
                 console.log('Cloned voices response:', response);
 
-                if (response.success || response.status === 'success') {
-                    const voices = response.voices || response.cloned_voices || [];
+                if (response.status === 'success') {
+                    const voices = response.voices || [];
                     // Save to localStorage as backup
                     if (voices.length > 0) {
                         saveLocalClonedVoices(voices);

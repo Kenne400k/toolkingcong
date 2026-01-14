@@ -67,6 +67,31 @@
 
         .modal-close:hover { color: #fff; }
 
+        /* Tabs */
+        .voice-tabs {
+            display: flex;
+            border-bottom: 1px solid #2a2a2a;
+            padding: 0 16px;
+        }
+
+        .voice-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .voice-tab:hover { color: #ccc; }
+
+        .voice-tab.active {
+            color: #fff;
+            border-bottom: 2px solid var(--primary);
+        }
+
         .modal-body {
             flex: 1;
             overflow-y: auto;
@@ -162,14 +187,21 @@
         }
 
         .voice-list {
-            max-height: calc(100vh - 220px);
+            max-height: calc(100vh - 260px);
             overflow-y: auto;
         }
 
-        .loading {
+        .loading, .empty-state {
             text-align: center;
             padding: 60px 40px;
             color: #555;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 16px;
         }
 
         .spinner {
@@ -186,7 +218,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Hidden audio */
         #previewAudio { display: none; }
     </style>
 </head>
@@ -198,6 +229,16 @@
             <i class="bi bi-mic"></i> <span id="titleText">Chọn Giọng Nói</span>
         </h3>
         <button class="modal-close" onclick="window.close()">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="voice-tabs">
+        <button class="voice-tab active" data-tab="default" onclick="switchTab('default')">
+            <i class="bi bi-cloud-download"></i> Mặc định
+        </button>
+        <button class="voice-tab" data-tab="library" onclick="switchTab('library')">
+            <i class="bi bi-collection"></i> Thư viện
+        </button>
     </div>
 
     <div class="modal-body">
@@ -221,7 +262,9 @@
 
     <script>
         let allVoices = [];
+        let libraryVoices = [];
         let currentProvider = 'elevenlabs';
+        let currentTab = 'default';
         const previewAudio = document.getElementById('previewAudio');
 
         const PROVIDER_LOGOS = {
@@ -234,9 +277,34 @@
             return urlParams.get(name);
         }
 
-        async function loadVoices() {
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.voice-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+
+            if (tab === 'default') {
+                renderVoices(allVoices);
+            } else if (tab === 'library') {
+                loadLibraryVoices();
+            }
+        }
+
+        async function init() {
             currentProvider = getQueryParam('provider') || 'elevenlabs';
             document.getElementById('providerLogo').src = PROVIDER_LOGOS[currentProvider] || PROVIDER_LOGOS.elevenlabs;
+
+            // Load default voices
+            await loadDefaultVoices();
+        }
+
+        async function loadDefaultVoices() {
+            document.getElementById('voicesList').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading voices...
+                </div>
+            `;
 
             try {
                 const res = await window.electronAPI.getResources();
@@ -249,6 +317,48 @@
             } catch (error) {
                 document.getElementById('voicesList').innerHTML = `<div class="loading">Lỗi: ${error.message}</div>`;
             }
+        }
+
+        function loadLibraryVoices() {
+            const storageKey = currentProvider === 'elevenlabs' ? 'voiceLibrary_elevenlabs' : 'voiceLibrary_minimax';
+            try {
+                libraryVoices = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            } catch(e) {
+                libraryVoices = [];
+            }
+
+            if (libraryVoices.length === 0) {
+                document.getElementById('countInfo').textContent = '';
+                document.getElementById('voicesList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-collection"></i>
+                        <p>Chưa có voice nào trong thư viện</p>
+                        <p style="font-size: 11px; margin-top: 8px;">Thêm voice từ tab "Mặc định"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            document.getElementById('countInfo').textContent = `${libraryVoices.length} voices trong thư viện`;
+            document.getElementById('voicesList').innerHTML = libraryVoices.map(voice => {
+                const voiceId = voice.voiceId || voice.voice_id || voice.id;
+                const voiceName = escapeHtml(voice.name || 'Unknown');
+                const previewUrl = (voice.preview_url || '').replace(/'/g, "\\'");
+                const project = voice.project ? `<span style="color: #a855f7;">[${escapeHtml(voice.project)}]</span> ` : '';
+
+                return `
+                <div class="voice-item" onclick="selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">
+                    <div class="info">
+                        <div class="name">${project}${voiceName}</div>
+                        <div class="id">${voiceId}</div>
+                        <div class="labels">${voice.model || ''}</div>
+                    </div>
+                    <div class="actions">
+                        ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); useLibraryVoice(${libraryVoices.indexOf(voice)})">Dùng</button>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function renderVoices(voices) {
@@ -283,12 +393,33 @@
 
         function filterVoices(query) {
             query = query.toLowerCase();
-            const filtered = allVoices.filter(v => {
+            const voices = currentTab === 'library' ? libraryVoices : allVoices;
+            const filtered = voices.filter(v => {
                 const name = (v.name || '').toLowerCase();
-                const id = (v.voice_id || v.id || '').toLowerCase();
+                const id = (v.voice_id || v.voiceId || v.id || '').toLowerCase();
                 return name.includes(query) || id.includes(query);
             });
-            renderVoices(filtered);
+
+            if (currentTab === 'library') {
+                // Re-render library with filter
+                const container = document.getElementById('voicesList');
+                if (filtered.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>Không tìm thấy voice</p></div>';
+                    return;
+                }
+                // Simple approach - just hide non-matching items
+                const items = container.querySelectorAll('.voice-item');
+                items.forEach((item, idx) => {
+                    const voice = libraryVoices[idx];
+                    if (voice) {
+                        const name = (voice.name || '').toLowerCase();
+                        const id = (voice.voiceId || '').toLowerCase();
+                        item.style.display = (name.includes(query) || id.includes(query)) ? 'flex' : 'none';
+                    }
+                });
+            } else {
+                renderVoices(filtered);
+            }
         }
 
         function togglePreview(url) {
@@ -328,12 +459,29 @@
 
             library.push(newVoice);
             localStorage.setItem(storageKey, JSON.stringify(library));
+            libraryVoices = library;
 
             if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
                 window.electronAPI.sendVoiceLibrary({ action: 'added', provider: currentProvider, voice: newVoice });
             }
 
             alert(`Đã thêm "${voiceName}" vào thư viện!`);
+        }
+
+        function useLibraryVoice(idx) {
+            const voice = libraryVoices[idx];
+            if (!voice) return;
+
+            // Send voice with settings to parent
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({ type: 'useVoiceFromLibrary', voice: voice }, '*');
+            }
+
+            if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
+                window.electronAPI.sendVoiceLibrary({ action: 'use', voice: voice });
+            }
+
+            setTimeout(() => window.close(), 300);
         }
 
         async function selectVoice(voiceId, voiceName) {
@@ -354,7 +502,7 @@
         }
 
         window.addEventListener('beforeunload', () => previewAudio?.pause());
-        loadVoices();
+        init();
     </script>
 </body>
 </html>

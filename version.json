@@ -1,9 +1,9 @@
 {
-  "version": "1.9.3",
+  "version": "1.9.4",
   "changelog": [
-    "Fix UI: Match modal styles from tool.html",
-    "Voice Library & Load Voices: Correct CSS styling",
-    "Add CLAUDE.md for project documentation"
+    "Fix: Swap button positions (My Clones/Clone, Library/Load)",
+    "Add tabs to Load Voices window (Mặc định/Thư viện)",
+    "Fix My Clones API using correct getClonedVoices IPC"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
