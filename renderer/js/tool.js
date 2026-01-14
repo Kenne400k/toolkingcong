@@ -2508,7 +2508,12 @@ class ProToolManager {
     }
 
     closeBackup() {
-        document.getElementById('backupModal').style.display = 'none';
+        const modal = document.getElementById('backupModal');
+        modal.classList.add('closing');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.classList.remove('closing');
+        }, 200);
     }
     
     async loadBackupHistory() {

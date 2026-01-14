@@ -787,6 +787,264 @@
         .bk-credits { text-align: right; width: 100px; }
         .bk-credits-val { display: block; font-size: 13px; font-weight: 700; color: #fff; }
         .bk-credits-label { display: block; font-size: 10px; color: #888; }
+
+        /* =================== SMOOTH ANIMATIONS =================== */
+
+        /* Keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes scaleOut {
+            from { opacity: 1; transform: scale(1) translateY(0); }
+            to { opacity: 0; transform: scale(0.9) translateY(-20px); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+
+        /* Backup Modal Animation */
+        .bk-modal-overlay {
+            animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bk-modal-overlay.closing {
+            animation: fadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .bk-modal-content {
+            animation: scaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .bk-modal-overlay.closing .bk-modal-content {
+            animation: scaleOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Backup Row Animation */
+        .bk-row {
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        .bk-row:nth-child(1) { animation-delay: 0s; }
+        .bk-row:nth-child(2) { animation-delay: 0.03s; }
+        .bk-row:nth-child(3) { animation-delay: 0.06s; }
+        .bk-row:nth-child(4) { animation-delay: 0.09s; }
+        .bk-row:nth-child(5) { animation-delay: 0.12s; }
+        .bk-row:nth-child(6) { animation-delay: 0.15s; }
+        .bk-row:nth-child(7) { animation-delay: 0.18s; }
+        .bk-row:nth-child(8) { animation-delay: 0.21s; }
+        .bk-row:nth-child(9) { animation-delay: 0.24s; }
+        .bk-row:nth-child(10) { animation-delay: 0.27s; }
+
+        /* Modal Animation (General) */
+        .modal {
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.25s;
+        }
+
+        .modal.show {
+            animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal .modal-box {
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s;
+        }
+
+        .modal.show .modal-box {
+            animation: scaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Button Hover Effects */
+        .btn, .toolbar-btn, .bk-btn-action {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover, .toolbar-btn:hover, .bk-btn-action:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active, .toolbar-btn:active, .bk-btn-action:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Task Row Animation */
+        .task-row {
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .task-row:hover {
+            transform: translateX(4px);
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        /* Notification Animation */
+        .notification {
+            animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .notification.hiding {
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) reverse forwards;
+        }
+
+        /* Nav Item Hover */
+        .nav-item {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item:hover {
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            animation: pulse 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Sidebar Section Toggle */
+        .tool-section {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Progress Bar Animation */
+        .bk-progress-bar, .progress-fill {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Checkbox Animation */
+        input[type="checkbox"] {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type="checkbox"]:checked {
+            animation: bounceIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Download Menu Animation */
+        .bk-download-menu {
+            transform-origin: top right;
+            animation: scaleIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Play Button Pulse */
+        .bk-play-btn:hover {
+            animation: pulse 0.5s infinite;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Smooth scrolling */
+        .bk-list-body, .modal-body, .task-list {
+            scroll-behavior: smooth;
+        }
+
+        /* GPU Acceleration for smoother animations */
+        .bk-modal-content, .modal-box, .task-row, .bk-row, .notification {
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hover glow effect */
+        .toolbar-btn.primary:hover {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .toolbar-btn.danger:hover {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Input focus animation */
+        .form-input, .voice-table input, .voice-table select {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input:focus, .voice-table input:focus, .voice-table select:focus {
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.3);
+            transform: scale(1.01);
+        }
+
+        /* Status badge animation */
+        .bk-status-badge {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bk-badge-processing {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Table row hover lift */
+        .voice-table tr {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .voice-table tbody tr:hover {
+            transform: scale(1.005);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 

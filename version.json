@@ -1,10 +1,10 @@
 {
-  "version": "1.10.3",
+  "version": "1.10.4",
   "changelog": [
-    "Voice Library: Hide spinner buttons on number inputs",
-    "Backup: Show full Voice ID with copy button",
-    "Use same API as TTS (get_history_detailed_v2)",
-    "Added bulk select, download (Audio/SRT/JSON), delete"
+    "Pro Tool: Super smooth animations for all UI elements",
+    "Modal open/close with scale & fade effects",
+    "Button hover with lift & glow effects",
+    "Staggered row animations, GPU accelerated"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
