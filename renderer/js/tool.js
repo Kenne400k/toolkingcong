@@ -1928,12 +1928,13 @@ class ProToolManager {
         }
 
         tbody.innerHTML = this.voiceLibraryElevenlabs.map((voice, idx) => `
-            <tr>
+            <tr data-idx="${idx}" data-provider="elevenlabs">
                 <td>${idx + 1}</td>
-                <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;"></td>
-                <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 160px;"></td>
+                <td><input type="text" value="${voice.project || ''}" placeholder="Project..." style="width: 70px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'project', this.value)"></td>
+                <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'name', this.value)"></td>
+                <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'voiceId', this.value)"></td>
                 <td>
-                    <select style="width: 110px; padding: 4px;">
+                    <select style="width: 100px; padding: 4px;" onchange="updateLibraryVoice('elevenlabs', ${idx}, 'model', this.value)">
                         <option value="eleven_multilingual_v2" ${voice.model === 'eleven_multilingual_v2' ? 'selected' : ''}>Multilingual V2</option>
                         <option value="eleven_turbo_v2_5" ${voice.model === 'eleven_turbo_v2_5' ? 'selected' : ''}>Turbo V2.5</option>
                         <option value="eleven_flash_v2" ${voice.model === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
@@ -1941,14 +1942,15 @@ class ProToolManager {
                         <option value="eleven_v3" ${voice.model === 'eleven_v3' ? 'selected' : ''}>Eleven V3</option>
                     </select>
                 </td>
-                <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 60px;"></td>
-                <td><input type="number" value="${voice.settings?.stability || 0.5}" step="0.1" min="0" max="1" style="width: 60px;"></td>
-                <td><input type="number" value="${voice.settings?.similarity || 0.75}" step="0.1" min="0" max="1" style="width: 60px;"></td>
-                <td><input type="number" value="${voice.settings?.style || 0}" step="0.1" min="0" max="1" style="width: 50px;"></td>
-                <td style="text-align: center;"><input type="checkbox" ${voice.settings?.speakerBoost !== false ? 'checked' : ''}></td>
-                <td>
-                    <button class="btn btn-sm" onclick="useLibraryVoice('elevenlabs', ${idx})" title="Sử dụng"><i class="bi bi-play-fill"></i></button>
-                    <button class="btn btn-sm" onclick="removeLibraryRow('elevenlabs', this)" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
+                <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateLibrarySetting('elevenlabs', ${idx}, 'speed', parseFloat(this.value))"></td>
+                <td><input type="number" value="${voice.settings?.stability || 0.5}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateLibrarySetting('elevenlabs', ${idx}, 'stability', parseFloat(this.value))"></td>
+                <td><input type="number" value="${voice.settings?.similarity || 0.75}" step="0.1" min="0" max="1" style="width: 55px;" onchange="updateLibrarySetting('elevenlabs', ${idx}, 'similarity', parseFloat(this.value))"></td>
+                <td><input type="number" value="${voice.settings?.style || 0}" step="0.1" min="0" max="1" style="width: 45px;" onchange="updateLibrarySetting('elevenlabs', ${idx}, 'style', parseFloat(this.value))"></td>
+                <td style="text-align: center;"><input type="checkbox" ${voice.settings?.speakerBoost !== false ? 'checked' : ''} onchange="updateLibrarySetting('elevenlabs', ${idx}, 'speakerBoost', this.checked)"></td>
+                <td style="display: flex; gap: 4px;">
+                    <button class="btn btn-sm" onclick="previewLibraryVoice('elevenlabs', ${idx})" title="Nghe thử"><i class="bi bi-volume-up"></i></button>
+                    <button class="btn btn-sm" onclick="useLibraryVoice('elevenlabs', ${idx})" title="Sử dụng"><i class="bi bi-check-lg"></i></button>
+                    <button class="btn btn-sm" onclick="removeLibraryRow('elevenlabs', ${idx})" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
         `).join('');
@@ -1964,24 +1966,26 @@ class ProToolManager {
         }
 
         tbody.innerHTML = this.voiceLibraryMinimax.map((voice, idx) => `
-            <tr>
+            <tr data-idx="${idx}" data-provider="minimax">
                 <td>${idx + 1}</td>
-                <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;"></td>
-                <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 160px;"></td>
+                <td><input type="text" value="${voice.project || ''}" placeholder="Project..." style="width: 70px;" onchange="updateLibraryVoice('minimax', ${idx}, 'project', this.value)"></td>
+                <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;" onchange="updateLibraryVoice('minimax', ${idx}, 'name', this.value)"></td>
+                <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateLibraryVoice('minimax', ${idx}, 'voiceId', this.value)"></td>
                 <td>
-                    <select style="width: 110px; padding: 4px;">
+                    <select style="width: 100px; padding: 4px;" onchange="updateLibraryVoice('minimax', ${idx}, 'model', this.value)">
                         <option value="speech-02-hd" ${voice.model === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
                         <option value="speech-02-turbo" ${voice.model === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
                         <option value="speech-01-hd" ${voice.model === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
                         <option value="speech-01-turbo" ${voice.model === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
                     </select>
                 </td>
-                <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 60px;"></td>
-                <td><input type="number" value="${voice.settings?.pitch || 0}" step="1" min="-12" max="12" style="width: 60px;"></td>
-                <td><input type="number" value="${voice.settings?.vol || 1}" step="0.1" min="0.1" max="10" style="width: 60px;"></td>
-                <td>
-                    <button class="btn btn-sm" onclick="useLibraryVoice('minimax', ${idx})" title="Sử dụng"><i class="bi bi-play-fill"></i></button>
-                    <button class="btn btn-sm" onclick="removeLibraryRow('minimax', this)" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
+                <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateLibrarySetting('minimax', ${idx}, 'speed', parseFloat(this.value))"></td>
+                <td><input type="number" value="${voice.settings?.pitch || 0}" step="1" min="-12" max="12" style="width: 50px;" onchange="updateLibrarySetting('minimax', ${idx}, 'pitch', parseFloat(this.value))"></td>
+                <td><input type="number" value="${voice.settings?.vol || 1}" step="0.1" min="0.1" max="10" style="width: 50px;" onchange="updateLibrarySetting('minimax', ${idx}, 'vol', parseFloat(this.value))"></td>
+                <td style="display: flex; gap: 4px;">
+                    <button class="btn btn-sm" onclick="previewLibraryVoice('minimax', ${idx})" title="Nghe thử"><i class="bi bi-volume-up"></i></button>
+                    <button class="btn btn-sm" onclick="useLibraryVoice('minimax', ${idx})" title="Sử dụng"><i class="bi bi-check-lg"></i></button>
+                    <button class="btn btn-sm" onclick="removeLibraryRow('minimax', ${idx})" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
         `).join('');
@@ -2854,19 +2858,14 @@ function resetVoiceSettings() {
 }
 
 function openVoiceLibrary() {
-    // Open new window instead of modal
-    if (window.electronAPI && window.electronAPI.openVoiceLibrary) {
-        window.electronAPI.openVoiceLibrary();
-    } else {
-        // Fallback to modal if not in Electron
-        document.getElementById('voiceLibraryModal').classList.add('show');
-        proTool.loadVoiceLibrary();
-        proTool.renderVoiceLibraryTable();
+    // Always use modal (no longer opening separate window)
+    document.getElementById('voiceLibraryModal').classList.add('show');
+    proTool.loadVoiceLibrary();
+    proTool.renderVoiceLibraryTable();
 
-        // Switch to current provider tab
-        const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
-        switchLibraryTab(currentProvider);
-    }
+    // Switch to current provider tab
+    const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
+    switchLibraryTab(currentProvider);
 }
 
 function closeVoiceLibrary() {
@@ -2955,17 +2954,91 @@ function addLibraryRow(provider) {
     tbody.appendChild(newRow);
 }
 
-// Remove row from library
-function removeLibraryRow(provider, btn) {
-    const row = btn.closest('tr');
-    const tbody = row.parentElement;
+// Remove row from library - now accepts index directly
+function removeLibraryRow(provider, index) {
+    if (provider === 'elevenlabs') {
+        proTool.voiceLibraryElevenlabs.splice(index, 1);
+        proTool.renderElevenlabsLibrary();
+    } else {
+        proTool.voiceLibraryMinimax.splice(index, 1);
+        proTool.renderMinimaxLibrary();
+    }
+    // Mark as unsaved
+    proTool.voiceLibrary = [...(proTool.voiceLibraryElevenlabs || []), ...(proTool.voiceLibraryMinimax || [])];
+}
 
-    row.remove();
+// Update voice field in library (project, name, voiceId, model)
+function updateLibraryVoice(provider, index, field, value) {
+    const library = provider === 'elevenlabs' ? proTool.voiceLibraryElevenlabs : proTool.voiceLibraryMinimax;
+    if (library && library[index]) {
+        library[index][field] = value;
+    }
+}
 
-    // Re-number IDs
-    tbody.querySelectorAll('tr').forEach((tr, idx) => {
-        tr.querySelector('td').textContent = idx + 1;
-    });
+// Update voice setting in library (speed, stability, similarity, style, speakerBoost, pitch, vol)
+function updateLibrarySetting(provider, index, field, value) {
+    const library = provider === 'elevenlabs' ? proTool.voiceLibraryElevenlabs : proTool.voiceLibraryMinimax;
+    if (library && library[index]) {
+        if (!library[index].settings) {
+            library[index].settings = {};
+        }
+        library[index].settings[field] = value;
+    }
+}
+
+// Preview voice from library - generate TTS and play
+let currentPreviewUrl = null;
+const previewAudio = document.getElementById('previewAudio');
+
+async function previewLibraryVoice(provider, index) {
+    const library = provider === 'elevenlabs' ? proTool.voiceLibraryElevenlabs : proTool.voiceLibraryMinimax;
+    const voice = library?.[index];
+
+    if (!voice || !voice.voiceId) {
+        proTool.showNotification('Voice ID trống!', 'warning');
+        return;
+    }
+
+    proTool.showNotification('Đang tạo audio preview...', 'info');
+
+    try {
+        const previewText = 'Xin chào, đây là giọng nói mẫu để bạn nghe thử.';
+
+        // Call API to generate TTS
+        const res = await window.electronAPI.apiRequest(
+            'https://kingcongstudio.com/ajaxs/tool2.php?action=tts',
+            {
+                text: previewText,
+                voice_id: voice.voiceId,
+                provider: provider,
+                model: voice.model,
+                speed: voice.settings?.speed || 1,
+                stability: voice.settings?.stability || 0.5,
+                similarity: voice.settings?.similarity || 0.75,
+                style: voice.settings?.style || 0,
+                boost: voice.settings?.speakerBoost !== false,
+                pitch: voice.settings?.pitch || 0,
+                vol: voice.settings?.vol || 1
+            }
+        );
+
+        if (res && res.status === 'success' && res.audio_url) {
+            // Play audio
+            if (previewAudio) {
+                previewAudio.src = res.audio_url;
+                previewAudio.play().catch(e => {
+                    console.error('Play error:', e);
+                    proTool.showNotification('Không thể phát audio!', 'error');
+                });
+                proTool.showNotification('Đang phát...', 'success');
+            }
+        } else {
+            proTool.showNotification(res?.message || 'Lỗi tạo audio!', 'error');
+        }
+    } catch (error) {
+        console.error('Preview error:', error);
+        proTool.showNotification('Lỗi: ' + error.message, 'error');
+    }
 }
 
 // Use voice from library
@@ -3026,11 +3099,6 @@ function useLibraryVoice(provider, index) {
 function addVoiceRow() {
     const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
     addLibraryRow(currentProvider);
-}
-
-function removeVoiceRow(btn) {
-    const currentProvider = document.getElementById('providerSelect')?.value || 'elevenlabs';
-    removeLibraryRow(currentProvider, btn);
 }
 
 function toggleSelectAll() {
@@ -3208,6 +3276,7 @@ async function addToLibrary() {
             id: Date.now(),
             voiceId: voiceId,
             name: voiceName,
+            project: '', // Default empty project
             provider: provider,
             model: model,
             settings: {
@@ -3224,6 +3293,7 @@ async function addToLibrary() {
             id: Date.now(),
             voiceId: voiceId,
             name: voiceName,
+            project: '', // Default empty project
             provider: provider,
             model: model,
             settings: {

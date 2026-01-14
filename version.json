@@ -1,7 +1,10 @@
 {
-  "version": "1.8.7",
+  "version": "1.8.8",
   "changelog": [
-    "Remove Add Voice buttons from Voice Library"
+    "Add Project column to Voice Library",
+    "Add Preview button to Voice Library (listen before use)",
+    "Separate ElevenLabs & Minimax library with proper columns",
+    "Fix Voice Library now uses modal instead of separate window"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
