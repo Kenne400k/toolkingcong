@@ -1066,13 +1066,15 @@
                 <button class="modal-close" onclick="closeVoiceLibrary()">×</button>
             </div>
 
-            <!-- Tabs -->
-            <div style="display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 16px;">
-                <button class="lib-tab active" data-provider="elevenlabs" onclick="switchLibraryTab('elevenlabs')" style="padding: 12px 20px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500;">
-                    <i class="bi bi-lightning-charge"></i> ElevenLabs
+            <!-- Tabs with logos -->
+            <div style="display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 16px; gap: 8px;">
+                <button class="lib-tab active" data-provider="elevenlabs" onclick="switchLibraryTab('elevenlabs')" style="padding: 10px 16px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                    <img src="https://help.elevenlabs.io/hc/theming_assets/01HZQ08B6SDY5X53YN9ABG4B99" style="width: 20px; height: 20px; border-radius: 4px;">
+                    <span>ElevenLabs</span>
                 </button>
-                <button class="lib-tab" data-provider="minimax" onclick="switchLibraryTab('minimax')" style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent;">
-                    <i class="bi bi-robot"></i> Minimax
+                <button class="lib-tab" data-provider="minimax" onclick="switchLibraryTab('minimax')" style="padding: 10px 16px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 8px;">
+                    <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png" style="width: 20px; height: 20px; border-radius: 4px;">
+                    <span>Minimax</span>
                 </button>
             </div>
 
@@ -1145,7 +1147,10 @@
                     <i class="bi bi-cloud-download"></i> Mặc định
                 </button>
                 <button class="voice-tab" data-tab="library" onclick="proTool.switchVoiceTab('library')" style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent;">
-                    <i class="bi bi-collection"></i> Thư viện ElevenLabs
+                    <i class="bi bi-collection"></i> Thư viện
+                </button>
+                <button class="voice-tab" data-tab="clones" onclick="proTool.switchVoiceTab('clones')" style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: none;">
+                    <i class="bi bi-mic"></i> My Clones
                 </button>
             </div>
             <div class="modal-body" id="voicesModalBody">

@@ -613,20 +613,11 @@ class ProToolManager {
     
     // Load voices from server - mở cửa sổ riêng
     async loadVoicesFromServer() {
-        // Open in separate window (disabled for now to use modal with tabs)
-        // if (window.electronAPI && window.electronAPI.openVoicesWindow) {
-        //     window.electronAPI.openVoicesWindow(this.provider);
-        //     return;
-        // }
-
         // Show modal
         document.getElementById('voicesModal').classList.add('show');
 
-        // Show/hide Library tab based on provider
-        const libraryTab = document.querySelector('.voice-tab[data-tab="library"]');
-        if (libraryTab) {
-            libraryTab.style.display = this.provider === 'elevenlabs' ? 'block' : 'none';
-        }
+        // Update tabs visibility based on provider
+        this.updateVoiceTabsVisibility();
 
         // Reset to default tab
         this.currentVoiceTab = 'default';
@@ -750,7 +741,126 @@ class ProToolManager {
             this.renderDefaultVoices();
         } else if (tab === 'library') {
             this.loadElevenLabsLibrary();
+        } else if (tab === 'clones') {
+            this.loadClonedVoices();
         }
+    }
+
+    // Update tabs visibility based on provider
+    updateVoiceTabsVisibility() {
+        const libraryTab = document.querySelector('.voice-tab[data-tab="library"]');
+        const clonesTab = document.querySelector('.voice-tab[data-tab="clones"]');
+
+        if (this.provider === 'elevenlabs') {
+            if (libraryTab) libraryTab.style.display = 'block';
+            if (clonesTab) clonesTab.style.display = 'none';
+        } else {
+            if (libraryTab) libraryTab.style.display = 'none';
+            if (clonesTab) clonesTab.style.display = 'block';
+        }
+    }
+
+    // Load cloned voices from API
+    async loadClonedVoices() {
+        const modalBody = document.getElementById('voicesModalBody');
+        modalBody.innerHTML = `
+            <div style="text-align: center; padding: 60px;">
+                <div style="width: 40px; height: 40px; border: 3px solid #333; border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+                <div style="color: #888; font-size: 13px;">Đang tải giọng nhân bản...</div>
+            </div>
+        `;
+
+        try {
+            const response = await window.electronAPI.apiRequest(
+                'https://kingcongstudio.com/ajaxs/tts3.php',
+                {
+                    action: 'get_cloned_voices',
+                    provider: 'minimax'
+                }
+            );
+
+            console.log('🎤 Cloned voices response:', response);
+
+            if (response.success || response.status === 'success') {
+                const voices = response.voices || response.cloned_voices || [];
+                this.clonedVoices = voices;
+                this.renderClonedVoices(voices);
+            } else {
+                this.renderClonedVoices([]);
+            }
+        } catch (error) {
+            console.error('❌ Load cloned voices error:', error);
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 60px; color: #f55;">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; display: block; margin-bottom: 16px;"></i>
+                    <p>Lỗi tải danh sách giọng clone</p>
+                    <button class="btn btn-sm" onclick="proTool.loadClonedVoices()" style="margin-top: 16px;">Thử lại</button>
+                </div>
+            `;
+        }
+    }
+
+    renderClonedVoices(voices) {
+        const modalBody = document.getElementById('voicesModalBody');
+
+        if (!voices || voices.length === 0) {
+            modalBody.innerHTML = `
+                <div style="text-align: center; padding: 60px; color: #666;">
+                    <i class="bi bi-mic" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 16px;"></i>
+                    <h4 style="margin-bottom: 8px;">Chưa có giọng nhân bản</h4>
+                    <p style="font-size: 12px;">Dùng "Voice Clone" trong sidebar để tạo giọng mới</p>
+                </div>
+            `;
+            return;
+        }
+
+        modalBody.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <input type="text" class="form-input" id="cloneVoiceSearch" placeholder="Tìm kiếm giọng clone..." oninput="proTool.filterClonedVoices(this.value)">
+            </div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                <i class="bi bi-mic"></i> ${voices.length} giọng nhân bản
+            </div>
+            <div id="clonedVoicesList" style="max-height: 400px; overflow-y: auto;">
+                ${voices.map(voice => {
+                    const voiceId = voice.voice_id || voice.id;
+                    const voiceName = (voice.name || voice.voice_name || 'Unnamed').replace(/'/g, "\\'");
+                    const previewUrl = (voice.sample_audio || voice.preview_url || '').replace(/'/g, "\\'");
+                    const language = voice.language || 'VN';
+                    const createdAt = voice.created_at || '';
+
+                    return `
+                    <div class="voice-item" data-name="${voiceName.toLowerCase()}" style="display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; cursor: pointer; background: #0a0a0a;"
+                         onclick="proTool.selectVoice('${voiceId}', '${voiceName}')"
+                         onmouseover="this.style.background='#111'; this.style.borderColor='#333'"
+                         onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#1a1a1a'">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 14px; color: #fff; font-weight: 500;">${voice.name || voice.voice_name || 'Unnamed'}</div>
+                            <div style="font-size: 10px; color: #555; margin-top: 3px;">${voiceId}</div>
+                            <div style="font-size: 10px; color: #666; margin-top: 4px;">
+                                ${[language, createdAt].filter(x => x).join(' • ')}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                            ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); proTool.toggleVoicePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
+                            <button class="btn btn-sm" onclick="event.stopPropagation(); proTool.addVoiceToLibraryFromModal('${voiceId}', '${voiceName}', '${previewUrl}')" title="Thêm vào thư viện"><i class="bi bi-plus-lg"></i></button>
+                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); proTool.selectVoice('${voiceId}', '${voiceName}')">Chọn</button>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    filterClonedVoices(query) {
+        const items = document.querySelectorAll('#clonedVoicesList .voice-item');
+        query = query.toLowerCase();
+
+        items.forEach(item => {
+            const name = item.dataset.name || '';
+            const text = item.textContent.toLowerCase();
+            item.style.display = (name.includes(query) || text.includes(query)) ? 'flex' : 'none';
+        });
     }
 
     renderDefaultVoices() {

@@ -1,10 +1,10 @@
 {
-  "version": "1.9.0",
+  "version": "1.9.1",
   "changelog": [
-    "Load Voices: Add preview button to listen voice samples",
-    "Load Voices: Add button to quickly add voice to library",
-    "Voice Library: Full 7 ElevenLabs models (V3, Multilingual V2, Turbo V2.5, Turbo V2, Flash V2.5, Flash V2, Monolingual V1)",
-    "Voice Library: Better CSS and toggle play/pause for preview"
+    "Load Voices: Add 'My Clones' tab for Minimax provider",
+    "Load Voices: Load cloned voices from API (tts3.php)",
+    "Voice Library: Use provider logos instead of icons in tabs",
+    "Voice Library: Dynamic tabs based on provider (Library for 11Labs, My Clones for Minimax)"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
