@@ -1,9 +1,9 @@
 {
-  "version": "1.10.11",
+  "version": "1.10.12",
   "changelog": [
-    "Fix Voice Library Minimax: Name column now correctly shows voice name",
-    "Fix Voice Library: Model dropdown default selection",
-    "Fix saveVoiceLibrary: Correct input index mapping for all fields"
+    "Fix Voice Library: Load models from API (same as sidebar Pro Tool)",
+    "Fix addToLibrary (+): Prioritize voice_name when fetching voice info",
+    "Fix Voice Library window: Use dynamic model options from API"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

@@ -310,7 +310,16 @@
         let currentTab = 'elevenlabs';
         const previewAudio = document.getElementById('previewAudio');
 
-        function init() {
+        // Models loaded from API (giống như sidebar Pro Tool)
+        let loadedModels = {
+            elevenlabs: [],
+            minimax: []
+        };
+
+        async function init() {
+            // Load models from API first
+            await loadModelsFromAPI();
+
             // Load ElevenLabs voices
             try {
                 elevenlabsVoices = JSON.parse(localStorage.getItem('voiceLibrary_elevenlabs') || '[]');
@@ -325,6 +334,65 @@
 
             renderElevenlabsLibrary();
             renderMinimaxLibrary();
+        }
+
+        async function loadModelsFromAPI() {
+            try {
+                const res = await window.electronAPI.getResources();
+                if (res && res.status === 'success' && res.data) {
+                    loadedModels = {
+                        elevenlabs: res.data.elevenlabs?.models || [],
+                        minimax: res.data.minimax?.models || []
+                    };
+                    console.log('✅ Models loaded:', loadedModels);
+                }
+            } catch (error) {
+                console.error('❌ Load models error:', error);
+                // Fallback to default models
+                loadedModels = {
+                    elevenlabs: [
+                        { id: 'eleven_v3', name: 'Eleven V3' },
+                        { id: 'eleven_multilingual_v2', name: 'Multilingual V2' },
+                        { id: 'eleven_turbo_v2_5', name: 'Turbo V2.5' },
+                        { id: 'eleven_turbo_v2', name: 'Turbo V2' },
+                        { id: 'eleven_flash_v2_5', name: 'Flash V2.5' },
+                        { id: 'eleven_flash_v2', name: 'Flash V2' }
+                    ],
+                    minimax: [
+                        { id: 'speech-02-hd', name: 'Speech HD 2.6' },
+                        { id: 'speech-02-turbo', name: 'Speech Turbo 2.6' },
+                        { id: 'speech-01-hd', name: 'Speech HD 2.5' },
+                        { id: 'speech-01-turbo', name: 'Speech Turbo 2.5' }
+                    ]
+                };
+            }
+        }
+
+        function getModelOptions(provider, currentModel) {
+            const models = loadedModels[provider] || [];
+            if (models.length === 0) {
+                // Fallback nếu chưa load được
+                if (provider === 'minimax') {
+                    return `
+                        <option value="speech-02-hd" ${currentModel === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
+                        <option value="speech-02-turbo" ${currentModel === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
+                        <option value="speech-01-hd" ${currentModel === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
+                        <option value="speech-01-turbo" ${currentModel === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
+                    `;
+                } else {
+                    return `
+                        <option value="eleven_v3" ${currentModel === 'eleven_v3' ? 'selected' : ''}>Eleven V3</option>
+                        <option value="eleven_multilingual_v2" ${currentModel === 'eleven_multilingual_v2' ? 'selected' : ''}>Multilingual V2</option>
+                        <option value="eleven_turbo_v2_5" ${currentModel === 'eleven_turbo_v2_5' ? 'selected' : ''}>Turbo V2.5</option>
+                        <option value="eleven_turbo_v2" ${currentModel === 'eleven_turbo_v2' ? 'selected' : ''}>Turbo V2</option>
+                        <option value="eleven_flash_v2_5" ${currentModel === 'eleven_flash_v2_5' ? 'selected' : ''}>Flash V2.5</option>
+                        <option value="eleven_flash_v2" ${currentModel === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
+                    `;
+                }
+            }
+            return models.map(m =>
+                `<option value="${m.id}" ${currentModel === m.id ? 'selected' : ''}>${m.name}</option>`
+            ).join('');
         }
 
         function switchTab(tab) {
@@ -366,16 +434,11 @@
                 <tr data-idx="${idx}">
                     <td>${idx + 1}</td>
                     <td><input type="text" value="${voice.project || ''}" placeholder="Project..." style="width: 70px;" onchange="updateElevenlabsVoice(${idx}, 'project', this.value)"></td>
-                    <td><input type="text" value="${escapeHtml(voice.name || '')}" placeholder="Name..." style="width: 90px;" onchange="updateElevenlabsVoice(${idx}, 'name', this.value)"></td>
-                    <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateElevenlabsVoice(${idx}, 'voiceId', this.value)"></td>
+                    <td><input type="text" value="${escapeHtml(voice.voice_name || voice.name || '')}" placeholder="Name..." style="width: 90px;" onchange="updateElevenlabsVoice(${idx}, 'name', this.value)"></td>
+                    <td><input type="text" value="${voice.voiceId || voice.voice_id || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateElevenlabsVoice(${idx}, 'voiceId', this.value)"></td>
                     <td>
                         <select style="width: 110px;" onchange="updateElevenlabsVoice(${idx}, 'model', this.value); renderElevenlabsLibrary();">
-                            <option value="eleven_v3" ${voice.model === 'eleven_v3' ? 'selected' : ''}>Eleven V3</option>
-                            <option value="eleven_multilingual_v2" ${voice.model === 'eleven_multilingual_v2' ? 'selected' : ''}>Multilingual V2</option>
-                            <option value="eleven_turbo_v2_5" ${voice.model === 'eleven_turbo_v2_5' ? 'selected' : ''}>Turbo V2.5</option>
-                            <option value="eleven_turbo_v2" ${voice.model === 'eleven_turbo_v2' ? 'selected' : ''}>Turbo V2</option>
-                            <option value="eleven_flash_v2_5" ${voice.model === 'eleven_flash_v2_5' ? 'selected' : ''}>Flash V2.5</option>
-                            <option value="eleven_flash_v2" ${voice.model === 'eleven_flash_v2' ? 'selected' : ''}>Flash V2</option>
+                            ${getModelOptions('elevenlabs', voice.model || 'eleven_multilingual_v2')}
                         </select>
                     </td>
                     <td style="${disabledStyle}"><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" ${isV3 ? 'disabled' : ''} onchange="updateElevenlabsSetting(${idx}, 'speed', parseFloat(this.value))"></td>
@@ -416,10 +479,7 @@
                     <td><input type="text" value="${displayVoiceId}" placeholder="Voice ID..." style="width: 140px;" onchange="updateMinimaxVoice(${idx}, 'voiceId', this.value)"></td>
                     <td>
                         <select style="width: 100px;" onchange="updateMinimaxVoice(${idx}, 'model', this.value)">
-                            <option value="speech-02-hd" ${currentModel === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
-                            <option value="speech-02-turbo" ${currentModel === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
-                            <option value="speech-01-hd" ${currentModel === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
-                            <option value="speech-01-turbo" ${currentModel === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
+                            ${getModelOptions('minimax', currentModel)}
                         </select>
                     </td>
                     <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateMinimaxSetting(${idx}, 'speed', parseFloat(this.value))"></td>

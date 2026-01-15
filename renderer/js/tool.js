@@ -3761,7 +3761,8 @@ async function addToLibrary() {
         console.log('🔍 Voice Info Result:', res);
 
         if (res && res.status === 'success' && res.data) {
-            voiceName = res.data.name || res.data.voice_name || voiceId;
+            // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
+            voiceName = res.data.voice_name || res.data.name || voiceId;
             previewUrl = res.data.preview_url || res.data.sample_audio || '';
             console.log('✅ Found voice name:', voiceName, 'preview:', previewUrl);
         } else {
