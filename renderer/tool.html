@@ -426,7 +426,7 @@
             -webkit-appearance: none;
             width: 14px;
             height: 14px;
-            background: #fff;
+            background: var(--text);
             border-radius: 50%;
             cursor: pointer;
         }
@@ -1415,7 +1415,7 @@
                                     <span class="slider-value" id="stabilityValue">50%</span>
                                 </div>
                                 <input type="range" id="voiceStability" min="0" max="100" step="1" value="50" oninput="updateSlider('stability')">
-                                <div id="stability-labels" style="display:none; justify-content:space-between; font-size:11px; color:#fff; margin-top:6px;">
+                                <div id="stability-labels" style="display:none; justify-content:space-between; font-size:11px; margin-top:6px;">
                                     <span>Creative</span>
                                     <span>Natural</span>
                                     <span>Robust</span>
@@ -1606,16 +1606,16 @@
                                 <i class="bi bi-clock-history"></i> Backup
                                 <span class="tooltip">Lịch sử / Backup</span>
                             </button>
+                            <button class="toolbar-btn has-tooltip" onclick="openOutputFolder()">
+                                <i class="bi bi-folder2-open"></i>
+                                <span class="tooltip">Mở output</span>
+                            </button>
                         </div>
 
                         <div style="margin-left: auto; display: flex; gap: 4px;">
                             <button class="toolbar-btn has-tooltip" onclick="clearTasks()">
                                 <i class="bi bi-trash"></i>
                                 <span class="tooltip">Xóa tất cả</span>
-                            </button>
-                            <button class="toolbar-btn has-tooltip" onclick="openOutputFolder()">
-                                <i class="bi bi-folder2-open"></i>
-                                <span class="tooltip">Mở output</span>
                             </button>
                         </div>
                     </div>
