@@ -7405,15 +7405,34 @@ async function uploadFileElectron() {
             // Đọc nội dung các file
             const files = [];
             for (const filePath of result.filePaths) {
+                const fileName = filePath.split(/[/\\]/).pop();
                 try {
-                    const content = await window.electronAPI.readFile(filePath);
-                    const fileName = filePath.split(/[/\\]/).pop();
-                    files.push({
-                        name: fileName,
-                        path: filePath,
-                        content: content,
-                        size: content ? content.length : 0
-                    });
+                    if (fileName.toLowerCase().endsWith('.zip')) {
+                        const fileData = await window.electronAPI.readFileAsBase64(filePath);
+                        if (fileData?.success && fileData.base64) {
+                            files.push({
+                                name: fileName,
+                                path: filePath,
+                                content: fileData.base64,
+                                size: fileData.base64.length,
+                                isBase64: true
+                            });
+                        } else {
+                            console.warn('⚠️ Không đọc được file ZIP:', fileName);
+                        }
+                    } else {
+                        const fileData = await window.electronAPI.readFile(filePath);
+                        if (fileData?.success) {
+                            files.push({
+                                name: fileName,
+                                path: filePath,
+                                content: fileData.content || '',
+                                size: fileData.content ? fileData.content.length : 0
+                            });
+                        } else {
+                            console.warn('⚠️ Không đọc được file:', fileName);
+                        }
+                    }
                 } catch (e) {
                     console.error('Error reading file:', filePath, e);
                 }
@@ -7467,14 +7486,19 @@ async function uploadFolderElectron() {
             // Map the paths to file objects with content
             const filesForProcessing = [];
             for (const filePath of validFilePaths) {
+                const fileName = filePath.split(/[/\\]/).pop();
                 try {
                     const fileData = await window.electronAPI.readFile(filePath);
-                    filesForProcessing.push({
-                        name: fileData.fileName,
-                        path: fileData.filePath,
-                        content: fileData.content,
-                        size: fileData.content ? fileData.content.length : 0
-                    });
+                    if (fileData?.success) {
+                        filesForProcessing.push({
+                            name: fileName,
+                            path: fileData.filePath || filePath,
+                            content: fileData.content || '',
+                            size: fileData.content ? fileData.content.length : 0
+                        });
+                    } else {
+                        console.warn('⚠️ Không đọc được file:', fileName);
+                    }
                 } catch (e) {
                     console.error('Error reading file from folder:', filePath, e);
                 }
@@ -7496,32 +7520,134 @@ function processElectronFiles(files) {
 
     console.log('📄 [Electron] Processing', files.length, 'files');
 
+    const normalizedFiles = files.map(file => {
+        const name = file?.name || 'untitled';
+        const content = typeof file?.content === 'string' ? file.content : '';
+        return {
+            name,
+            content,
+            size: Number.isFinite(file?.size) ? file.size : content.length,
+            isBase64: Boolean(file?.isBase64)
+        };
+    });
+
     // Nếu chỉ 1 file text -> đưa vào textarea
-    if (files.length === 1) {
-        const file = files[0];
+    if (normalizedFiles.length === 1) {
+        const file = normalizedFiles[0];
         const name = file.name.toLowerCase();
 
         if (name.endsWith('.txt') || name.endsWith('.srt')) {
             // Đưa nội dung vào textarea
             const content = file.content || '';
-            $('#inputText').val(content);
+            if (name.endsWith('.srt')) {
+                window.isSrtFile = true;
+                $('#srtFeeInfo').show();
+            } else {
+                window.isSrtFile = false;
+                $('#srtFeeInfo').hide();
+            }
+
+            localStorage.setItem('tts_filename', file.name);
+            localStorage.setItem('tts_is_srt', window.isSrtFile);
+            localStorage.setItem('tts_input_draft', content);
+
+            $('#txtInput').val(content);
+            togglePlaceholder();
             updateCharCount();
+            updateEstimatedCost();
+            $('#fileNameDisplay').text(`📂 ${file.name}`).fadeIn();
             showToast(`✅ Đã tải: ${file.name}`);
             return;
         }
     }
 
-    // Nhiều file -> Mở Bulk Modal
-    // Convert to File-like objects for processUploadFiles
-    const fileObjects = files.map(f => ({
-        name: f.name,
-        size: f.size || (f.content ? f.content.length : 0),
-        text: () => Promise.resolve(f.content || ''),
-        _electronFile: true,
-        _content: f.content
-    }));
+    // Nhiều file hoặc ZIP -> xử lý như bulk upload
+    const validFiles = normalizedFiles.filter(file => {
+        const name = file.name.toLowerCase();
+        return name.endsWith('.txt') || name.endsWith('.srt') || name.endsWith('.zip');
+    });
 
-    processUploadFiles(fileObjects);
+    if (validFiles.length === 0) {
+        alert('Không có file hợp lệ! Chỉ chấp nhận .txt, .srt, .zip');
+        return;
+    }
+
+    if (validFiles.length > 20) {
+        alert('Tối đa 20 file!');
+        return;
+    }
+
+    openBulkModal();
+
+    $('#bulkDropZone').html('<div class="spinner-border" style="color: #667eea;"></div><p style="margin-top: 15px; color: #888;">Đang đọc file...</p>');
+
+    const processZipBuffer = async (arrayBuffer, sourceName) => {
+        try {
+            const zip = await JSZip.loadAsync(arrayBuffer);
+            const filePromises = [];
+
+            zip.forEach((relativePath, zipEntry) => {
+                if (!zipEntry.dir && relativePath.endsWith('.txt')) {
+                    filePromises.push(
+                        zipEntry.async('string').then(content => {
+                            bulkFiles.push({
+                                name: relativePath,
+                                content: content,
+                                chars: content.length,
+                                from: sourceName
+                            });
+                        })
+                    );
+                }
+            });
+
+            await Promise.all(filePromises);
+        } catch (err) {
+            console.error('ZIP extract error:', err);
+            alert('Lỗi khi giải nén file ZIP!');
+        }
+    };
+
+    const base64ToArrayBuffer = (base64String) => {
+        const base64 = base64String.includes(',') ? base64String.split(',')[1] : base64String;
+        const binaryString = atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes.buffer;
+    };
+
+    (async () => {
+        for (const file of validFiles) {
+            if (file.name.toLowerCase().endsWith('.zip')) {
+                if (!file.isBase64) {
+                    alert(`File ZIP "${file.name}" không đọc được.`);
+                    continue;
+                }
+                const arrayBuffer = base64ToArrayBuffer(file.content || '');
+                await processZipBuffer(arrayBuffer, file.name);
+            } else {
+                const content = file.content || '';
+                bulkFiles.push({
+                    name: file.name,
+                    content: content,
+                    chars: content.length,
+                    from: 'upload'
+                });
+            }
+        }
+
+        $('#bulkDropZone').html(`
+            <i class="bi bi-cloud-upload" style="font-size: 48px; color: #667eea; display: block; margin-bottom: 16px;"></i>
+            <h4 style="margin-bottom: 8px;">Kéo thả file hoặc click để chọn</h4>
+            <p style="color: #888; font-size: 13px;">Hỗ trợ: .txt, .zip (tối đa 20 file, mỗi file < 5MB)</p>
+        `);
+
+        renderFileList();
+        calculateBulkCost();
+    })();
 }
 
 // ========== SINGLE FILE UPLOAD (HTML Input fallback) ==========

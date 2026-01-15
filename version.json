@@ -1,8 +1,8 @@
 {
-  "version": "1.10.26",
+  "version": "1.10.27",
   "changelog": [
-    "UI: Fix voice selector dark mode and Pro Tool light text",
-    "UI: Add smoother transitions"
+    "TTS: Fix Electron file/folder upload processing",
+    "TTS: Handle ZIP uploads in bulk flow"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
