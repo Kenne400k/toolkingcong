@@ -1,8 +1,8 @@
 {
-  "version": "1.10.18",
+  "version": "1.10.19",
   "changelog": [
-    "Reorder voice buttons: My Clones/Clone on top",
-    "Load/Library buttons moved below"
+    "Swap Clone/My Clones button positions",
+    "Clone on left, My Clones on right"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
