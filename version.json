@@ -1,9 +1,7 @@
 {
-  "version": "1.10.22",
+  "version": "1.10.23",
   "changelog": [
-    "TTS Tab: Fixed detailed history bulk action buttons",
-    "Fixed updateBulkActions() to use correct element IDs",
-    "Added JSON download button to detailed history toolbar"
+    "Pro Tool: Fixed Minimax Speed/Volume default display (1.00 instead of 1.0)"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
