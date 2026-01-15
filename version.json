@@ -1,10 +1,9 @@
 {
-  "version": "1.10.21",
+  "version": "1.10.22",
   "changelog": [
-    "Fixed detailed history modal toolbar buttons showing only numbers without labels",
-    "Synced renderDetailedList function from web version to Electron",
-    "Added bulk action functions for detailed history (download, delete)",
-    "Improved detailed history UI with proper button text display"
+    "TTS Tab: Fixed detailed history bulk action buttons",
+    "Fixed updateBulkActions() to use correct element IDs",
+    "Added JSON download button to detailed history toolbar"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

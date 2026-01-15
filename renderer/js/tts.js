@@ -1973,23 +1973,22 @@ function updateBulkActions() {
         if ($(this).data('json')) totalJson++;
     });
 
-    // --- SỬA LẠI ĐOẠN NÀY ---
-    // Không ẩn header nữa, chỉ enable/disable nút thôi
+    // --- CẬP NHẬT SỐ LƯỢNG VÀ TRẠNG THÁI NÚT ---
 
     // Cập nhật số trên nút Xóa & Trạng thái Enable/Disable
-    $('#btnBulkDelete span').text(count);
+    $('#deleteCount').text(count);
     $('#btnBulkDelete').prop('disabled', count === 0);
 
     // Cập nhật nút Audio
-    $('#btnBulkDownloadAudio span').text(totalAudio);
+    $('#audioCount').text(totalAudio);
     $('#btnBulkDownloadAudio').prop('disabled', totalAudio === 0);
 
     // Cập nhật nút SRT
-    $('#btnBulkDownloadSrt span').text(totalSrt);
+    $('#srtCount').text(totalSrt);
     $('#btnBulkDownloadSrt').prop('disabled', totalSrt === 0);
 
-    // Cập nhật nút JSON
-    $('#btnBulkDownloadJson span').text(totalJson);
+    // Cập nhật nút JSON (nếu có)
+    $('#jsonCount').text(totalJson);
     $('#btnBulkDownloadJson').prop('disabled', totalJson === 0);
 
     // Xử lý checkbox chọn tất cả (nếu không còn item nào được chọn thì bỏ tick Select All)
