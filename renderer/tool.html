@@ -1180,19 +1180,16 @@
                     <!-- Voice -->
                     <div class="tool-section">
                         <div class="section-title">Voice</div>
-                        <!-- Voice ID first -->
-                        <div class="form-group">
-                            <label class="form-label">Voice ID</label>
-                            <div style="display: flex; gap: 6px;">
-                                <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID..." style="flex: 1;">
-                                <input type="hidden" id="selectedVoiceName" value="">
-                                <button class="btn btn-sm" onclick="addToLibrary()" title="Add to Library">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
-                            </div>
+                        <!-- Voice buttons - ABOVE Voice ID -->
+                        <div class="btn-group" style="margin-bottom: 8px;">
+                            <button class="btn" onclick="loadVoicesFromServer()">
+                                <i class="bi bi-cloud-download"></i> Load
+                            </button>
+                            <button class="btn" onclick="openVoiceLibrary()">
+                                <i class="bi bi-collection"></i> Library
+                            </button>
                         </div>
-                        <!-- Voice buttons - below Voice ID -->
-                        <div id="voiceCloneSection" style="display: none; margin-top: 8px;">
+                        <div id="voiceCloneSection" style="display: none; margin-bottom: 8px;">
                             <div class="btn-group">
                                 <button class="btn" onclick="openClonedVoicesModal()">
                                     <i class="bi bi-collection-play"></i> My Clones
@@ -1202,13 +1199,16 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="btn-group" style="margin-top: 8px;">
-                            <button class="btn" onclick="openVoiceLibrary()">
-                                <i class="bi bi-collection"></i> Library
-                            </button>
-                            <button class="btn" onclick="loadVoicesFromServer()">
-                                <i class="bi bi-cloud-download"></i> Load
-                            </button>
+                        <!-- Voice ID -->
+                        <div class="form-group">
+                            <label class="form-label">Voice ID</label>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID..." style="flex: 1;">
+                                <input type="hidden" id="selectedVoiceName" value="">
+                                <button class="btn btn-sm" onclick="addToLibrary()" title="Add to Library">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
                         </div>
                         <!-- Model - ElevenLabs -->
                         <div class="form-group" id="elevenlabsModelGroup" style="margin-top: 12px;">

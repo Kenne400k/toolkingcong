@@ -1,7 +1,8 @@
 {
-  "version": "1.10.14",
+  "version": "1.10.15",
   "changelog": [
-    "Pro Tool: Center align columns Output Name, Content, Voice ID, Status"
+    "Pro Tool sidebar: Move voice buttons above Voice ID input",
+    "Reorder buttons: Load | Library, My Clones | Clone"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
