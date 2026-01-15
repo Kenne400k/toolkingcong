@@ -1,8 +1,9 @@
 {
-  "version": "1.10.19",
+  "version": "1.10.20",
   "changelog": [
-    "Swap Clone/My Clones button positions",
-    "Clone on left, My Clones on right"
+    "Fixed slider knob color to adapt to theme.",
+    "Fixed v3 stability labels being invisible in light mode.",
+    "Reordered toolbar buttons in Pro Tool tab."
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
