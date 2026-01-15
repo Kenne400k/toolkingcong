@@ -1,9 +1,9 @@
 {
-  "version": "1.10.16",
+  "version": "1.10.17",
   "changelog": [
-    "NEW: Light Mode / Dark Mode toggle",
-    "Button in header (moon/sun icon) to switch theme",
-    "Theme preference saved to localStorage"
+    "FIX: Light Mode text colors now properly dark",
+    "Tool sidebar & footer keep dark theme in Light Mode",
+    "Provider dropdown keeps white text on dark background"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
