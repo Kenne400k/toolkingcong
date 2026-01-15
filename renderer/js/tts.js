@@ -7947,49 +7947,6 @@ function closeBulkModal() {
     bulkFiles = [];
 }
 
-// Drag & Drop trong modal
-let bulkDropZone = document.getElementById('bulkDropZone');
-
-$('#bulkDropZone').on('click', function () {
-    if (!$('#voiceIdVal').val()) {
-        alert('⚠️ Vui lòng chọn giọng nói trước!');
-        closeBulkModal();
-        openVoiceModal();
-        return;
-    }
-    $('#bulkFileInput').click();
-});
-
-$('#bulkFileInput').on('change', function (e) {
-    handleBulkFiles(Array.from(e.target.files));
-    $(this).val(''); // Reset
-});
-
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    bulkDropZone.addEventListener(eventName, e => {
-        e.preventDefault();
-        e.stopPropagation();
-    }, false);
-});
-
-['dragenter', 'dragover'].forEach(eventName => {
-    bulkDropZone.addEventListener(eventName, () => {
-        $('#bulkDropZone').css('border-color', '#667eea');
-    }, false);
-});
-
-['dragleave', 'drop'].forEach(eventName => {
-    bulkDropZone.addEventListener(eventName, () => {
-        $('#bulkDropZone').css('border-color', '#444');
-    }, false);
-});
-
-bulkDropZone.addEventListener('drop', e => {
-    let dt = e.dataTransfer;
-    let files = Array.from(dt.files);
-    handleBulkFiles(files);
-}, false);
-
 async function handleBulkFiles(files) {
     console.log('📦 handleBulkFiles called with:', files.length, 'files');
 

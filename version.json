@@ -1,7 +1,7 @@
 {
-  "version": "1.10.28",
+  "version": "1.10.29",
   "changelog": [
-    "TTS: Fix single-file upload char count update"
+    "TTS: Guard bulk upload drop zone initialization"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
