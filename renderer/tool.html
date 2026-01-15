@@ -710,71 +710,92 @@
             background: #050505;
         }
 
+        /* Header Row */
+        .bk-header-row {
+            display: grid;
+            grid-template-columns: 36px 180px 70px 130px 80px 70px 1fr 80px;
+            align-items: center;
+            padding: 10px 20px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #222;
+            gap: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
         /* Row Item */
         .bk-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: 36px 180px 70px 130px 80px 70px 1fr 80px;
             align-items: center;
             padding: 12px 20px;
             border-bottom: 1px solid #1a1a1a;
-            gap: 16px;
+            gap: 10px;
             transition: background 0.15s;
         }
         .bk-row:hover { background: #111; }
 
         /* Checkbox */
+        .bk-checkbox-wrapper { display: flex; align-items: center; justify-content: center; }
         .bk-checkbox-wrapper input { width: 16px; height: 16px; cursor: pointer; accent-color: #667eea; }
 
         /* Info column */
-        .bk-info { width: 240px; display: flex; flex-direction: column; gap: 4px; }
+        .bk-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
         .bk-time { font-size: 12px; font-family: monospace; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-        .bk-provider-icon { width: 14px; height: 14px; border-radius: 50%; }
-        .bk-text-preview { font-size: 12px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-provider-icon { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+        .bk-text-preview { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Project/Voice columns */
-        .bk-project { width: 80px; font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bk-voice-id { display: flex; align-items: center; gap: 4px; font-size: 11px; }
-        .bk-voice-id-text { color: #4ade80; font-family: monospace; cursor: pointer; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-project { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-voice-id { display: flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; }
+        .bk-voice-id-text { color: #4ade80; font-family: monospace; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
         .bk-voice-id-text:hover { color: #86efac; text-decoration: underline; }
-        .bk-copy-btn { background: none; border: none; color: #666; cursor: pointer; padding: 2px; font-size: 12px; }
+        .bk-copy-btn { background: none; border: none; color: #666; cursor: pointer; padding: 2px; font-size: 12px; flex-shrink: 0; }
         .bk-copy-btn:hover { color: #4ade80; }
-        .bk-voice-name { width: 100px; font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-voice-name { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Status Badge */
         .bk-status-badge {
-            width: 80px;
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 4px;
+            padding: 4px 8px;
             border-radius: 4px;
+            white-space: nowrap;
         }
         .bk-badge-done { background: #fff; color: #000; }
         .bk-badge-processing { background: #333; color: #fff; border: 1px solid #555; }
         .bk-badge-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
 
         /* Content Area */
-        .bk-content-area { flex: 1; display: flex; align-items: center; gap: 12px; }
+        .bk-content-area { display: flex; align-items: center; gap: 10px; min-width: 0; }
 
         /* Player Mini */
-        .bk-player { flex: 1; display: flex; align-items: center; gap: 10px; }
-        .bk-play-btn { background: transparent; border: 1px solid #fff; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; }
-        .bk-progress-track { flex: 1; height: 4px; background: #333; border-radius: 2px; position: relative; cursor: pointer; }
+        .bk-player { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .bk-play-btn { background: transparent; border: 1px solid #fff; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; flex-shrink: 0; }
+        .bk-progress-track { flex: 1; height: 4px; background: #333; border-radius: 2px; position: relative; cursor: pointer; min-width: 60px; }
         .bk-progress-bar { height: 100%; background: #666; width: 0%; border-radius: 2px; }
-        .bk-timer { font-size: 11px; color: #888; font-family: monospace; }
+        .bk-timer { font-size: 10px; color: #888; font-family: monospace; white-space: nowrap; flex-shrink: 0; }
 
         /* Error/Processing Text */
-        .bk-status-text { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+        .bk-status-text { font-size: 11px; display: flex; align-items: center; gap: 6px; }
         .bk-text-error { color: #ef4444; }
         .bk-text-processing { color: #a855f7; }
 
         /* Actions */
-        .bk-actions-group { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-        .bk-delete-btn { color: #666; cursor: pointer; font-size: 16px; background: none; border: none; }
+        .bk-actions-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .bk-delete-btn { color: #666; cursor: pointer; font-size: 14px; background: none; border: none; }
         .bk-delete-btn:hover { color: #ef4444; }
 
         /* Download Dropdown */
         .bk-download-wrapper { position: relative; display: inline-block; }
-        .bk-download-btn { background: transparent; border: 1px solid #444; color: #fff; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+        .bk-download-btn { background: transparent; border: 1px solid #444; color: #fff; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
         .bk-download-btn:hover { background: #222; border-color: #667eea; }
         .bk-download-menu { position: absolute; top: calc(100% + 5px); right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; min-width: 200px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; overflow: hidden; display: none; }
         .bk-download-header { padding: 10px 12px; background: #222; border-bottom: 1px solid #333; font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; }
@@ -784,9 +805,9 @@
         .bk-download-item.bk-download-disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
         /* Credits column */
-        .bk-credits { text-align: right; width: 100px; }
-        .bk-credits-val { display: block; font-size: 13px; font-weight: 700; color: #fff; }
-        .bk-credits-label { display: block; font-size: 10px; color: #888; }
+        .bk-credits { text-align: right; }
+        .bk-credits-val { display: block; font-size: 12px; font-weight: 700; color: #fff; }
+        .bk-credits-label { display: block; font-size: 9px; color: #888; }
 
         /* =================== SMOOTH ANIMATIONS =================== */
 

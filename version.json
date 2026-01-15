@@ -1,7 +1,7 @@
 {
-  "version": "1.10.8",
+  "version": "1.10.9",
   "changelog": [
-    "Add info tooltips for Split by Characters and Auto Split options"
+    "Backup modal: Align columns with CSS Grid and header row"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

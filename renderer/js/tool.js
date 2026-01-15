@@ -2623,7 +2623,19 @@ class ProToolManager {
             return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')} ${d.getDate()}/${d.getMonth() + 1}`;
         };
 
-        let html = '';
+        // Header row
+        let html = `
+        <div class="bk-header-row">
+            <div></div>
+            <div>Thời gian / Nội dung</div>
+            <div>Project</div>
+            <div>Voice ID</div>
+            <div>Tên giọng</div>
+            <div>Trạng thái</div>
+            <div>Player</div>
+            <div>Credits</div>
+        </div>
+        `;
         tasks.forEach((task, index) => {
             // Lấy task_id (ưu tiên task_id, sau đó id)
             const taskId = task.task_id || task.id || '';
