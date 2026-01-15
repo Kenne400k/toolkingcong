@@ -464,7 +464,8 @@
 
         async function selectVoice(voiceId, voiceName) {
             if (window.electronAPI && window.electronAPI.selectVoiceFromWindow) {
-                await window.electronAPI.selectVoiceFromWindow(voiceId);
+                // Gửi cả voiceId và voiceName để lưu vào Pro Tool
+                await window.electronAPI.selectVoiceFromWindow(voiceId, voiceName);
             }
             setTimeout(() => window.close(), 300);
         }

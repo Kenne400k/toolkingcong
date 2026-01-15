@@ -940,9 +940,10 @@ ipcMain.handle('open-cloned-voices-window', async () => {
 });
 
 // Send selected voice back to main window
-ipcMain.handle('select-voice-from-window', async (event, voiceId) => {
+ipcMain.handle('select-voice-from-window', async (event, data) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('voice-selected', voiceId);
+    // data = { voiceId, voiceName }
+    mainWindow.webContents.send('voice-selected', data);
   }
   return { success: true };
 });

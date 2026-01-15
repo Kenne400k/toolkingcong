@@ -1,9 +1,9 @@
 {
-  "version": "1.10.12",
+  "version": "1.10.13",
   "changelog": [
-    "Fix Voice Library: Load models from API (same as sidebar Pro Tool)",
-    "Fix addToLibrary (+): Prioritize voice_name when fetching voice info",
-    "Fix Voice Library window: Use dynamic model options from API"
+    "Fix addToLibrary (+): Now uses voice name from 'Chọn giọng nói' window",
+    "Add hidden input to store selected voice name",
+    "IPC now passes both voiceId and voiceName when selecting voice"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

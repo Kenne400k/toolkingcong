@@ -262,10 +262,14 @@ class ProToolManager {
 
         // Listen for voice selection from child windows
         if (window.electronAPI && window.electronAPI.onVoiceSelected) {
-            window.electronAPI.onVoiceSelected((voiceId) => {
-                console.log('🎤 Voice selected from window:', voiceId);
+            window.electronAPI.onVoiceSelected((data) => {
+                // data = { voiceId, voiceName }
+                const voiceId = data?.voiceId || data;
+                const voiceName = data?.voiceName || '';
+                console.log('🎤 Voice selected from window:', voiceId, voiceName);
                 document.getElementById('selectedVoiceId').value = voiceId;
-                this.showNotification(`Selected: ${voiceId}`, 'success');
+                document.getElementById('selectedVoiceName').value = voiceName;
+                this.showNotification(`Selected: ${voiceName || voiceId}`, 'success');
             });
         }
 
@@ -758,6 +762,8 @@ class ProToolManager {
     
     selectVoice(voiceId, voiceName) {
         document.getElementById('selectedVoiceId').value = voiceId;
+        // Lưu voice name để dùng khi add to library
+        document.getElementById('selectedVoiceName').value = voiceName || '';
         this.showNotification(`Selected: ${voiceName}`, 'success');
         document.getElementById('voicesModal').classList.remove('show');
     }
@@ -3745,32 +3751,38 @@ async function addToLibrary() {
         return;
     }
 
-    // Show loading notification
-    proTool.showNotification('Đang tìm thông tin voice...', 'info');
-
-    let voiceName = voiceId; // Default to voiceId if not found
+    // Lấy voice name từ input hidden (đã lưu khi chọn từ window "Chọn giọng nói")
+    let voiceName = document.getElementById('selectedVoiceName')?.value?.trim() || '';
     let previewUrl = ''; // Preview URL for listening
 
-    try {
-        // Call API to get voice info
-        const res = await window.electronAPI.apiRequest(
-            'https://kingcongstudio.com/ajaxs/get_resources2.php?action=search_voice_id',
-            { voice_id: voiceId }
-        );
+    // Nếu không có voice name (user nhập tay voiceId), thì mới gọi API
+    if (!voiceName || voiceName === voiceId) {
+        proTool.showNotification('Đang tìm thông tin voice...', 'info');
 
-        console.log('🔍 Voice Info Result:', res);
+        try {
+            // Call API to get voice info
+            const res = await window.electronAPI.apiRequest(
+                'https://kingcongstudio.com/ajaxs/get_resources2.php?action=search_voice_id',
+                { voice_id: voiceId }
+            );
 
-        if (res && res.status === 'success' && res.data) {
-            // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
-            voiceName = res.data.voice_name || res.data.name || voiceId;
-            previewUrl = res.data.preview_url || res.data.sample_audio || '';
-            console.log('✅ Found voice name:', voiceName, 'preview:', previewUrl);
-        } else {
-            console.log('⚠️ Voice not found, using ID as name');
+            console.log('🔍 Voice Info Result:', res);
+
+            if (res && res.status === 'success' && res.data) {
+                // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
+                voiceName = res.data.voice_name || res.data.name || voiceId;
+                previewUrl = res.data.preview_url || res.data.sample_audio || '';
+                console.log('✅ Found voice name:', voiceName, 'preview:', previewUrl);
+            } else {
+                console.log('⚠️ Voice not found, using ID as name');
+                voiceName = voiceId;
+            }
+        } catch (error) {
+            console.error('❌ Error fetching voice info:', error);
+            voiceName = voiceId; // Fallback to voiceId
         }
-    } catch (error) {
-        console.error('❌ Error fetching voice info:', error);
-        // Continue with voiceId as name
+    } else {
+        console.log('✅ Using cached voice name:', voiceName);
     }
 
     // Get current settings based on provider

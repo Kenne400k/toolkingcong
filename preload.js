@@ -55,8 +55,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 🔥 Voices Window
   openVoicesWindow: (provider) => ipcRenderer.invoke('open-voices-window', provider),
-  selectVoiceFromWindow: (voiceId) => ipcRenderer.invoke('select-voice-from-window', voiceId),
-  onVoiceSelected: (callback) => ipcRenderer.on('voice-selected', (event, voiceId) => callback(voiceId)),
+  selectVoiceFromWindow: (voiceId, voiceName) => ipcRenderer.invoke('select-voice-from-window', { voiceId, voiceName }),
+  onVoiceSelected: (callback) => ipcRenderer.on('voice-selected', (event, data) => callback(data)),
 
   // 🔥 Cloned Voices Window
   openClonedVoicesWindow: () => ipcRenderer.invoke('open-cloned-voices-window'),
