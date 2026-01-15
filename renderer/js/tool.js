@@ -780,15 +780,8 @@ class ProToolManager {
 
         // Update tab UI
         document.querySelectorAll('.voice-tab').forEach(btn => {
-            if (btn.dataset.tab === tab) {
-                btn.style.color = '#fff';
-                btn.style.borderBottom = '2px solid #a855f7';
-                btn.style.fontWeight = '500';
-            } else {
-                btn.style.color = '#888';
-                btn.style.borderBottom = '2px solid transparent';
-                btn.style.fontWeight = 'normal';
-            }
+            const isActive = btn.dataset.tab === tab;
+            btn.classList.toggle('active', isActive);
         });
 
         // Load content based on tab
@@ -3380,15 +3373,8 @@ function saveVoiceLibrary() {
 function switchLibraryTab(provider) {
     // Update tabs
     document.querySelectorAll('.lib-tab').forEach(tab => {
-        if (tab.dataset.provider === provider) {
-            tab.style.color = '#fff';
-            tab.style.borderBottom = '2px solid #a855f7';
-            tab.classList.add('active');
-        } else {
-            tab.style.color = '#888';
-            tab.style.borderBottom = '2px solid transparent';
-            tab.classList.remove('active');
-        }
+        const isActive = tab.dataset.provider === provider;
+        tab.classList.toggle('active', isActive);
     });
 
     // Show/hide library content

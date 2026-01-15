@@ -352,19 +352,36 @@
         }
 
         html.light .lib-tab {
-            background: var(--bg-secondary);
-            border-color: var(--border);
             color: var(--text-dim);
+            border-bottom-color: transparent;
         }
 
         html.light .lib-tab:hover {
-            background: var(--hover-bg);
             color: var(--text);
         }
 
         html.light .lib-tab.active {
-            background: var(--primary);
-            color: #fff;
+            color: var(--text);
+            border-bottom-color: var(--primary);
+        }
+
+        html.light .lib-tabs,
+        html.light .voice-tabs {
+            border-color: var(--border);
+        }
+
+        html.light .voice-tab {
+            color: var(--text-dim);
+            border-bottom-color: transparent;
+        }
+
+        html.light .voice-tab:hover {
+            color: var(--text);
+        }
+
+        html.light .voice-tab.active {
+            color: var(--text);
+            border-bottom-color: var(--primary);
         }
 
         html.light .tooltip {
@@ -448,84 +465,90 @@
             color: var(--primary);
         }
 
-        /* Provider dropdown - Keep white text (dark background) */
         html.light .provider-select {
-            background: #0a0a0a;
-            border-color: #1a1a1a;
-            color: #fff;
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
         }
 
         html.light .provider-select span {
-            color: #fff;
+            color: var(--text);
         }
 
         html.light .provider-menu {
-            background: #111;
-            border-color: #222;
+            background: var(--bg-secondary);
+            border-color: var(--border);
         }
 
         html.light .provider-option {
-            color: #fff;
+            color: var(--text);
         }
 
         html.light .provider-option span {
-            color: #fff;
+            color: var(--text);
         }
 
-        /* Tool sidebar elements - Keep dark theme */
+        html.light .provider-option:hover {
+            background: var(--hover-bg);
+        }
+
+        html.light .provider-option.active {
+            background: var(--hover-bg);
+        }
+
         html.light .tool-sidebar {
-            background: #050505;
-            border-color: #1a1a1a;
+            background: var(--bg-secondary);
+            border-color: var(--border);
         }
 
         html.light .tool-sidebar .tool-section {
-            border-color: #1a1a1a;
+            border-color: var(--border);
         }
 
         html.light .tool-sidebar .section-title {
-            color: #555;
+            color: var(--text);
         }
 
         html.light .tool-sidebar .form-label {
-            color: #555;
+            color: var(--text-dim);
         }
 
         html.light .tool-sidebar .form-select,
         html.light .tool-sidebar .form-input {
-            background: #0a0a0a;
-            border-color: #1a1a1a;
-            color: #fff;
+            background: var(--input-bg);
+            border-color: var(--border);
+            color: var(--text);
         }
 
         html.light .tool-sidebar .slider-header span {
-            color: #666;
+            color: var(--text-dim);
         }
 
         html.light .tool-sidebar .slider-value {
-            color: #fff;
+            color: var(--text);
         }
 
         html.light .tool-sidebar .checkbox-row {
-            color: #666;
+            color: var(--text-dim);
         }
 
         html.light .tool-sidebar .checkbox-row:hover {
-            color: #fff;
+            color: var(--text);
         }
 
         html.light .tool-sidebar .checkbox-row:has(input:checked) {
-            color: #fff;
+            color: var(--text);
         }
 
         html.light .tool-sidebar .btn {
-            background: #111;
-            border-color: #222;
-            color: #fff;
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
         }
 
         html.light .tool-sidebar .btn:hover {
-            background: #1a1a1a;
-            border-color: #333;
+            background: var(--hover-bg);
+            border-color: var(--border);
         }
 
         html.light .tool-sidebar .btn-primary {
@@ -534,28 +557,28 @@
         }
 
         html.light .tool-sidebar .info-tip {
-            color: #555;
+            color: var(--text-dim);
         }
 
         html.light .tool-sidebar .info-text {
-            background: #0a0a0a;
-            color: #666;
+            background: var(--bg-tertiary);
+            color: var(--text-dim);
         }
 
-        /* Tool footer - Keep dark theme */
         html.light .tool-footer {
-            background: #050505;
-            border-color: #1a1a1a;
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text-dim);
         }
 
         html.light .tool-footer .btn {
-            background: #111;
-            border-color: #222;
-            color: #fff;
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
         }
 
         html.light .tool-footer .btn:hover {
-            background: #1a1a1a;
+            background: var(--hover-bg);
         }
 
         html.light .tool-footer .btn-primary {
@@ -1399,6 +1422,65 @@
             display: flex;
             justify-content: flex-end;
             gap: 8px;
+        }
+
+        /* Library/Voice tabs */
+        .lib-tab {
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lib-tab:hover {
+            color: #fff;
+        }
+
+        .lib-tab.active {
+            color: #fff;
+            border-bottom-color: var(--primary);
+        }
+
+        .lib-tabs {
+            display: flex;
+            border-bottom: 1px solid #2a2a2a;
+            padding: 0 16px;
+            gap: 8px;
+        }
+
+        .voice-tabs {
+            display: flex;
+            border-bottom: 1px solid #2a2a2a;
+            padding: 0 16px;
+            gap: 8px;
+        }
+
+        .voice-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .voice-tab:hover {
+            color: #fff;
+        }
+
+        .voice-tab.active {
+            color: #fff;
+            border-bottom-color: var(--primary);
         }
 
         .voice-table {
@@ -2890,15 +2972,13 @@
             </div>
 
             <!-- Tabs with logos -->
-            <div style="display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 16px; gap: 8px;">
-                <button class="lib-tab active" data-provider="elevenlabs" onclick="switchLibraryTab('elevenlabs')"
-                    style="padding: 10px 16px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+            <div class="lib-tabs">
+                <button class="lib-tab active" data-provider="elevenlabs" onclick="switchLibraryTab('elevenlabs')">
                     <img src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4"
                         style="width: 20px; height: 20px; border-radius: 4px;">
                     <span>ElevenLabs</span>
                 </button>
-                <button class="lib-tab" data-provider="minimax" onclick="switchLibraryTab('minimax')"
-                    style="padding: 10px 16px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 8px;">
+                <button class="lib-tab" data-provider="minimax" onclick="switchLibraryTab('minimax')">
                     <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png"
                         style="width: 20px; height: 20px; border-radius: 4px;">
                     <span>Minimax</span>
@@ -2963,24 +3043,22 @@
     </div>
 
     <!-- Voices Modal -->
-    <div class="modal" id="voicesModal">
+    <div class="modal keep-dark" id="voicesModal">
         <div class="modal-box" style="max-width: 700px;">
             <div class="modal-header">
                 <h3><i class="bi bi-mic"></i> Chọn Giọng Nói</h3>
                 <button class="modal-close" onclick="closeVoicesModal()">×</button>
             </div>
             <!-- Tabs -->
-            <div class="voice-tabs" style="display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 16px;">
-                <button class="voice-tab active" data-tab="default" onclick="proTool.switchVoiceTab('default')"
-                    style="padding: 12px 20px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500;">
+            <div class="voice-tabs">
+                <button class="voice-tab active" data-tab="default" onclick="proTool.switchVoiceTab('default')">
                     <i class="bi bi-cloud-download"></i> Mặc định
                 </button>
-                <button class="voice-tab" data-tab="library" onclick="proTool.switchVoiceTab('library')"
-                    style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent;">
+                <button class="voice-tab" data-tab="library" onclick="proTool.switchVoiceTab('library')">
                     <i class="bi bi-collection"></i> Thư viện
                 </button>
                 <button class="voice-tab" data-tab="clones" onclick="proTool.switchVoiceTab('clones')"
-                    style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: none;">
+                    style="display: none;">
                     <i class="bi bi-mic"></i> My Clones
                 </button>
             </div>
