@@ -1336,15 +1336,7 @@
                     <!-- Voice -->
                     <div class="tool-section">
                         <div class="section-title">Voice</div>
-                        <!-- Voice buttons - ABOVE Voice ID -->
-                        <div class="btn-group" style="margin-bottom: 8px;">
-                            <button class="btn" onclick="loadVoicesFromServer()">
-                                <i class="bi bi-cloud-download"></i> Load
-                            </button>
-                            <button class="btn" onclick="openVoiceLibrary()">
-                                <i class="bi bi-collection"></i> Library
-                            </button>
-                        </div>
+                        <!-- My Clones / Clone buttons (Minimax only) -->
                         <div id="voiceCloneSection" style="display: none; margin-bottom: 8px;">
                             <div class="btn-group">
                                 <button class="btn" onclick="openClonedVoicesModal()">
@@ -1354,6 +1346,15 @@
                                     <i class="bi bi-mic"></i> Clone
                                 </button>
                             </div>
+                        </div>
+                        <!-- Load / Library buttons -->
+                        <div class="btn-group" style="margin-bottom: 8px;">
+                            <button class="btn" onclick="loadVoicesFromServer()">
+                                <i class="bi bi-cloud-download"></i> Load
+                            </button>
+                            <button class="btn" onclick="openVoiceLibrary()">
+                                <i class="bi bi-collection"></i> Library
+                            </button>
                         </div>
                         <!-- Voice ID -->
                         <div class="form-group">

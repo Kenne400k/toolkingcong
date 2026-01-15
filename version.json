@@ -1,9 +1,8 @@
 {
-  "version": "1.10.17",
+  "version": "1.10.18",
   "changelog": [
-    "FIX: Light Mode text colors now properly dark",
-    "Tool sidebar & footer keep dark theme in Light Mode",
-    "Provider dropdown keeps white text on dark background"
+    "Reorder voice buttons: My Clones/Clone on top",
+    "Load/Library buttons moved below"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
