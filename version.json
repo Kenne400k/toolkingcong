@@ -1,9 +1,7 @@
 {
-  "version": "1.10.13",
+  "version": "1.10.14",
   "changelog": [
-    "Fix addToLibrary (+): Now uses voice name from 'Chọn giọng nói' window",
-    "Add hidden input to store selected voice name",
-    "IPC now passes both voiceId and voiceName when selecting voice"
+    "Pro Tool: Center align columns Output Name, Content, Voice ID, Status"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

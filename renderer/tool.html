@@ -472,7 +472,19 @@
             letter-spacing: 0.5px;
             border-bottom: 1px solid #1a1a1a;
         }
-        
+
+        /* Center columns: Output Name, Content, Voice ID, Status */
+        .task-table th:nth-child(3),
+        .task-table th:nth-child(4),
+        .task-table th:nth-child(5),
+        .task-table th:nth-child(6),
+        .task-table td:nth-child(3),
+        .task-table td:nth-child(4),
+        .task-table td:nth-child(5),
+        .task-table td:nth-child(6) {
+            text-align: center;
+        }
+
         .task-table td {
             padding: 10px 14px;
             font-size: 12px;
