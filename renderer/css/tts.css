@@ -614,6 +614,136 @@
 .bulk-modal-body::-webkit-scrollbar-thumb:hover {
     background: #444;
 }
+
+/* ==========================================
+   📁 FOLDER CONFIRM POPUP
+   ========================================== */
+#folderConfirmPopup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    z-index: 999999;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-confirm-box {
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    text-align: center;
+}
+
+.folder-confirm-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: #222;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #444;
+}
+
+.folder-confirm-icon i {
+    font-size: 28px;
+    color: #fff;
+}
+
+#folderConfirmPopup h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+#folderConfirmPopup p {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+}
+
+#folderFileList {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-bottom: 24px;
+    text-align: left;
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.folder-confirm-actions {
+    display: flex;
+    gap: 12px;
+}
+
+#folderCancelBtn,
+#folderUploadBtn {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+#folderCancelBtn {
+    border: 1px solid #444;
+    background: transparent;
+    color: #ccc;
+}
+
+#folderUploadBtn {
+    border: none;
+    background: #fff;
+    color: #000;
+}
+
+#folderCancelBtn:hover {
+    background: #222;
+    border-color: #666;
+    color: #fff;
+}
+
+#folderUploadBtn:hover {
+    background: #e5e5e5;
+}
+
+#folderUploadBtn:active,
+#folderCancelBtn:active {
+    transform: scale(0.98);
+}
+
+#folderFileList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#folderFileList::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+#folderFileList::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+
+#folderFileList::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
 /* ========================================
    🎨 MODERN POPUP STYLES - DARK THEME
    ======================================== */

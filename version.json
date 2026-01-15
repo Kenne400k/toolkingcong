@@ -1,7 +1,7 @@
 {
-  "version": "1.10.29",
+  "version": "1.10.30",
   "changelog": [
-    "TTS: Guard bulk upload drop zone initialization"
+    "TTS: Restore bulk upload UI and folder confirm popup"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
