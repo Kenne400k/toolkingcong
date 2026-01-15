@@ -34,6 +34,19 @@ html.light body {
   color: var(--text);
 }
 
+html.light body.tts-split-theme {
+  --el-bg: #0b0b0b;
+  --el-card: #1c1c1c;
+  --el-border: #333;
+  --el-text-main: #ffffff;
+  --el-text-sub: #a1a1a1;
+  --el-accent: #ffffff;
+  --el-hover: #2a2a2a;
+  --success: #ffffff;
+  --warning: #ffffff;
+  --error: #ef4444;
+}
+
 html.light .text-white {
   color: var(--text);
 }
@@ -114,22 +127,22 @@ html.light .btn-danger:hover {
 }
 
 /* ========== Inputs ========== */
-html.light .form-input,
-html.light .form-select,
-html.light .voice-table input,
-html.light .voice-table select,
-html.light .custom-select,
-html.light .vm-search-input,
-html.light textarea.tts-textarea {
+html.light body:not(.tts-split-theme) .form-input,
+html.light body:not(.tts-split-theme) .form-select,
+html.light body:not(.tts-split-theme) .voice-table input,
+html.light body:not(.tts-split-theme) .voice-table select,
+html.light body:not(.tts-split-theme) .custom-select,
+html.light body:not(.tts-split-theme) .vm-search-input,
+html.light body:not(.tts-split-theme) textarea.tts-textarea {
   background: var(--input-bg);
   border-color: var(--border);
   color: var(--text);
 }
 
-html.light .form-input:focus,
-html.light .form-select:focus,
-html.light .custom-select:focus,
-html.light .vm-search-input:focus {
+html.light body:not(.tts-split-theme) .form-input:focus,
+html.light body:not(.tts-split-theme) .form-select:focus,
+html.light body:not(.tts-split-theme) .custom-select:focus,
+html.light body:not(.tts-split-theme) .vm-search-input:focus {
   border-color: var(--primary);
 }
 
@@ -155,32 +168,32 @@ html.light .data-table tbody tr:hover {
 }
 
 /* ========== Modals & Panels ========== */
-html.light .modal-content,
-html.light .modal-box,
-html.light .bulk-confirm-box,
-html.light .bulk-modal-content,
-html.light .bk-modal-content,
-html.light .delete-modal-box,
-html.light .dh-modal-content,
-html.light .voice-modal-content {
+html.light body:not(.tts-split-theme) .modal-content,
+html.light body:not(.tts-split-theme) .modal-box,
+html.light body:not(.tts-split-theme) .bulk-confirm-box,
+html.light body:not(.tts-split-theme) .bulk-modal-content,
+html.light body:not(.tts-split-theme) .bk-modal-content,
+html.light body:not(.tts-split-theme) .delete-modal-box,
+html.light body:not(.tts-split-theme) .dh-modal-content,
+html.light body:not(.tts-split-theme) .voice-modal-content {
   background: var(--bg-secondary);
   border-color: var(--border);
 }
 
-html.light .modal-header,
-html.light .modal-footer {
+html.light body:not(.tts-split-theme) .modal-header,
+html.light body:not(.tts-split-theme) .modal-footer {
   border-color: var(--border);
 }
 
-html.light .modal-header h3 {
+html.light body:not(.tts-split-theme) .modal-header h3 {
   color: var(--text);
 }
 
-html.light .modal-close {
+html.light body:not(.tts-split-theme) .modal-close {
   color: var(--text-muted);
 }
 
-html.light .modal-close:hover {
+html.light body:not(.tts-split-theme) .modal-close:hover {
   color: var(--text);
 }
 
@@ -239,7 +252,7 @@ html.light .info-text code {
   color: var(--text);
 }
 
-html.light .spinner {
+html.light body:not(.tts-split-theme) .spinner {
   border-color: var(--border);
   border-top-color: var(--primary);
 }
@@ -268,185 +281,185 @@ html.light .status.error {
 }
 
 /* ========== TTS overrides ========== */
-html.light .tts-container,
-html.light .input-area {
+html.light body:not(.tts-split-theme) .tts-container,
+html.light body:not(.tts-split-theme) .input-area {
   background: var(--el-bg);
   border-color: var(--el-border);
 }
 
-html.light .sidebar-panel {
+html.light body:not(.tts-split-theme) .sidebar-panel {
   background: var(--el-card);
   border-color: var(--el-border);
 }
 
-html.light .textarea-wrapper,
-html.light .textarea-inner {
+html.light body:not(.tts-split-theme) .textarea-wrapper,
+html.light body:not(.tts-split-theme) .textarea-inner {
   background: var(--el-card);
 }
 
-html.light textarea.tts-textarea {
+html.light body:not(.tts-split-theme) textarea.tts-textarea {
   color: var(--el-text-main);
 }
 
-html.light .es-title {
+html.light body:not(.tts-split-theme) .es-title {
   color: var(--el-text-main);
 }
 
-html.light .es-subtitle,
-html.light .es-tip,
-html.light .input-footer {
+html.light body:not(.tts-split-theme) .es-subtitle,
+html.light body:not(.tts-split-theme) .es-tip,
+html.light body:not(.tts-split-theme) .input-footer {
   color: var(--el-text-sub);
   border-color: var(--el-border);
 }
 
-html.light .es-code {
+html.light body:not(.tts-split-theme) .es-code {
   background: var(--bg-tertiary);
   border-color: var(--border);
   color: var(--primary);
 }
 
-html.light .upload-btn {
+html.light body:not(.tts-split-theme) .upload-btn {
   border-color: var(--border);
   color: var(--text-dim);
 }
 
-html.light .upload-btn:hover {
+html.light body:not(.tts-split-theme) .upload-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
   background: rgba(79, 70, 229, 0.08);
 }
 
-html.light #fileNameDisplay {
+html.light body:not(.tts-split-theme) #fileNameDisplay {
   background: var(--bg-tertiary);
   border-color: var(--border);
   color: var(--text-dim);
 }
 
-html.light .tab-btn:hover {
+html.light body:not(.tts-split-theme) .tab-btn:hover {
   color: var(--el-text-main);
 }
 
-html.light .tab-btn.active {
+html.light body:not(.tts-split-theme) .tab-btn.active {
   background: var(--el-hover);
   color: var(--el-text-main);
   border-color: var(--el-border);
 }
 
-html.light .provider-dropdown-btn,
-html.light .provider-dropdown-menu {
+html.light body:not(.tts-split-theme) .provider-dropdown-btn,
+html.light body:not(.tts-split-theme) .provider-dropdown-menu {
   background: var(--bg-secondary);
   border-color: var(--border);
   color: var(--text);
 }
 
-html.light .provider-dropdown-btn:hover {
+html.light body:not(.tts-split-theme) .provider-dropdown-btn:hover {
   background: var(--hover-bg);
   border-color: var(--border);
 }
 
-html.light .provider-option {
+html.light body:not(.tts-split-theme) .provider-option {
   color: var(--text);
 }
 
-html.light .provider-option:hover {
+html.light body:not(.tts-split-theme) .provider-option:hover {
   background: var(--hover-bg);
 }
 
-html.light .provider-option.active {
+html.light body:not(.tts-split-theme) .provider-option.active {
   background: #e0e7ff;
   border-left-color: var(--accent);
 }
 
-html.light .provider-option .provider-name {
+html.light body:not(.tts-split-theme) .provider-option .provider-name {
   color: var(--text);
 }
 
-html.light .provider-option .provider-desc {
+html.light body:not(.tts-split-theme) .provider-option .provider-desc {
   color: var(--text-dim);
 }
 
-html.light .provider-option .check-icon {
+html.light body:not(.tts-split-theme) .provider-option .check-icon {
   color: var(--accent);
 }
 
-html.light .setting-group label {
+html.light body:not(.tts-split-theme) .setting-group label {
   color: var(--text);
 }
 
-html.light .custom-select {
+html.light body:not(.tts-split-theme) .custom-select {
   color: var(--text);
 }
 
-html.light .bulk-confirm-title,
-html.light .bulk-confirm-stat-value,
-html.light .bulk-confirm-message {
+html.light body:not(.tts-split-theme) .bulk-confirm-title,
+html.light body:not(.tts-split-theme) .bulk-confirm-stat-value,
+html.light body:not(.tts-split-theme) .bulk-confirm-message {
   color: var(--text);
 }
 
-html.light .bulk-confirm-stats {
+html.light body:not(.tts-split-theme) .bulk-confirm-stats {
   background: var(--bg-tertiary);
   border-color: var(--border);
 }
 
-html.light .bulk-confirm-stat-row {
+html.light body:not(.tts-split-theme) .bulk-confirm-stat-row {
   border-color: var(--border);
 }
 
-html.light .bulk-confirm-stat-label {
+html.light body:not(.tts-split-theme) .bulk-confirm-stat-label {
   color: var(--text-dim);
 }
 
-html.light .bulk-confirm-warning {
+html.light body:not(.tts-split-theme) .bulk-confirm-warning {
   background: rgba(245, 158, 11, 0.12);
   border-color: rgba(245, 158, 11, 0.3);
 }
 
-html.light .bulk-confirm-warning-text {
+html.light body:not(.tts-split-theme) .bulk-confirm-warning-text {
   color: var(--text-dim);
 }
 
-html.light .bulk-confirm-btn-cancel {
+html.light body:not(.tts-split-theme) .bulk-confirm-btn-cancel {
   border-color: var(--border);
   color: var(--text-dim);
 }
 
-html.light .bulk-confirm-btn-cancel:hover {
+html.light body:not(.tts-split-theme) .bulk-confirm-btn-cancel:hover {
   background: var(--hover-bg);
   color: var(--text);
 }
 
-html.light .bulk-confirm-btn-confirm {
+html.light body:not(.tts-split-theme) .bulk-confirm-btn-confirm {
   background: var(--primary);
   color: #fff;
 }
 
-html.light .bulk-confirm-btn-confirm:hover {
+html.light body:not(.tts-split-theme) .bulk-confirm-btn-confirm:hover {
   box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
 }
 
-html.light .bulk-modal-header {
+html.light body:not(.tts-split-theme) .bulk-modal-header {
   border-color: var(--border);
 }
 
-html.light .bulk-modal-header h3 {
+html.light body:not(.tts-split-theme) .bulk-modal-header h3 {
   color: var(--text);
 }
 
-html.light .bulk-modal-close {
+html.light body:not(.tts-split-theme) .bulk-modal-close {
   color: var(--text-muted);
 }
 
-html.light .bulk-modal-close:hover {
+html.light body:not(.tts-split-theme) .bulk-modal-close:hover {
   color: var(--text);
 }
 
-html.light .history-card {
+html.light body:not(.tts-split-theme) .history-card {
   background: var(--bg-secondary);
   border-color: var(--border);
   color: var(--text);
 }
 
-html.light .history-card:hover {
+html.light body:not(.tts-split-theme) .history-card:hover {
   background: var(--hover-bg);
 }
 
