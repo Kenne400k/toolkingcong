@@ -13,19 +13,98 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        :root {
+        /* Dark Mode (default) */
+        :root, html.dark {
             --primary: #a855f7;
             --accent: #667eea;
             --bg-main: #0a0a0a;
             --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
             --border: #2a2a2a;
             --text: #e5e5e5;
             --text-dim: #888;
+            --text-muted: #555;
+            --input-bg: #000;
+            --hover-bg: #111;
+            --scrollbar: #333;
         }
-        
+
+        /* Light Mode */
+        html.light {
+            --primary: #9333ea;
+            --accent: #4f46e5;
+            --bg-main: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e5e5e5;
+            --border: #d1d5db;
+            --text: #1f2937;
+            --text-dim: #6b7280;
+            --text-muted: #9ca3af;
+            --input-bg: #ffffff;
+            --hover-bg: #f3f4f6;
+            --scrollbar: #d1d5db;
+        }
+
+        /* Light mode overrides for specific elements */
+        html.light .status-done { background: #22c55e; color: #fff; }
+        html.light .status-pending { background: #e5e5e5; color: #374151; }
+        html.light .status-failed { background: #fee2e2; color: #dc2626; }
+        html.light .status-processing { background: #fef3c7; color: #d97706; }
+        html.light .btn { background: var(--bg-secondary); border-color: var(--border); color: var(--text); }
+        html.light .btn:hover { background: var(--hover-bg); border-color: #9ca3af; }
+        html.light .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+        html.light .btn-primary:hover { background: #7c3aed; }
+        html.light .form-input, html.light .form-select { background: var(--input-bg); border-color: var(--border); color: var(--text); }
+        html.light .form-input:focus, html.light .form-select:focus { border-color: var(--primary); }
+        html.light .task-table th { background: var(--bg-main); color: var(--text-dim); border-color: var(--border); }
+        html.light .task-table td { border-color: var(--border); }
+        html.light .task-table tr:hover td { background: var(--hover-bg); }
+        html.light .task-content { color: var(--text); }
+        html.light .modal-content, html.light .modal-box { background: var(--bg-secondary); border-color: var(--border); }
+        html.light .modal-header { border-color: var(--border); }
+        html.light .modal-header h3 { color: var(--text); }
+        html.light .modal-footer { border-color: var(--border); }
+        html.light .bk-modal-content { background: var(--bg-secondary); }
+        html.light .bk-row { border-color: var(--border); }
+        html.light .bk-row:hover { background: var(--hover-bg); }
+        html.light .bk-header { background: var(--bg-main); }
+        html.light .bk-header h3 { color: var(--text); }
+        html.light .bk-toolbar { background: var(--bg-secondary); border-color: var(--border); }
+        html.light .bk-header-row { background: var(--bg-main); color: var(--text-dim); border-color: var(--border); }
+        html.light .voice-table th { background: var(--bg-main); color: var(--text-dim); }
+        html.light .voice-table input, html.light .voice-table select { background: var(--input-bg); border-color: var(--border); color: var(--text); }
+        html.light .credits-box { background: var(--bg-secondary); border-color: var(--border); color: var(--text); }
+        html.light .top-bar { background: var(--bg-secondary); border-color: var(--border); }
+        html.light .top-bar-title { color: var(--text); }
+        html.light .tool-section { background: var(--bg-secondary); }
+        html.light .section-title { color: var(--text); }
+        html.light .form-label { color: var(--text-dim); }
+        html.light .sidebar-nav .nav-item { color: var(--text-dim); }
+        html.light .sidebar-nav .nav-item:hover, html.light .sidebar-nav .nav-item.active { background: var(--hover-bg); color: var(--text); }
+        html.light .main-sidebar { background: var(--bg-secondary); border-color: var(--border); }
+        html.light .sidebar-header { border-color: var(--border); }
+        html.light .tool-sidebar { background: var(--bg-secondary); border-color: var(--border); }
+        html.light .tool-footer { background: var(--bg-secondary); border-color: var(--border); }
+        html.light .task-area { background: var(--bg-main); }
+        html.light .info-tip { color: var(--text-dim); }
+        html.light .info-text { background: var(--bg-main); color: var(--text-dim); }
+        html.light .checkbox-row { color: var(--text); }
+        html.light .slider-header span { color: var(--text-dim); }
+        html.light .slider-value { color: var(--text); }
+        html.light ::-webkit-scrollbar-thumb { background: var(--scrollbar); }
+        html.light .bk-time { color: var(--text); }
+        html.light .bk-text-preview { color: var(--text-dim); }
+        html.light .bk-credits-val { color: var(--text); }
+        html.light .bk-status-badge.bk-badge-done { background: #22c55e; color: #fff; }
+        html.light .bk-timer { color: var(--text-dim); }
+        html.light .bk-download-menu { background: var(--bg-secondary); border-color: var(--border); }
+        html.light .bk-download-header { background: var(--bg-main); border-color: var(--border); color: var(--text-dim); }
+        html.light .bk-download-item { color: var(--text); }
+        html.light .bk-download-item:hover { background: var(--hover-bg); }
+
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
         
         body {
             background: var(--bg-main);
@@ -1136,12 +1215,25 @@
                         background: var(--bg-secondary);
                         border: 1px solid var(--border);
                         border-radius: 6px;
-                        color: #fff;
+                        color: var(--text);
                         font-size: 12px;
                         font-weight: 600;
                         cursor: pointer;
                         transition: all 0.2s;
                     ">VI</button>
+                    <button id="themeSwitchBtn" onclick="toggleTheme()" style="
+                        padding: 6px 10px;
+                        background: var(--bg-secondary);
+                        border: 1px solid var(--border);
+                        border-radius: 6px;
+                        color: var(--text);
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    " title="Toggle Light/Dark Mode"><i class="bi bi-moon-fill"></i></button>
                     <div class="credits-box">
                         <i class="bi bi-wallet2"></i>
                         <span id="userCredits">0</span> Credits
@@ -1816,18 +1908,51 @@
     <script src="js/tool.js"></script>
     
     <script>
+        // ==================== THEME TOGGLE ====================
+        function initTheme() {
+            const savedTheme = localStorage.getItem('appTheme') || 'dark';
+            applyTheme(savedTheme);
+        }
+
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeSwitchBtn');
+
+            if (theme === 'light') {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                if (btn) btn.innerHTML = '<i class="bi bi-sun-fill"></i>';
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                if (btn) btn.innerHTML = '<i class="bi bi-moon-fill"></i>';
+            }
+            localStorage.setItem('appTheme', theme);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.classList.contains('light') ? 'light' : 'dark';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+        }
+
+        // Initialize theme on page load
+        initTheme();
+
+        // ==================== PROVIDER DROPDOWN ====================
         // Provider dropdown
         function toggleProviderDropdown() {
             document.getElementById('providerDropdown').classList.toggle('open');
         }
-        
+
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.provider-dropdown')) {
                 document.getElementById('providerDropdown').classList.remove('open');
             }
         });
-        
+
         // Slider updates - đã chuyển sang tool.js để hỗ trợ V3 model
 
         // Floating tooltip for info icons

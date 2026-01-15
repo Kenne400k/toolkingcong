@@ -1,8 +1,9 @@
 {
-  "version": "1.10.15",
+  "version": "1.10.16",
   "changelog": [
-    "Pro Tool sidebar: Move voice buttons above Voice ID input",
-    "Reorder buttons: Load | Library, My Clones | Clone"
+    "NEW: Light Mode / Dark Mode toggle",
+    "Button in header (moon/sun icon) to switch theme",
+    "Theme preference saved to localStorage"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
