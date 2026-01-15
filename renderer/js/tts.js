@@ -7553,7 +7553,6 @@ function processElectronFiles(files) {
 
             $('#txtInput').val(content);
             togglePlaceholder();
-            updateCharCount();
             updateEstimatedCost();
             $('#fileNameDisplay').text(`📂 ${file.name}`).fadeIn();
             showToast(`✅ Đã tải: ${file.name}`);

@@ -1,8 +1,7 @@
 {
-  "version": "1.10.27",
+  "version": "1.10.28",
   "changelog": [
-    "TTS: Fix Electron file/folder upload processing",
-    "TTS: Handle ZIP uploads in bulk flow"
+    "TTS: Fix single-file upload char count update"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
