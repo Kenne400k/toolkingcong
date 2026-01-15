@@ -1,7 +1,7 @@
 {
-  "version": "1.10.30",
+  "version": "1.10.31",
   "changelog": [
-    "TTS: Restore bulk upload UI and folder confirm popup"
+    "TTS: Fix bulk confirm language handling"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

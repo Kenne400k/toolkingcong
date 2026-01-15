@@ -8266,6 +8266,12 @@ function calculateBulkCost() {
 // ========================================
 // 🔥 MỞ POPUP XÁC NHẬN BULK (FIXED)
 // ========================================
+function getUiLang() {
+    return (window.i18n && window.i18n.currentLang)
+        || localStorage.getItem('app_language')
+        || 'vi';
+}
+
 function processBulkFiles() {
     // 1. Validate
     if (bulkFiles.length === 0) {
@@ -8289,11 +8295,13 @@ function processBulkFiles() {
     let $warning = $('#bcWarning');
     let $confirmBtn = $('#btnBulkConfirm');
 
+    const lang = getUiLang();
+
     if (balanceAfter < 0) {
         $('#bcBalanceAfter').removeClass('balance').addClass('danger');
         $warning.show();
         $('#bcWarningText').text(
-            currentLang === 'vi'
+            lang === 'vi'
                 ? `Bạn thiếu ${Math.abs(balanceAfter).toLocaleString()} credits. Vui lòng nạp thêm để tiếp tục.`
                 : `You need ${Math.abs(balanceAfter).toLocaleString()} more credits. Please top up to continue.`
         );
@@ -8321,9 +8329,10 @@ function closeBulkConfirmPopup() {
 async function confirmBulkProcess() {
     // 1. Khóa nút
     let $btn = $('#btnBulkConfirm');
+    const lang = getUiLang();
     $btn.addClass('loading').prop('disabled', true);
     $btn.find('i').removeClass('bi-magic').addClass('bi-arrow-repeat');
-    $btn.find('span').text(currentLang === 'vi' ? 'Đang xử lý...' : 'Processing...');
+    $btn.find('span').text(lang === 'vi' ? 'Đang xử lý...' : 'Processing...');
 
     let successCount = 0;
     let failCount = 0;
@@ -8339,7 +8348,7 @@ async function confirmBulkProcess() {
 
         // Update progress text
         let progress = Math.round((i + 1) / bulkFiles.length * 100);
-        $btn.find('span').text(`${currentLang === 'vi' ? 'Đang xử lý' : 'Processing'} ${i + 1}/${bulkFiles.length} (${progress}%)`);
+        $btn.find('span').text(`${lang === 'vi' ? 'Đang xử lý' : 'Processing'} ${i + 1}/${bulkFiles.length} (${progress}%)`);
 
         // Xác định checkbox phụ đề
         let isSubtitleChecked = (currentProvider === 'minimax')
@@ -8439,8 +8448,9 @@ async function confirmBulkProcess() {
             resultMsg += `\n\n(Đã sử dụng Backup miễn phí)`;
         }
 
+        const lang = getUiLang();
         showModernAlert(
-            currentLang === 'vi' ? 'Hoàn thành xử lý' : 'Processing Complete',
+            lang === 'vi' ? 'Hoàn thành xử lý' : 'Processing Complete',
             resultMsg,
             'success'
         );
