@@ -33,6 +33,7 @@
             }
         };
     </script>
+    <script src="js/theme.js"></script>
 
     <link rel="stylesheet" href="css/tts.css">
 
@@ -181,6 +182,7 @@
             padding: 16px;
         }
     </style>
+    <link rel="stylesheet" href="css/theme.css">
 </head>
 
 <body class="bg-main">
@@ -250,12 +252,13 @@
                         background: var(--bg-secondary);
                         border: 1px solid var(--border);
                         border-radius: 6px;
-                        color: #fff;
+                        color: var(--text);
                         font-size: 12px;
                         font-weight: 600;
                         cursor: pointer;
                         transition: all 0.2s;
                     ">VI</button>
+                    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme"></button>
                     <div class="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg border border-custom">
                         <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
                         <span class="text-sm font-semibold text-white" id="userCredits">0</span>

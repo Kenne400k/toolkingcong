@@ -1,7 +1,7 @@
 {
-  "version": "1.10.23",
+  "version": "1.10.24",
   "changelog": [
-    "Pro Tool: Fixed Minimax Speed/Volume default display (1.00 instead of 1.0)"
+    "UI: Added light/dark mode support across renderer windows"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

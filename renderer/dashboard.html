@@ -6,6 +6,7 @@
     <title>VoiceStudio - Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
     <script id="tailwind-config">
@@ -27,6 +28,7 @@
             }
         };
     </script>
+    <script src="js/theme.js"></script>
     
     <style>
         * {
@@ -299,6 +301,7 @@
             perspective: 1000px;
         }
     </style>
+    <link rel="stylesheet" href="css/theme.css">
 </head>
 
 <body class="bg-main">
@@ -362,12 +365,13 @@
                         background: var(--bg-secondary);
                         border: 1px solid var(--border);
                         border-radius: 6px;
-                        color: #fff;
+                        color: var(--text);
                         font-size: 12px;
                         font-weight: 600;
                         cursor: pointer;
                         transition: all 0.2s;
                     ">VI</button>
+                    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme"></button>
                     <div class="flex items-center gap-2 bg-secondary px-4 py-2 rounded-lg border border-custom">
                         <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
                         <span class="text-sm font-semibold text-white" id="header-credits">0</span>

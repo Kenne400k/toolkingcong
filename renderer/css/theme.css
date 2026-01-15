@@ -1,0 +1,557 @@
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+  --primary: #9333ea;
+  --accent: #4f46e5;
+  --bg-main: #f5f5f5;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e5e5e5;
+  --border: #d1d5db;
+  --text: #1f2937;
+  --text-dim: #6b7280;
+  --text-muted: #9ca3af;
+  --input-bg: #ffffff;
+  --hover-bg: #f3f4f6;
+  --scrollbar: #d1d5db;
+
+  --el-bg: #f5f5f5;
+  --el-card: #ffffff;
+  --el-border: #d1d5db;
+  --el-text-main: #1f2937;
+  --el-text-sub: #6b7280;
+  --el-accent: var(--accent);
+  --el-hover: #f3f4f6;
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --error: #dc2626;
+}
+
+html.light body {
+  background: var(--bg-main);
+  color: var(--text);
+}
+
+html.light .text-white {
+  color: var(--text);
+}
+
+html.light .text-dim {
+  color: var(--text-dim);
+}
+
+html.light .bg-main {
+  background: var(--bg-main);
+}
+
+html.light .bg-secondary {
+  background: var(--bg-secondary);
+}
+
+html.light .bg-tertiary {
+  background: var(--bg-tertiary);
+}
+
+html.light .border-custom {
+  border-color: var(--border);
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+}
+
+.theme-toggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--hover-bg);
+}
+
+/* ========== Buttons ========== */
+html.light .btn {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html.light .btn:hover {
+  background: var(--hover-bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html.light .btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+html.light .btn-primary:hover {
+  background: #6d28d9;
+}
+
+html.light .btn-danger {
+  color: #dc2626;
+}
+
+html.light .btn-danger:hover {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: #dc2626;
+}
+
+/* ========== Inputs ========== */
+html.light .form-input,
+html.light .form-select,
+html.light .voice-table input,
+html.light .voice-table select,
+html.light .custom-select,
+html.light .vm-search-input,
+html.light textarea.tts-textarea {
+  background: var(--input-bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html.light .form-input:focus,
+html.light .form-select:focus,
+html.light .custom-select:focus,
+html.light .vm-search-input:focus {
+  border-color: var(--primary);
+}
+
+/* ========== Tables ========== */
+html.light .task-table th,
+html.light .voice-table th,
+html.light .data-table thead tr {
+  background: var(--bg-tertiary);
+  color: var(--text-dim);
+  border-color: var(--border);
+}
+
+html.light .task-table td,
+html.light .voice-table td,
+html.light .data-table tbody tr {
+  border-color: var(--border);
+}
+
+html.light .task-table tr:hover td,
+html.light .voice-table tr:hover td,
+html.light .data-table tbody tr:hover {
+  background: var(--hover-bg);
+}
+
+/* ========== Modals & Panels ========== */
+html.light .modal-content,
+html.light .modal-box,
+html.light .bulk-confirm-box,
+html.light .bulk-modal-content,
+html.light .bk-modal-content,
+html.light .delete-modal-box,
+html.light .dh-modal-content,
+html.light .voice-modal-content {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+html.light .modal-header,
+html.light .modal-footer {
+  border-color: var(--border);
+}
+
+html.light .modal-header h3 {
+  color: var(--text);
+}
+
+html.light .modal-close {
+  color: var(--text-muted);
+}
+
+html.light .modal-close:hover {
+  color: var(--text);
+}
+
+/* ========== Tabs ========== */
+html.light .tabs,
+html.light .voice-tabs {
+  border-color: var(--border);
+}
+
+html.light .lib-tab,
+html.light .voice-tab {
+  color: var(--text-dim);
+}
+
+html.light .lib-tab:hover,
+html.light .voice-tab:hover {
+  color: var(--text);
+}
+
+html.light .lib-tab.active,
+html.light .voice-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--primary);
+}
+
+/* ========== Voice list items ========== */
+html.light .voice-item {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+html.light .voice-item:hover {
+  background: var(--hover-bg);
+}
+
+html.light .voice-item .name {
+  color: var(--text);
+}
+
+html.light .voice-item .id,
+html.light .voice-item .labels,
+html.light .voice-item .meta,
+html.light .count-info {
+  color: var(--text-muted);
+}
+
+/* ========== Utility panels ========== */
+html.light .info-text {
+  background: var(--bg-tertiary);
+  color: var(--text-dim);
+}
+
+html.light .info-text code {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html.light .spinner {
+  border-color: var(--border);
+  border-top-color: var(--primary);
+}
+
+/* ========== Status badges (backup window) ========== */
+html.light .status.pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+html.light .status.processing {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+html.light .status.done,
+html.light .status.completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+html.light .status.failed,
+html.light .status.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ========== TTS overrides ========== */
+html.light .tts-container,
+html.light .input-area {
+  background: var(--el-bg);
+  border-color: var(--el-border);
+}
+
+html.light .sidebar-panel {
+  background: var(--el-card);
+  border-color: var(--el-border);
+}
+
+html.light .textarea-wrapper,
+html.light .textarea-inner {
+  background: var(--el-card);
+}
+
+html.light textarea.tts-textarea {
+  color: var(--el-text-main);
+}
+
+html.light .es-title {
+  color: var(--el-text-main);
+}
+
+html.light .es-subtitle,
+html.light .es-tip,
+html.light .input-footer {
+  color: var(--el-text-sub);
+  border-color: var(--el-border);
+}
+
+html.light .es-code {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--primary);
+}
+
+html.light .upload-btn {
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+html.light .upload-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(79, 70, 229, 0.08);
+}
+
+html.light #fileNameDisplay {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+html.light .tab-btn:hover {
+  color: var(--el-text-main);
+}
+
+html.light .tab-btn.active {
+  background: var(--el-hover);
+  color: var(--el-text-main);
+  border-color: var(--el-border);
+}
+
+html.light .provider-dropdown-btn,
+html.light .provider-dropdown-menu {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html.light .provider-dropdown-btn:hover {
+  background: var(--hover-bg);
+  border-color: var(--border);
+}
+
+html.light .provider-option {
+  color: var(--text);
+}
+
+html.light .provider-option:hover {
+  background: var(--hover-bg);
+}
+
+html.light .provider-option.active {
+  background: #e0e7ff;
+  border-left-color: var(--accent);
+}
+
+html.light .provider-option .provider-name {
+  color: var(--text);
+}
+
+html.light .provider-option .provider-desc {
+  color: var(--text-dim);
+}
+
+html.light .provider-option .check-icon {
+  color: var(--accent);
+}
+
+html.light .setting-group label {
+  color: var(--text);
+}
+
+html.light .custom-select {
+  color: var(--text);
+}
+
+html.light .bulk-confirm-title,
+html.light .bulk-confirm-stat-value,
+html.light .bulk-confirm-message {
+  color: var(--text);
+}
+
+html.light .bulk-confirm-stats {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+}
+
+html.light .bulk-confirm-stat-row {
+  border-color: var(--border);
+}
+
+html.light .bulk-confirm-stat-label {
+  color: var(--text-dim);
+}
+
+html.light .bulk-confirm-warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+html.light .bulk-confirm-warning-text {
+  color: var(--text-dim);
+}
+
+html.light .bulk-confirm-btn-cancel {
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+html.light .bulk-confirm-btn-cancel:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+html.light .bulk-confirm-btn-confirm {
+  background: var(--primary);
+  color: #fff;
+}
+
+html.light .bulk-confirm-btn-confirm:hover {
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
+}
+
+html.light .bulk-modal-header {
+  border-color: var(--border);
+}
+
+html.light .bulk-modal-header h3 {
+  color: var(--text);
+}
+
+html.light .bulk-modal-close {
+  color: var(--text-muted);
+}
+
+html.light .bulk-modal-close:hover {
+  color: var(--text);
+}
+
+html.light .history-card {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html.light .history-card:hover {
+  background: var(--hover-bg);
+}
+
+/* ========== Voice cloning overrides ========== */
+html.light .top-bar,
+html.light .main-sidebar,
+html.light .clone-container,
+html.light .form-panel,
+html.light .library-area {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+html.light .clone-container {
+  background: var(--bg-main);
+}
+
+html.light .section-header {
+  border-color: var(--border);
+}
+
+html.light .top-bar-title,
+html.light .section-title,
+html.light .user-name,
+html.light .form-group label,
+html.light .file-name,
+html.light .vc-title {
+  color: var(--text);
+}
+
+html.light .form-input {
+  background: var(--input-bg);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+html.light .form-input::placeholder {
+  color: var(--text-muted);
+}
+
+html.light .upload-box {
+  border-color: var(--border);
+}
+
+html.light .upload-icon,
+html.light .upload-text,
+html.light .upload-hint,
+html.light .file-size {
+  color: var(--text-dim);
+}
+
+html.light .file-preview-card,
+html.light .voice-card {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+html.light .btn-refresh {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+html.light .btn-refresh:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+html.light .btn-icon-action {
+  background: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+html.light .btn-icon-action:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+html.light .modal-body {
+  color: var(--text-dim);
+}
+
+html.light .btn-cancel {
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+html.light .btn-cancel:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+html.light .loading-overlay {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+html.light .loading-text {
+  color: var(--text);
+}
+
+html.light .loading-hint {
+  color: var(--text-dim);
+}
+
+html.light .loading-progress {
+  background: var(--bg-tertiary);
+}
