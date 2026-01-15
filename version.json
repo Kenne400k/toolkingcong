@@ -1,7 +1,8 @@
 {
-  "version": "1.10.25",
+  "version": "1.10.26",
   "changelog": [
-    "UI: Keep Text to Speech inner dark in light mode"
+    "UI: Fix voice selector dark mode and Pro Tool light text",
+    "UI: Add smoother transitions"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
