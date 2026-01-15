@@ -2099,6 +2099,8 @@ class ProToolManager {
 
     saveVoiceLibrary() {
         // Save ElevenLabs library
+        // Thứ tự columns: #, Project, Name, Voice ID, Model, Speed, Stability, Similarity, Style, Boost, Actions
+        // inputs: [0]=Project, [1]=Name, [2]=VoiceID, [3]=Speed, [4]=Stability, [5]=Similarity, [6]=Style, [7]=Boost(checkbox)
         const elevenlabsRows = document.querySelectorAll('#elevenlabsLibraryBody tr');
         this.voiceLibraryElevenlabs = [];
 
@@ -2108,15 +2110,16 @@ class ProToolManager {
             const voice = {
                 id: index + 1,
                 provider: 'elevenlabs',
-                name: inputs[0]?.value?.trim() || '',
-                voiceId: inputs[1]?.value?.trim() || '',
+                project: inputs[0]?.value?.trim() || '',
+                name: inputs[1]?.value?.trim() || '',
+                voiceId: inputs[2]?.value?.trim() || '',
                 model: selects[0]?.value || 'eleven_multilingual_v2',
                 settings: {
-                    speed: parseFloat(inputs[2]?.value) || 1,
-                    stability: parseFloat(inputs[3]?.value) || 0.5,
-                    similarity: parseFloat(inputs[4]?.value) || 0.75,
-                    style: parseFloat(inputs[5]?.value) || 0,
-                    speakerBoost: inputs[6]?.checked !== false
+                    speed: parseFloat(inputs[3]?.value) || 1,
+                    stability: parseFloat(inputs[4]?.value) || 0.5,
+                    similarity: parseFloat(inputs[5]?.value) || 0.75,
+                    style: parseFloat(inputs[6]?.value) || 0,
+                    speakerBoost: inputs[7]?.checked !== false
                 }
             };
             if (voice.voiceId) {
@@ -2125,6 +2128,8 @@ class ProToolManager {
         });
 
         // Save Minimax library
+        // Thứ tự columns: #, Project, Name, Voice ID, Model, Speed, Pitch, Vol, Actions
+        // inputs: [0]=Project, [1]=Name, [2]=VoiceID, [3]=Speed, [4]=Pitch, [5]=Vol
         const minimaxRows = document.querySelectorAll('#minimaxLibraryBody tr');
         this.voiceLibraryMinimax = [];
 
@@ -2134,13 +2139,14 @@ class ProToolManager {
             const voice = {
                 id: index + 1,
                 provider: 'minimax',
-                name: inputs[0]?.value?.trim() || '',
-                voiceId: inputs[1]?.value?.trim() || '',
+                project: inputs[0]?.value?.trim() || '',
+                name: inputs[1]?.value?.trim() || '',
+                voiceId: inputs[2]?.value?.trim() || '',
                 model: selects[0]?.value || 'speech-02-hd',
                 settings: {
-                    speed: parseFloat(inputs[2]?.value) || 1,
-                    pitch: parseFloat(inputs[3]?.value) || 0,
-                    vol: parseFloat(inputs[4]?.value) || 1
+                    speed: parseFloat(inputs[3]?.value) || 1,
+                    pitch: parseFloat(inputs[4]?.value) || 0,
+                    vol: parseFloat(inputs[5]?.value) || 1
                 }
             };
             if (voice.voiceId) {
@@ -2216,18 +2222,26 @@ class ProToolManager {
             return;
         }
 
-        tbody.innerHTML = this.voiceLibraryMinimax.map((voice, idx) => `
+        tbody.innerHTML = this.voiceLibraryMinimax.map((voice, idx) => {
+            // Lấy tên: ưu tiên voice_name > name, tránh trường hợp name = voiceId
+            const displayName = voice.voice_name || voice.name || '';
+            // Lấy voice ID: ưu tiên voiceId > voice_id > id
+            const displayVoiceId = voice.voiceId || voice.voice_id || voice.id || '';
+            // Model: default là speech-02-hd nếu không có
+            const currentModel = voice.model || 'speech-02-hd';
+
+            return `
             <tr data-idx="${idx}" data-provider="minimax">
                 <td>${idx + 1}</td>
                 <td><input type="text" value="${voice.project || ''}" placeholder="Project..." style="width: 70px;" onchange="updateLibraryVoice('minimax', ${idx}, 'project', this.value)"></td>
-                <td><input type="text" value="${voice.name || ''}" placeholder="Name..." style="width: 90px;" onchange="updateLibraryVoice('minimax', ${idx}, 'name', this.value)"></td>
-                <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateLibraryVoice('minimax', ${idx}, 'voiceId', this.value)"></td>
+                <td><input type="text" value="${this.escapeHtml(displayName)}" placeholder="Name..." style="width: 90px;" onchange="updateLibraryVoice('minimax', ${idx}, 'name', this.value)"></td>
+                <td><input type="text" value="${displayVoiceId}" placeholder="Voice ID..." style="width: 140px;" onchange="updateLibraryVoice('minimax', ${idx}, 'voiceId', this.value)"></td>
                 <td>
                     <select style="width: 100px; padding: 4px;" onchange="updateLibraryVoice('minimax', ${idx}, 'model', this.value)">
-                        <option value="speech-02-hd" ${voice.model === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
-                        <option value="speech-02-turbo" ${voice.model === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
-                        <option value="speech-01-hd" ${voice.model === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
-                        <option value="speech-01-turbo" ${voice.model === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
+                        <option value="speech-02-hd" ${currentModel === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
+                        <option value="speech-02-turbo" ${currentModel === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
+                        <option value="speech-01-hd" ${currentModel === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
+                        <option value="speech-01-turbo" ${currentModel === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
                     </select>
                 </td>
                 <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateLibrarySetting('minimax', ${idx}, 'speed', parseFloat(this.value))"></td>
@@ -2238,8 +2252,8 @@ class ProToolManager {
                     <button class="btn btn-sm" onclick="useLibraryVoice('minimax', ${idx})" title="Sử dụng"><i class="bi bi-check-lg"></i></button>
                     <button class="btn btn-sm" onclick="removeLibraryRow('minimax', ${idx})" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
                 </td>
-            </tr>
-        `).join('');
+            </tr>`;
+        }).join('');
     }
     
     // ==================== JOIN MP3 & SRT ====================

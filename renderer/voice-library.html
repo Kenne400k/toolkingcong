@@ -400,18 +400,26 @@
                 return;
             }
 
-            tbody.innerHTML = minimaxVoices.map((voice, idx) => `
+            tbody.innerHTML = minimaxVoices.map((voice, idx) => {
+                // Lấy tên: ưu tiên voice_name > name, tránh trường hợp name = voiceId
+                const displayName = voice.voice_name || voice.name || '';
+                // Lấy voice ID: ưu tiên voiceId > voice_id > id
+                const displayVoiceId = voice.voiceId || voice.voice_id || voice.id || '';
+                // Model: default là speech-02-hd nếu không có
+                const currentModel = voice.model || 'speech-02-hd';
+
+                return `
                 <tr data-idx="${idx}">
                     <td>${idx + 1}</td>
                     <td><input type="text" value="${voice.project || ''}" placeholder="Project..." style="width: 70px;" onchange="updateMinimaxVoice(${idx}, 'project', this.value)"></td>
-                    <td><input type="text" value="${escapeHtml(voice.name || '')}" placeholder="Name..." style="width: 90px;" onchange="updateMinimaxVoice(${idx}, 'name', this.value)"></td>
-                    <td><input type="text" value="${voice.voiceId || ''}" placeholder="Voice ID..." style="width: 140px;" onchange="updateMinimaxVoice(${idx}, 'voiceId', this.value)"></td>
+                    <td><input type="text" value="${escapeHtml(displayName)}" placeholder="Name..." style="width: 90px;" onchange="updateMinimaxVoice(${idx}, 'name', this.value)"></td>
+                    <td><input type="text" value="${displayVoiceId}" placeholder="Voice ID..." style="width: 140px;" onchange="updateMinimaxVoice(${idx}, 'voiceId', this.value)"></td>
                     <td>
                         <select style="width: 100px;" onchange="updateMinimaxVoice(${idx}, 'model', this.value)">
-                            <option value="speech-02-hd" ${voice.model === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
-                            <option value="speech-02-turbo" ${voice.model === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
-                            <option value="speech-01-hd" ${voice.model === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
-                            <option value="speech-01-turbo" ${voice.model === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
+                            <option value="speech-02-hd" ${currentModel === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
+                            <option value="speech-02-turbo" ${currentModel === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
+                            <option value="speech-01-hd" ${currentModel === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
+                            <option value="speech-01-turbo" ${currentModel === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
                         </select>
                     </td>
                     <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateMinimaxSetting(${idx}, 'speed', parseFloat(this.value))"></td>
@@ -422,8 +430,8 @@
                         <button class="btn btn-sm" onclick="useVoice('minimax', ${idx})" title="Sử dụng"><i class="bi bi-check-lg"></i></button>
                         <button class="btn btn-sm" onclick="removeVoice('minimax', ${idx})" title="Xóa" style="color: #f55;"><i class="bi bi-trash"></i></button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         }
 
         function updateElevenlabsVoice(idx, field, value) {

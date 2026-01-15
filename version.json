@@ -1,8 +1,9 @@
 {
-  "version": "1.10.10",
+  "version": "1.10.11",
   "changelog": [
-    "Fix Voice Library: Name column showing Voice ID instead of name",
-    "Prioritize voice_name field over name field for Minimax voices"
+    "Fix Voice Library Minimax: Name column now correctly shows voice name",
+    "Fix Voice Library: Model dropdown default selection",
+    "Fix saveVoiceLibrary: Correct input index mapping for all fields"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
