@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html class="dark" lang="vi">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>KingCong - Pro Tool</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         /* Dark Mode (default) */
-        :root, html.dark {
+        :root,
+        html.dark {
             --primary: #a855f7;
             --accent: #667eea;
             --bg-main: #0a0a0a;
@@ -46,141 +54,540 @@
         }
 
         /* Light mode overrides for specific elements */
-        html.light .status-done { background: #22c55e; color: #fff; }
-        html.light .status-pending { background: #e5e5e5; color: #374151; }
-        html.light .status-failed { background: #fee2e2; color: #dc2626; }
-        html.light .status-processing { background: #fef3c7; color: #d97706; }
-        html.light .btn { background: var(--bg-secondary); border-color: var(--border); color: var(--text); }
-        html.light .btn:hover { background: var(--hover-bg); border-color: #9ca3af; }
-        html.light .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-        html.light .btn-primary:hover { background: #7c3aed; }
-        html.light .form-input, html.light .form-select { background: var(--input-bg); border-color: var(--border); color: var(--text); }
-        html.light .form-input:focus, html.light .form-select:focus { border-color: var(--primary); }
-        html.light .task-table th { background: var(--bg-main); color: var(--text-dim); border-color: var(--border); }
-        html.light .task-table td { border-color: var(--border); }
-        html.light .task-table tr:hover td { background: var(--hover-bg); }
-        html.light .task-content { color: var(--text); }
-        html.light .modal-content, html.light .modal-box { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .modal-header { border-color: var(--border); }
-        html.light .modal-header h3 { color: var(--text); }
-        html.light .modal-footer { border-color: var(--border); }
-        html.light .bk-modal-content { background: var(--bg-secondary); }
-        html.light .bk-row { border-color: var(--border); }
-        html.light .bk-row:hover { background: var(--hover-bg); }
-        html.light .bk-header { background: var(--bg-main); }
-        html.light .bk-header h3 { color: var(--text); }
-        html.light .bk-toolbar { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .bk-header-row { background: var(--bg-main); color: var(--text-dim); border-color: var(--border); }
-        html.light .voice-table th { background: var(--bg-main); color: var(--text-dim); }
-        html.light .voice-table input, html.light .voice-table select { background: var(--input-bg); border-color: var(--border); color: var(--text); }
-        html.light .credits-box { background: var(--bg-secondary); border-color: var(--border); color: var(--text); }
-        html.light .top-bar { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .top-bar-title { color: var(--text); }
-        html.light .tool-section { background: var(--bg-secondary); }
-        html.light .section-title { color: var(--text); }
-        html.light .form-label { color: var(--text-dim); }
-        html.light .sidebar-nav .nav-item { color: var(--text-dim); }
-        html.light .sidebar-nav .nav-item:hover, html.light .sidebar-nav .nav-item.active { background: var(--hover-bg); color: var(--text); }
-        html.light .main-sidebar { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .sidebar-header { border-color: var(--border); }
-        html.light .tool-sidebar { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .tool-footer { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .task-area { background: var(--bg-main); }
-        html.light .info-tip { color: var(--text-dim); }
-        html.light .info-text { background: var(--bg-main); color: var(--text-dim); }
-        html.light .checkbox-row { color: var(--text); }
-        html.light .slider-header span { color: var(--text-dim); }
-        html.light .slider-value { color: var(--text); }
-        html.light ::-webkit-scrollbar-thumb { background: var(--scrollbar); }
-        html.light .bk-time { color: var(--text); }
-        html.light .bk-text-preview { color: var(--text-dim); }
-        html.light .bk-credits-val { color: var(--text); }
-        html.light .bk-status-badge.bk-badge-done { background: #22c55e; color: #fff; }
-        html.light .bk-timer { color: var(--text-dim); }
-        html.light .bk-download-menu { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .bk-download-header { background: var(--bg-main); border-color: var(--border); color: var(--text-dim); }
-        html.light .bk-download-item { color: var(--text); }
-        html.light .bk-download-item:hover { background: var(--hover-bg); }
+        html.light .status-done {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        html.light .status-pending {
+            background: #e5e5e5;
+            color: #374151;
+        }
+
+        html.light .status-failed {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        html.light .status-processing {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        html.light .btn {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .btn:hover {
+            background: var(--hover-bg);
+            border-color: #9ca3af;
+        }
+
+        html.light .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        html.light .btn-primary:hover {
+            background: #7c3aed;
+        }
+
+        html.light .form-input,
+        html.light .form-select {
+            background: var(--input-bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .form-input:focus,
+        html.light .form-select:focus {
+            border-color: var(--primary);
+        }
+
+        html.light .task-table th {
+            background: var(--bg-main);
+            color: var(--text-dim);
+            border-color: var(--border);
+        }
+
+        html.light .task-table td {
+            border-color: var(--border);
+        }
+
+        html.light .task-table tr:hover td {
+            background: var(--hover-bg);
+        }
+
+        html.light .task-content {
+            color: var(--text);
+        }
+
+        html.light .modal-content,
+        html.light .modal-box {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .modal-header {
+            border-color: var(--border);
+        }
+
+        html.light .modal-header h3 {
+            color: var(--text);
+        }
+
+        html.light .modal-footer {
+            border-color: var(--border);
+        }
+
+        html.light .bk-modal-content {
+            background: var(--bg-secondary);
+        }
+
+        html.light .bk-row {
+            border-color: var(--border);
+        }
+
+        html.light .bk-row:hover {
+            background: var(--hover-bg);
+        }
+
+        html.light .bk-header {
+            background: var(--bg-main);
+        }
+
+        html.light .bk-header h3 {
+            color: var(--text);
+        }
+
+        html.light .bk-toolbar {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .bk-header-row {
+            background: var(--bg-main);
+            color: var(--text-dim);
+            border-color: var(--border);
+        }
+
+        html.light .voice-table th {
+            background: var(--bg-main);
+            color: var(--text-dim);
+        }
+
+        html.light .voice-table input,
+        html.light .voice-table select {
+            background: var(--input-bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .credits-box {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .top-bar {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .top-bar-title {
+            color: var(--text);
+        }
+
+        html.light .tool-section {
+            background: var(--bg-secondary);
+        }
+
+        html.light .section-title {
+            color: var(--text);
+        }
+
+        html.light .form-label {
+            color: var(--text-dim);
+        }
+
+        html.light .sidebar-nav .nav-item {
+            color: var(--text-dim);
+        }
+
+        html.light .sidebar-nav .nav-item:hover,
+        html.light .sidebar-nav .nav-item.active {
+            background: var(--hover-bg);
+            color: var(--text);
+        }
+
+        html.light .main-sidebar {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .sidebar-header {
+            border-color: var(--border);
+        }
+
+        html.light .tool-sidebar {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .tool-footer {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .task-area {
+            background: var(--bg-main);
+        }
+
+        html.light .info-tip {
+            color: var(--text-dim);
+        }
+
+        html.light .info-text {
+            background: var(--bg-main);
+            color: var(--text-dim);
+        }
+
+        html.light .checkbox-row {
+            color: var(--text);
+        }
+
+        html.light .slider-header span {
+            color: var(--text-dim);
+        }
+
+        html.light .slider-value {
+            color: var(--text);
+        }
+
+        html.light ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar);
+        }
+
+        html.light .bk-time {
+            color: var(--text);
+        }
+
+        html.light .bk-text-preview {
+            color: var(--text-dim);
+        }
+
+        html.light .bk-credits-val {
+            color: var(--text);
+        }
+
+        html.light .bk-status-badge.bk-badge-done {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        html.light .bk-timer {
+            color: var(--text-dim);
+        }
+
+        html.light .bk-download-menu {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .bk-download-header {
+            background: var(--bg-main);
+            border-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .bk-download-item {
+            color: var(--text);
+        }
+
+        html.light .bk-download-item:hover {
+            background: var(--hover-bg);
+        }
 
         /* Light mode - Text color fixes */
-        html.light .user-name { color: var(--text); }
-        html.light .task-filename { color: var(--text); }
-        html.light .modal-close { color: var(--text-dim); }
-        html.light .modal-close:hover { color: var(--text); }
-        html.light .empty-state { color: var(--text-dim); }
-        html.light .tabs { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .tab-btn { color: var(--text-dim); }
-        html.light .tab-btn:hover { color: var(--text); background: var(--hover-bg); }
-        html.light .tab-btn.active { color: var(--primary); }
-        html.light .lib-tab { background: var(--bg-secondary); border-color: var(--border); color: var(--text-dim); }
-        html.light .lib-tab:hover { background: var(--hover-bg); color: var(--text); }
-        html.light .lib-tab.active { background: var(--primary); color: #fff; }
-        html.light .tooltip { background: var(--bg-secondary); border-color: var(--border); color: var(--text); }
-        html.light .dropdown-menu { background: var(--bg-secondary); border-color: var(--border); }
-        html.light .dropdown-item { color: var(--text); }
-        html.light .dropdown-item:hover { background: var(--hover-bg); }
-        html.light .action-text { color: var(--text-dim); }
-        html.light .stat-value { color: var(--text); }
-        html.light .stat-label { color: var(--text-dim); }
-        html.light .speed-text { color: var(--text); }
-        html.light .option-title { color: var(--text); }
-        html.light .option-desc { color: var(--text-dim); }
-        html.light .bk-title { color: var(--text); }
-        html.light .task-action-btn { color: var(--text-dim); }
-        html.light .task-action-btn:hover { color: var(--text); background: var(--hover-bg); }
-        html.light .toolbar-btn { color: var(--text-dim); }
-        html.light .toolbar-btn:hover { color: var(--text); background: var(--hover-bg); }
-        html.light .play-btn { color: var(--text-dim); }
-        html.light .play-btn:hover { color: var(--primary); }
-        html.light .add-lib-btn { color: var(--text-dim); }
-        html.light .add-lib-btn:hover { color: var(--primary); }
+        html.light .user-name {
+            color: var(--text);
+        }
+
+        html.light .task-filename {
+            color: var(--text);
+        }
+
+        html.light .modal-close {
+            color: var(--text-dim);
+        }
+
+        html.light .modal-close:hover {
+            color: var(--text);
+        }
+
+        html.light .empty-state {
+            color: var(--text-dim);
+        }
+
+        html.light .tabs {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .tab-btn {
+            color: var(--text-dim);
+        }
+
+        html.light .tab-btn:hover {
+            color: var(--text);
+            background: var(--hover-bg);
+        }
+
+        html.light .tab-btn.active {
+            color: var(--primary);
+        }
+
+        html.light .lib-tab {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .lib-tab:hover {
+            background: var(--hover-bg);
+            color: var(--text);
+        }
+
+        html.light .lib-tab.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        html.light .tooltip {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .dropdown-menu {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .dropdown-item {
+            color: var(--text);
+        }
+
+        html.light .dropdown-item:hover {
+            background: var(--hover-bg);
+        }
+
+        html.light .action-text {
+            color: var(--text-dim);
+        }
+
+        html.light .stat-value {
+            color: var(--text);
+        }
+
+        html.light .stat-label {
+            color: var(--text-dim);
+        }
+
+        html.light .speed-text {
+            color: var(--text);
+        }
+
+        html.light .option-title {
+            color: var(--text);
+        }
+
+        html.light .option-desc {
+            color: var(--text-dim);
+        }
+
+        html.light .bk-title {
+            color: var(--text);
+        }
+
+        html.light .task-action-btn {
+            color: var(--text-dim);
+        }
+
+        html.light .task-action-btn:hover {
+            color: var(--text);
+            background: var(--hover-bg);
+        }
+
+        html.light .toolbar-btn {
+            color: var(--text-dim);
+        }
+
+        html.light .toolbar-btn:hover {
+            color: var(--text);
+            background: var(--hover-bg);
+        }
+
+        html.light .play-btn {
+            color: var(--text-dim);
+        }
+
+        html.light .play-btn:hover {
+            color: var(--primary);
+        }
+
+        html.light .add-lib-btn {
+            color: var(--text-dim);
+        }
+
+        html.light .add-lib-btn:hover {
+            color: var(--primary);
+        }
 
         /* Provider dropdown - Keep white text (dark background) */
-        html.light .provider-select { background: #0a0a0a; border-color: #1a1a1a; color: #fff; }
-        html.light .provider-select span { color: #fff; }
-        html.light .provider-menu { background: #111; border-color: #222; }
-        html.light .provider-option { color: #fff; }
-        html.light .provider-option span { color: #fff; }
+        html.light .provider-select {
+            background: #0a0a0a;
+            border-color: #1a1a1a;
+            color: #fff;
+        }
+
+        html.light .provider-select span {
+            color: #fff;
+        }
+
+        html.light .provider-menu {
+            background: #111;
+            border-color: #222;
+        }
+
+        html.light .provider-option {
+            color: #fff;
+        }
+
+        html.light .provider-option span {
+            color: #fff;
+        }
 
         /* Tool sidebar elements - Keep dark theme */
-        html.light .tool-sidebar { background: #050505; border-color: #1a1a1a; }
-        html.light .tool-sidebar .tool-section { border-color: #1a1a1a; }
-        html.light .tool-sidebar .section-title { color: #555; }
-        html.light .tool-sidebar .form-label { color: #555; }
+        html.light .tool-sidebar {
+            background: #050505;
+            border-color: #1a1a1a;
+        }
+
+        html.light .tool-sidebar .tool-section {
+            border-color: #1a1a1a;
+        }
+
+        html.light .tool-sidebar .section-title {
+            color: #555;
+        }
+
+        html.light .tool-sidebar .form-label {
+            color: #555;
+        }
+
         html.light .tool-sidebar .form-select,
-        html.light .tool-sidebar .form-input { background: #0a0a0a; border-color: #1a1a1a; color: #fff; }
-        html.light .tool-sidebar .slider-header span { color: #666; }
-        html.light .tool-sidebar .slider-value { color: #fff; }
-        html.light .tool-sidebar .checkbox-row { color: #666; }
-        html.light .tool-sidebar .checkbox-row:hover { color: #fff; }
-        html.light .tool-sidebar .checkbox-row:has(input:checked) { color: #fff; }
-        html.light .tool-sidebar .btn { background: #111; border-color: #222; color: #fff; }
-        html.light .tool-sidebar .btn:hover { background: #1a1a1a; border-color: #333; }
-        html.light .tool-sidebar .btn-primary { background: var(--primary); color: #fff; }
-        html.light .tool-sidebar .info-tip { color: #555; }
-        html.light .tool-sidebar .info-text { background: #0a0a0a; color: #666; }
+        html.light .tool-sidebar .form-input {
+            background: #0a0a0a;
+            border-color: #1a1a1a;
+            color: #fff;
+        }
+
+        html.light .tool-sidebar .slider-header span {
+            color: #666;
+        }
+
+        html.light .tool-sidebar .slider-value {
+            color: #fff;
+        }
+
+        html.light .tool-sidebar .checkbox-row {
+            color: #666;
+        }
+
+        html.light .tool-sidebar .checkbox-row:hover {
+            color: #fff;
+        }
+
+        html.light .tool-sidebar .checkbox-row:has(input:checked) {
+            color: #fff;
+        }
+
+        html.light .tool-sidebar .btn {
+            background: #111;
+            border-color: #222;
+            color: #fff;
+        }
+
+        html.light .tool-sidebar .btn:hover {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+
+        html.light .tool-sidebar .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        html.light .tool-sidebar .info-tip {
+            color: #555;
+        }
+
+        html.light .tool-sidebar .info-text {
+            background: #0a0a0a;
+            color: #666;
+        }
 
         /* Tool footer - Keep dark theme */
-        html.light .tool-footer { background: #050505; border-color: #1a1a1a; }
-        html.light .tool-footer .btn { background: #111; border-color: #222; color: #fff; }
-        html.light .tool-footer .btn:hover { background: #1a1a1a; }
-        html.light .tool-footer .btn-primary { background: var(--primary); color: #fff; }
+        html.light .tool-footer {
+            background: #050505;
+            border-color: #1a1a1a;
+        }
 
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
-        
+        html.light .tool-footer .btn {
+            background: #111;
+            border-color: #222;
+            color: #fff;
+        }
+
+        html.light .tool-footer .btn:hover {
+            background: #1a1a1a;
+        }
+
+        html.light .tool-footer .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar);
+            border-radius: 4px;
+        }
+
         body {
             background: var(--bg-main);
             color: var(--text);
             font-family: 'Inter', -apple-system, sans-serif;
             overflow: hidden;
         }
-        
-        *, *::before, *::after {
+
+        *,
+        *::before,
+        *::after {
             transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
         }
-        
+
         /* =================== MAIN SIDEBAR =================== */
         .main-sidebar {
             width: 240px;
@@ -190,18 +597,18 @@
             flex-direction: column;
             flex-shrink: 0;
         }
-        
+
         .sidebar-header {
             padding: 20px;
             border-bottom: 1px solid var(--border);
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        
+
         .avatar-wrapper {
             width: 40px;
             height: 40px;
@@ -210,7 +617,7 @@
             padding: 2px;
             flex-shrink: 0;
         }
-        
+
         .avatar-inner {
             width: 100%;
             height: 100%;
@@ -223,13 +630,29 @@
             font-size: 14px;
             overflow: hidden;
         }
-        
-        .avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
-        .user-name { font-size: 14px; font-weight: 500; color: #fff; }
-        .user-plan { font-size: 11px; color: var(--text-dim); }
-        
-        .nav-menu { flex: 1; padding: 12px; }
-        
+
+        .avatar-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .user-plan {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 12px;
+        }
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -242,7 +665,7 @@
             cursor: pointer;
             position: relative;
         }
-        
+
         .nav-item::before {
             content: '';
             position: absolute;
@@ -255,13 +678,32 @@
             border-radius: 0 2px 2px 0;
             transition: height 0.2s ease;
         }
-        
-        .nav-item:hover { background: rgba(168, 85, 247, 0.08); color: var(--text); }
-        .nav-item.active { background: rgba(168, 85, 247, 0.12); color: var(--primary); }
-        .nav-item.active::before { height: 60%; }
-        .nav-item i, .nav-item span.material-symbols-outlined { font-size: 20px; width: 24px; }
-        .nav-footer { padding: 12px; border-top: 1px solid var(--border); }
-        
+
+        .nav-item:hover {
+            background: rgba(168, 85, 247, 0.08);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--primary);
+        }
+
+        .nav-item.active::before {
+            height: 60%;
+        }
+
+        .nav-item i,
+        .nav-item span.material-symbols-outlined {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .nav-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+        }
+
         /* =================== HEADER =================== */
         .top-bar {
             height: 60px;
@@ -273,9 +715,13 @@
             background: var(--bg-main);
             flex-shrink: 0;
         }
-        
-        .top-bar-title { font-size: 16px; font-weight: 600; color: #fff; }
-        
+
+        .top-bar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
         .credits-box {
             display: flex;
             align-items: center;
@@ -286,9 +732,11 @@
             border-radius: 8px;
             font-size: 13px;
         }
-        
-        .credits-box i { color: var(--primary); }
-        
+
+        .credits-box i {
+            color: var(--primary);
+        }
+
         /* =================== TOOL AREA =================== */
         .tool-layout {
             flex: 1;
@@ -296,7 +744,7 @@
             overflow: hidden;
             background: #000;
         }
-        
+
         .tool-sidebar {
             width: 280px;
             background: #050505;
@@ -308,12 +756,12 @@
             flex-shrink: 0;
             position: relative;
         }
-        
+
         .tool-section {
             padding: 14px 16px;
             border-bottom: 1px solid #1a1a1a;
         }
-        
+
         .section-title {
             font-size: 10px;
             font-weight: 600;
@@ -322,7 +770,7 @@
             letter-spacing: 1px;
             margin-bottom: 10px;
         }
-        
+
         /* Provider Dropdown */
         .provider-select {
             display: flex;
@@ -334,23 +782,32 @@
             border-radius: 8px;
             cursor: pointer;
         }
-        
-        .provider-select:hover { border-color: #333; }
-        
+
+        .provider-select:hover {
+            border-color: #333;
+        }
+
         .provider-select img {
             width: 24px;
             height: 24px;
             border-radius: 4px;
         }
-        
-        .provider-select span { flex: 1; font-size: 13px; }
-        .provider-select i { color: #555; font-size: 12px; }
-        
+
+        .provider-select span {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .provider-select i {
+            color: #555;
+            font-size: 12px;
+        }
+
         /* Provider Dropdown Menu */
         .provider-dropdown {
             position: relative;
         }
-        
+
         .provider-menu {
             position: absolute;
             top: 100%;
@@ -364,9 +821,11 @@
             z-index: 100;
             display: none;
         }
-        
-        .provider-dropdown.open .provider-menu { display: block; }
-        
+
+        .provider-dropdown.open .provider-menu {
+            display: block;
+        }
+
         .provider-option {
             display: flex;
             align-items: center;
@@ -374,18 +833,44 @@
             padding: 10px 12px;
             cursor: pointer;
         }
-        
-        .provider-option:hover { background: #1a1a1a; }
-        .provider-option.active { background: #1a1a1a; }
-        .provider-option img { width: 24px; height: 24px; border-radius: 4px; }
-        .provider-option span { font-size: 13px; }
-        
+
+        .provider-option:hover {
+            background: #1a1a1a;
+        }
+
+        .provider-option.active {
+            background: #1a1a1a;
+        }
+
+        .provider-option img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        .provider-option span {
+            font-size: 13px;
+        }
+
         /* Form */
-        .form-group { margin-bottom: 10px; }
-        .form-group:last-child { margin-bottom: 0; }
-        .form-label { display: block; font-size: 10px; color: #555; margin-bottom: 6px; text-transform: uppercase; }
-        
-        .form-select, .form-input {
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 10px;
+            color: #555;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-select,
+        .form-input {
             width: 100%;
             padding: 10px 12px;
             background: #0a0a0a;
@@ -395,14 +880,17 @@
             font-size: 13px;
             outline: none;
         }
-        
-        .form-select:focus, .form-input:focus { border-color: #333; }
-        
+
+        .form-select:focus,
+        .form-input:focus {
+            border-color: #333;
+        }
+
         /* Sliders */
         .slider-group {
             margin-bottom: 12px;
         }
-        
+
         .slider-header {
             display: flex;
             justify-content: space-between;
@@ -410,9 +898,11 @@
             color: #666;
             margin-bottom: 6px;
         }
-        
-        .slider-value { color: #fff; }
-        
+
+        .slider-value {
+            color: #fff;
+        }
+
         input[type="range"] {
             width: 100%;
             height: 4px;
@@ -421,7 +911,7 @@
             outline: none;
             -webkit-appearance: none;
         }
-        
+
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 14px;
@@ -430,10 +920,14 @@
             border-radius: 50%;
             cursor: pointer;
         }
-        
+
         /* Checkboxes */
-        .checkbox-list { display: flex; flex-direction: column; gap: 2px; }
-        
+        .checkbox-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
         .checkbox-row {
             display: flex;
             align-items: center;
@@ -445,16 +939,27 @@
             color: #666;
             position: relative;
         }
-        
-        .checkbox-row:hover { background: #0a0a0a; color: #fff; }
-        .checkbox-row input { width: 14px; height: 14px; accent-color: #fff; }
-        .checkbox-row:has(input:checked) { color: #fff; }
-        
+
+        .checkbox-row:hover {
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .checkbox-row input {
+            width: 14px;
+            height: 14px;
+            accent-color: #fff;
+        }
+
+        .checkbox-row:has(input:checked) {
+            color: #fff;
+        }
+
         /* Tooltip - Dùng title attribute thay vì custom tooltip */
         .has-tooltip {
             position: relative;
         }
-        
+
         /* Toolbar tooltips - hiện bên dưới */
         .toolbar .tooltip {
             position: absolute;
@@ -473,9 +978,9 @@
             visibility: hidden;
             pointer-events: none;
             z-index: 99999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
-        
+
         .toolbar .tooltip::before {
             content: '';
             position: absolute;
@@ -485,17 +990,17 @@
             border: 6px solid transparent;
             border-bottom-color: #444;
         }
-        
+
         .toolbar .has-tooltip:hover .tooltip {
             opacity: 1;
             visibility: visible;
         }
-        
+
         /* Sidebar không dùng custom tooltip - dùng title attribute */
         .tool-sidebar .tooltip {
             display: none !important;
         }
-        
+
         /* Info tip icon */
         .info-tip {
             margin-left: auto;
@@ -503,15 +1008,15 @@
             font-size: 12px;
             cursor: help;
         }
-        
+
         .info-tip:hover {
             color: #888;
         }
-        
+
         .checkbox-row span {
             flex: 1;
         }
-        
+
         /* Floating tooltip div - sẽ được tạo bằng JS */
         #floatingTip {
             position: fixed;
@@ -524,10 +1029,10 @@
             z-index: 999999;
             pointer-events: none;
             max-width: 250px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             display: none;
         }
-        
+
         /* Buttons */
         .btn {
             padding: 10px 14px;
@@ -543,16 +1048,44 @@
             background: #0a0a0a;
             color: #fff;
         }
-        
-        .btn:hover { background: #111; border-color: #333; }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: #fff; color: #000; border: none; }
-        .btn-primary:hover { background: #e5e5e5; }
-        .btn-block { width: 100%; }
-        .btn-sm { padding: 6px 10px; font-size: 11px; }
-        .btn-group { display: flex; gap: 6px; }
-        .btn-group .btn { flex: 1; }
-        
+
+        .btn:hover {
+            background: #111;
+            border-color: #333;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #e5e5e5;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
         /* =================== TOOL CONTENT =================== */
         .tool-content {
             flex: 1;
@@ -561,7 +1094,7 @@
             overflow: hidden;
             background: #000;
         }
-        
+
         /* Toolbar */
         .toolbar {
             display: flex;
@@ -572,10 +1105,20 @@
             background: #050505;
             flex-wrap: wrap;
         }
-        
-        .toolbar-group { display: flex; align-items: center; gap: 4px; }
-        .toolbar-divider { width: 1px; height: 20px; background: #1a1a1a; margin: 0 6px; }
-        
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 20px;
+            background: #1a1a1a;
+            margin: 0 6px;
+        }
+
         .toolbar-btn {
             padding: 8px 12px;
             background: #0a0a0a;
@@ -589,19 +1132,48 @@
             gap: 5px;
             position: relative;
         }
-        
-        .toolbar-btn:hover { background: #111; border-color: #333; }
-        .toolbar-btn:active { transform: scale(0.97); }
-        .toolbar-btn.primary { background: #fff; color: #000; border: none; font-weight: 600; }
-        .toolbar-btn.primary:hover { background: #e5e5e5; }
-        .toolbar-btn.danger { color: #f55; }
-        .toolbar-btn.danger:hover { background: rgba(255, 85, 85, 0.1); border-color: #f55; }
-        
+
+        .toolbar-btn:hover {
+            background: #111;
+            border-color: #333;
+        }
+
+        .toolbar-btn:active {
+            transform: scale(0.97);
+        }
+
+        .toolbar-btn.primary {
+            background: #fff;
+            color: #000;
+            border: none;
+            font-weight: 600;
+        }
+
+        .toolbar-btn.primary:hover {
+            background: #e5e5e5;
+        }
+
+        .toolbar-btn.danger {
+            color: #f55;
+        }
+
+        .toolbar-btn.danger:hover {
+            background: rgba(255, 85, 85, 0.1);
+            border-color: #f55;
+        }
+
         /* Task Area */
-        .task-area { flex: 1; overflow: auto; background: #000; }
-        
-        .task-table { width: 100%; border-collapse: collapse; }
-        
+        .task-area {
+            flex: 1;
+            overflow: auto;
+            background: #000;
+        }
+
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
         .task-table th {
             position: sticky;
             top: 0;
@@ -633,9 +1205,11 @@
             font-size: 12px;
             border-bottom: 1px solid #0a0a0a;
         }
-        
-        .task-table tr:hover td { background: #050505; }
-        
+
+        .task-table tr:hover td {
+            background: #050505;
+        }
+
         .task-content {
             max-width: 350px;
             white-space: nowrap;
@@ -643,9 +1217,13 @@
             text-overflow: ellipsis;
             color: #ccc;
         }
-        
-        .task-filename { font-size: 10px; color: #444; margin-top: 2px; }
-        
+
+        .task-filename {
+            font-size: 10px;
+            color: #444;
+            margin-top: 2px;
+        }
+
         .status {
             display: inline-block;
             padding: 3px 8px;
@@ -653,11 +1231,26 @@
             font-size: 10px;
             font-weight: 500;
         }
-        
-        .status.pending { background: #1a1a00; color: #aa0; }
-        .status.processing { background: #001a1a; color: #0aa; }
-        .status.done { background: #001a00; color: #0a0; }
-        .status.failed { background: #1a0000; color: #a00; }
+
+        .status.pending {
+            background: #1a1a00;
+            color: #aa0;
+        }
+
+        .status.processing {
+            background: #001a1a;
+            color: #0aa;
+        }
+
+        .status.done {
+            background: #001a00;
+            color: #0a0;
+        }
+
+        .status.failed {
+            background: #1a0000;
+            color: #a00;
+        }
 
         /* Progress Bar for Processing Status */
         .status-progress-wrapper {
@@ -688,7 +1281,7 @@
             font-weight: 600;
             text-align: center;
         }
-        
+
         /* Footer */
         .tool-footer {
             padding: 10px 14px;
@@ -700,7 +1293,7 @@
             font-size: 11px;
             color: #555;
         }
-        
+
         .status-dot {
             width: 6px;
             height: 6px;
@@ -709,16 +1302,25 @@
             margin-right: 8px;
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
-        
+
         /* =================== MODALS =================== */
         .modal {
             position: fixed;
@@ -734,9 +1336,12 @@
             opacity: 0;
             backdrop-filter: blur(4px);
         }
-        
-        .modal.show { display: flex; opacity: 1; }
-        
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
         .modal-box {
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
@@ -748,9 +1353,11 @@
             flex-direction: column;
             transform: scale(0.95) translateY(10px);
         }
-        
-        .modal.show .modal-box { transform: scale(1) translateY(0); }
-        
+
+        .modal.show .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
         .modal-header {
             padding: 16px 20px;
             border-bottom: 1px solid #1a1a1a;
@@ -758,26 +1365,118 @@
             align-items: center;
             justify-content: space-between;
         }
-        
-        .modal-header h3 { font-size: 14px; font-weight: 600; color: #fff; }
-        .modal-close { background: none; border: none; color: #555; font-size: 20px; cursor: pointer; padding: 4px; line-height: 1; }
-        .modal-close:hover { color: #fff; }
-        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
-        .modal-footer { padding: 16px 20px; border-top: 1px solid #1a1a1a; display: flex; justify-content: flex-end; gap: 8px; }
-        
-        .voice-table { width: 100%; border-collapse: collapse; }
-        .voice-table th, .voice-table td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #1a1a1a; font-size: 11px; }
-        .voice-table th { color: #555; font-weight: 500; font-size: 9px; text-transform: uppercase; background: #050505; position: sticky; top: 0; z-index: 5; }
-        .voice-table input { padding: 6px 8px; background: #000; border: 1px solid #1a1a1a; border-radius: 4px; color: #fff; font-size: 11px; }
-        .voice-table input:focus { outline: none; border-color: #444; }
-        .voice-table input[type="number"] { text-align: center; }
-        .voice-table input[type="checkbox"] { width: 16px; height: 16px; accent-color: #a855f7; cursor: pointer; }
-        .voice-table select { padding: 6px 8px; background: #000; border: 1px solid #1a1a1a; border-radius: 4px; color: #fff; font-size: 11px; cursor: pointer; }
-        .voice-table select:focus { outline: none; border-color: #444; }
-        .voice-table tr:hover td { background: #0a0a0a; }
-        .voice-table .btn { padding: 5px 8px; font-size: 10px; }
-        .voice-table .btn i { font-size: 12px; }
-        
+
+        .modal-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #1a1a1a;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .voice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .voice-table th,
+        .voice-table td {
+            padding: 8px 6px;
+            text-align: left;
+            border-bottom: 1px solid #1a1a1a;
+            font-size: 11px;
+        }
+
+        .voice-table th {
+            color: #555;
+            font-weight: 500;
+            font-size: 9px;
+            text-transform: uppercase;
+            background: #050505;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .voice-table input {
+            padding: 6px 8px;
+            background: #000;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 11px;
+        }
+
+        .voice-table input:focus {
+            outline: none;
+            border-color: #444;
+        }
+
+        .voice-table input[type="number"] {
+            text-align: center;
+        }
+
+        .voice-table input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #a855f7;
+            cursor: pointer;
+        }
+
+        .voice-table select {
+            padding: 6px 8px;
+            background: #000;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .voice-table select:focus {
+            outline: none;
+            border-color: #444;
+        }
+
+        .voice-table tr:hover td {
+            background: #0a0a0a;
+        }
+
+        .voice-table .btn {
+            padding: 5px 8px;
+            font-size: 10px;
+        }
+
+        .voice-table .btn i {
+            font-size: 12px;
+        }
+
         .info-text {
             font-size: 11px;
             color: #666;
@@ -787,7 +1486,7 @@
             border-radius: 6px;
             margin-bottom: 16px;
         }
-        
+
         .info-text code {
             background: #1a1a1a;
             padding: 2px 6px;
@@ -799,7 +1498,10 @@
         /* =================== BACKUP MODAL (Giống Lịch Sử Chi Tiết) =================== */
         .bk-modal-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(4px);
             z-index: 9999;
@@ -817,7 +1519,7 @@
             border-radius: 12px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
         }
 
         /* Header */
@@ -828,9 +1530,23 @@
             justify-content: space-between;
             align-items: center;
         }
-        .bk-header h3 { margin: 0; color: #fff; font-size: 18px; font-weight: 700; }
-        .bk-close { color: #888; cursor: pointer; font-size: 20px; }
-        .bk-close:hover { color: #fff; }
+
+        .bk-header h3 {
+            margin: 0;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .bk-close {
+            color: #888;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .bk-close:hover {
+            color: #fff;
+        }
 
         /* Toolbar */
         .bk-toolbar {
@@ -853,9 +1569,20 @@
             transition: 0.2s;
             font-weight: 500;
         }
-        .bk-btn-action:hover:not(:disabled) { border-color: #666; background: #222; }
-        .bk-btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-        .bk-btn-action span { font-weight: 700; }
+
+        .bk-btn-action:hover:not(:disabled) {
+            border-color: #666;
+            background: #222;
+        }
+
+        .bk-btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .bk-btn-action span {
+            font-weight: 700;
+        }
 
         /* List Body */
         .bk-list-body {
@@ -894,26 +1621,112 @@
             gap: 10px;
             transition: background 0.15s;
         }
-        .bk-row:hover { background: #111; }
+
+        .bk-row:hover {
+            background: #111;
+        }
 
         /* Checkbox */
-        .bk-checkbox-wrapper { display: flex; align-items: center; justify-content: center; }
-        .bk-checkbox-wrapper input { width: 16px; height: 16px; cursor: pointer; accent-color: #667eea; }
+        .bk-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bk-checkbox-wrapper input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
 
         /* Info column */
-        .bk-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-        .bk-time { font-size: 12px; font-family: monospace; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-        .bk-provider-icon { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
-        .bk-text-preview { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .bk-time {
+            font-size: 12px;
+            font-family: monospace;
+            color: #fff;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bk-provider-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .bk-text-preview {
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         /* Project/Voice columns */
-        .bk-project { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bk-voice-id { display: flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; }
-        .bk-voice-id-text { color: #4ade80; font-family: monospace; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
-        .bk-voice-id-text:hover { color: #86efac; text-decoration: underline; }
-        .bk-copy-btn { background: none; border: none; color: #666; cursor: pointer; padding: 2px; font-size: 12px; flex-shrink: 0; }
-        .bk-copy-btn:hover { color: #4ade80; }
-        .bk-voice-name { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bk-project {
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bk-voice-id {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            min-width: 0;
+        }
+
+        .bk-voice-id-text {
+            color: #4ade80;
+            font-family: monospace;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .bk-voice-id-text:hover {
+            color: #86efac;
+            text-decoration: underline;
+        }
+
+        .bk-copy-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 2px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .bk-copy-btn:hover {
+            color: #4ade80;
+        }
+
+        .bk-voice-name {
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         /* Status Badge */
         .bk-status-badge {
@@ -924,114 +1737,460 @@
             border-radius: 4px;
             white-space: nowrap;
         }
-        .bk-badge-done { background: #fff; color: #000; }
-        .bk-badge-processing { background: #333; color: #fff; border: 1px solid #555; }
-        .bk-badge-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+
+        .bk-badge-done {
+            background: #fff;
+            color: #000;
+        }
+
+        .bk-badge-processing {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        /* 🔥 BACKUP DOWNLOAD DROPDOWN */
+        .bk-download-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .bk-download-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #888;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+
+        .bk-download-btn:hover {
+            border-color: #fff;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .bk-download-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .bk-download-header {
+            padding: 8px 12px;
+            background: #0a0a0a;
+            color: #666;
+            font-size: 10px;
+            font-weight: 500;
+            border-bottom: 1px solid #222;
+            text-transform: uppercase;
+        }
+
+        .bk-download-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            color: #999;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 12px;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            border: none;
+            border-bottom: 1px solid #222;
+        }
+
+        .bk-download-item:last-child {
+            border-bottom: none;
+        }
+
+        .bk-download-item:hover {
+            background: #222;
+            color: #fff;
+        }
+
+        .bk-download-disabled {
+            color: #444 !important;
+            cursor: not-allowed !important;
+            pointer-events: none;
+        }
+
+        .bk-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .bk-badge-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
 
         /* Content Area */
-        .bk-content-area { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .bk-content-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
 
         /* Player Mini */
-        .bk-player { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
-        .bk-play-btn { background: transparent; border: 1px solid #fff; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; flex-shrink: 0; }
-        .bk-progress-track { flex: 1; height: 4px; background: #333; border-radius: 2px; position: relative; cursor: pointer; min-width: 60px; }
-        .bk-progress-bar { height: 100%; background: #666; width: 0%; border-radius: 2px; }
-        .bk-timer { font-size: 10px; color: #888; font-family: monospace; white-space: nowrap; flex-shrink: 0; }
+        .bk-player {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .bk-play-btn {
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .bk-progress-track {
+            flex: 1;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+            min-width: 60px;
+        }
+
+        .bk-progress-bar {
+            height: 100%;
+            background: #666;
+            width: 0%;
+            border-radius: 2px;
+        }
+
+        .bk-timer {
+            font-size: 10px;
+            color: #888;
+            font-family: monospace;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
 
         /* Error/Processing Text */
-        .bk-status-text { font-size: 11px; display: flex; align-items: center; gap: 6px; }
-        .bk-text-error { color: #ef4444; }
-        .bk-text-processing { color: #a855f7; }
+        .bk-status-text {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bk-text-error {
+            color: #ef4444;
+        }
+
+        .bk-text-processing {
+            color: #a855f7;
+        }
 
         /* Actions */
-        .bk-actions-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-        .bk-delete-btn { color: #666; cursor: pointer; font-size: 14px; background: none; border: none; }
-        .bk-delete-btn:hover { color: #ef4444; }
+        .bk-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .bk-delete-btn {
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            background: none;
+            border: none;
+        }
+
+        .bk-delete-btn:hover {
+            color: #ef4444;
+        }
 
         /* Download Dropdown */
-        .bk-download-wrapper { position: relative; display: inline-block; }
-        .bk-download-btn { background: transparent; border: 1px solid #444; color: #fff; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
-        .bk-download-btn:hover { background: #222; border-color: #667eea; }
-        .bk-download-menu { position: absolute; top: calc(100% + 5px); right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; min-width: 200px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; overflow: hidden; display: none; }
-        .bk-download-header { padding: 10px 12px; background: #222; border-bottom: 1px solid #333; font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; }
-        .bk-download-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; color: #fff; text-decoration: none; font-size: 13px; transition: all 0.2s; cursor: pointer; }
-        .bk-download-item:hover { background: #222; }
-        .bk-download-item i { font-size: 16px; width: 20px; text-align: center; }
-        .bk-download-item.bk-download-disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+        .bk-download-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .bk-download-btn {
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bk-download-btn:hover {
+            background: #222;
+            border-color: #667eea;
+        }
+
+        .bk-download-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            overflow: hidden;
+            display: none;
+        }
+
+        .bk-download-header {
+            padding: 10px 12px;
+            background: #222;
+            border-bottom: 1px solid #333;
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .bk-download-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .bk-download-item:hover {
+            background: #222;
+        }
+
+        .bk-download-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .bk-download-item.bk-download-disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
 
         /* Credits column */
-        .bk-credits { text-align: right; }
-        .bk-credits-val { display: block; font-size: 12px; font-weight: 700; color: #fff; }
-        .bk-credits-label { display: block; font-size: 9px; color: #888; }
+        .bk-credits {
+            text-align: right;
+        }
+
+        .bk-credits-val {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .bk-credits-label {
+            display: block;
+            font-size: 9px;
+            color: #888;
+        }
 
         /* =================== SMOOTH ANIMATIONS =================== */
 
         /* Keyframes */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
         }
 
         @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         @keyframes scaleOut {
-            from { opacity: 1; transform: scale(1) translateY(0); }
-            to { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            from {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         @keyframes slideInLeft {
-            from { opacity: 0; transform: translateX(-50px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes bounceIn {
-            0% { opacity: 0; transform: scale(0.3); }
-            50% { transform: scale(1.05); }
-            70% { transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         @keyframes ripple {
-            0% { transform: scale(0); opacity: 1; }
-            100% { transform: scale(4); opacity: 0; }
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
         }
 
         /* Backup Modal Animation */
@@ -1056,16 +2215,45 @@
             animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
         }
 
-        .bk-row:nth-child(1) { animation-delay: 0s; }
-        .bk-row:nth-child(2) { animation-delay: 0.03s; }
-        .bk-row:nth-child(3) { animation-delay: 0.06s; }
-        .bk-row:nth-child(4) { animation-delay: 0.09s; }
-        .bk-row:nth-child(5) { animation-delay: 0.12s; }
-        .bk-row:nth-child(6) { animation-delay: 0.15s; }
-        .bk-row:nth-child(7) { animation-delay: 0.18s; }
-        .bk-row:nth-child(8) { animation-delay: 0.21s; }
-        .bk-row:nth-child(9) { animation-delay: 0.24s; }
-        .bk-row:nth-child(10) { animation-delay: 0.27s; }
+        .bk-row:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .bk-row:nth-child(2) {
+            animation-delay: 0.03s;
+        }
+
+        .bk-row:nth-child(3) {
+            animation-delay: 0.06s;
+        }
+
+        .bk-row:nth-child(4) {
+            animation-delay: 0.09s;
+        }
+
+        .bk-row:nth-child(5) {
+            animation-delay: 0.12s;
+        }
+
+        .bk-row:nth-child(6) {
+            animation-delay: 0.15s;
+        }
+
+        .bk-row:nth-child(7) {
+            animation-delay: 0.18s;
+        }
+
+        .bk-row:nth-child(8) {
+            animation-delay: 0.21s;
+        }
+
+        .bk-row:nth-child(9) {
+            animation-delay: 0.24s;
+        }
+
+        .bk-row:nth-child(10) {
+            animation-delay: 0.27s;
+        }
 
         /* Modal Animation (General) */
         .modal {
@@ -1085,18 +2273,24 @@
         }
 
         /* Button Hover Effects */
-        .btn, .toolbar-btn, .bk-btn-action {
+        .btn,
+        .toolbar-btn,
+        .bk-btn-action {
             position: relative;
             overflow: hidden;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .btn:hover, .toolbar-btn:hover, .bk-btn-action:hover:not(:disabled) {
+        .btn:hover,
+        .toolbar-btn:hover,
+        .bk-btn-action:hover:not(:disabled) {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        .btn:active, .toolbar-btn:active, .bk-btn-action:active {
+        .btn:active,
+        .toolbar-btn:active,
+        .bk-btn-action:active {
             transform: translateY(0) scale(0.98);
         }
 
@@ -1143,7 +2337,8 @@
         }
 
         /* Progress Bar Animation */
-        .bk-progress-bar, .progress-fill {
+        .bk-progress-bar,
+        .progress-fill {
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -1173,12 +2368,18 @@
         }
 
         /* Smooth scrolling */
-        .bk-list-body, .modal-body, .task-list {
+        .bk-list-body,
+        .modal-body,
+        .task-list {
             scroll-behavior: smooth;
         }
 
         /* GPU Acceleration for smoother animations */
-        .bk-modal-content, .modal-box, .task-row, .bk-row, .notification {
+        .bk-modal-content,
+        .modal-box,
+        .task-row,
+        .bk-row,
+        .notification {
             will-change: transform, opacity;
             backface-visibility: hidden;
             -webkit-font-smoothing: antialiased;
@@ -1194,11 +2395,15 @@
         }
 
         /* Input focus animation */
-        .form-input, .voice-table input, .voice-table select {
+        .form-input,
+        .voice-table input,
+        .voice-table select {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .form-input:focus, .voice-table input:focus, .voice-table select:focus {
+        .form-input:focus,
+        .voice-table input:focus,
+        .voice-table select:focus {
             box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.3);
             transform: scale(1.01);
         }
@@ -1226,7 +2431,7 @@
 
 <body>
     <div class="flex h-screen w-full overflow-hidden">
-        
+
         <!-- ========== MAIN SIDEBAR ========== -->
         <aside class="main-sidebar" id="app-sidebar">
             <div class="sidebar-header">
@@ -1240,7 +2445,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <nav class="nav-menu">
                 <a class="nav-item" href="dashboard.html" data-page="dashboard">
                     <span class="material-symbols-outlined">dashboard</span>
@@ -1259,7 +2464,7 @@
                     Pro Tool
                 </a>
             </nav>
-            
+
             <div class="nav-footer">
                 <a class="nav-item" id="logout-btn">
                     <span class="material-symbols-outlined">logout</span>
@@ -1267,10 +2472,10 @@
                 </a>
             </div>
         </aside>
-        
+
         <!-- ========== MAIN AREA ========== -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            
+
             <div class="top-bar" id="app-header">
                 <div class="top-bar-title" data-i18n="pro_tool">Pro Tool</div>
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -1304,35 +2509,39 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="tool-layout">
-                
+
                 <!-- Tool Sidebar -->
                 <div class="tool-sidebar">
-                    
+
                     <!-- Provider -->
                     <div class="tool-section">
                         <div class="section-title">Provider</div>
                         <div class="provider-dropdown" id="providerDropdown">
                             <div class="provider-select" onclick="toggleProviderDropdown()">
-                                <img id="providerImg" src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4" alt="">
+                                <img id="providerImg" src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4"
+                                    alt="">
                                 <span id="providerName">ElevenLabs</span>
                                 <i class="bi bi-chevron-down"></i>
                             </div>
                             <div class="provider-menu">
-                                <div class="provider-option active" data-provider="elevenlabs" onclick="selectProvider('elevenlabs')">
+                                <div class="provider-option active" data-provider="elevenlabs"
+                                    onclick="selectProvider('elevenlabs')">
                                     <img src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4" alt="">
                                     <span>ElevenLabs</span>
                                 </div>
-                                <div class="provider-option" data-provider="minimax" onclick="selectProvider('minimax')">
-                                    <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png" alt="">
+                                <div class="provider-option" data-provider="minimax"
+                                    onclick="selectProvider('minimax')">
+                                    <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png"
+                                        alt="">
                                     <span>Minimax</span>
                                 </div>
                             </div>
                         </div>
                         <input type="hidden" id="providerSelect" value="elevenlabs">
                     </div>
-                    
+
                     <!-- Voice -->
                     <div class="tool-section">
                         <div class="section-title">Voice</div>
@@ -1360,7 +2569,8 @@
                         <div class="form-group">
                             <label class="form-label">Voice ID</label>
                             <div style="display: flex; gap: 6px;">
-                                <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID..." style="flex: 1;">
+                                <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID..."
+                                    style="flex: 1;">
                                 <input type="hidden" id="selectedVoiceName" value="">
                                 <button class="btn btn-sm" onclick="addToLibrary()" title="Add to Library">
                                     <i class="bi bi-plus-lg"></i>
@@ -1390,10 +2600,11 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <!-- Voice Settings -->
                     <div class="tool-section">
-                        <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="section-title"
+                            style="display: flex; justify-content: space-between; align-items: center;">
                             <span>Voice Settings</span>
                             <button class="btn btn-sm" onclick="resetVoiceSettings()" title="Reset về mặc định">
                                 <i class="bi bi-arrow-counterclockwise"></i> Reset
@@ -1407,15 +2618,18 @@
                                     <span>Speed</span>
                                     <span class="slider-value" id="speedValue">1.00</span>
                                 </div>
-                                <input type="range" id="voiceSpeed" min="0.7" max="1.2" step="0.01" value="1" oninput="updateSlider('speed')">
+                                <input type="range" id="voiceSpeed" min="0.7" max="1.2" step="0.01" value="1"
+                                    oninput="updateSlider('speed')">
                             </div>
                             <div class="slider-group" id="slider-stability">
                                 <div class="slider-header">
                                     <span>Stability</span>
                                     <span class="slider-value" id="stabilityValue">50%</span>
                                 </div>
-                                <input type="range" id="voiceStability" min="0" max="100" step="1" value="50" oninput="updateSlider('stability')">
-                                <div id="stability-labels" style="display:none; justify-content:space-between; font-size:11px; margin-top:6px;">
+                                <input type="range" id="voiceStability" min="0" max="100" step="1" value="50"
+                                    oninput="updateSlider('stability')">
+                                <div id="stability-labels"
+                                    style="display:none; justify-content:space-between; font-size:11px; margin-top:6px;">
                                     <span>Creative</span>
                                     <span>Natural</span>
                                     <span>Robust</span>
@@ -1426,14 +2640,16 @@
                                     <span>Similarity</span>
                                     <span class="slider-value" id="similarityValue">75%</span>
                                 </div>
-                                <input type="range" id="voiceSimilarity" min="0" max="100" step="1" value="75" oninput="updateSlider('similarity')">
+                                <input type="range" id="voiceSimilarity" min="0" max="100" step="1" value="75"
+                                    oninput="updateSlider('similarity')">
                             </div>
                             <div class="slider-group" id="slider-style">
                                 <div class="slider-header">
                                     <span>Style</span>
                                     <span class="slider-value" id="styleValue">0%</span>
                                 </div>
-                                <input type="range" id="voiceStyle" min="0" max="100" step="1" value="0" oninput="updateSlider('style')">
+                                <input type="range" id="voiceStyle" min="0" max="100" step="1" value="0"
+                                    oninput="updateSlider('style')">
                             </div>
                             <label class="checkbox-row" id="toggle-boost">
                                 <input type="checkbox" id="speakerBoost" checked>
@@ -1448,21 +2664,24 @@
                                     <span>Speed</span>
                                     <span class="slider-value" id="mmSpeedValue">1.0</span>
                                 </div>
-                                <input type="range" id="mmVoiceSpeed" min="0.5" max="2" step="0.01" value="1" oninput="updateSlider('mmSpeed')">
+                                <input type="range" id="mmVoiceSpeed" min="0.5" max="2" step="0.01" value="1"
+                                    oninput="updateSlider('mmSpeed')">
                             </div>
                             <div class="slider-group">
                                 <div class="slider-header">
                                     <span>Pitch</span>
                                     <span class="slider-value" id="mmPitchValue">0</span>
                                 </div>
-                                <input type="range" id="mmVoicePitch" min="-12" max="12" step="1" value="0" oninput="updateSlider('mmPitch')">
+                                <input type="range" id="mmVoicePitch" min="-12" max="12" step="1" value="0"
+                                    oninput="updateSlider('mmPitch')">
                             </div>
                             <div class="slider-group">
                                 <div class="slider-header">
                                     <span>Volume</span>
                                     <span class="slider-value" id="mmVolValue">1.0</span>
                                 </div>
-                                <input type="range" id="mmVoiceVol" min="0.01" max="10" step="0.01" value="1" oninput="updateSlider('mmVol')">
+                                <input type="range" id="mmVoiceVol" min="0.01" max="10" step="0.01" value="1"
+                                    oninput="updateSlider('mmVol')">
                             </div>
                         </div>
 
@@ -1473,13 +2692,15 @@
                         </label>
 
                         <!-- Advanced Settings Toggle -->
-                        <button class="btn btn-sm" style="width: 100%; margin-top: 8px;" onclick="toggleAdvancedSettings()">
+                        <button class="btn btn-sm" style="width: 100%; margin-top: 8px;"
+                            onclick="toggleAdvancedSettings()">
                             <i class="bi bi-gear"></i> Advanced Settings
                             <i class="bi bi-chevron-down" id="advSettingsIcon"></i>
                         </button>
 
                         <!-- Advanced Settings Panel (hidden by default) -->
-                        <div id="advancedSettingsPanel" style="display: none; margin-top: 10px; padding: 10px; background: #0a0a0a; border-radius: 6px; border: 1px solid #1a1a1a;">
+                        <div id="advancedSettingsPanel"
+                            style="display: none; margin-top: 10px; padding: 10px; background: #0a0a0a; border-radius: 6px; border: 1px solid #1a1a1a;">
                             <!-- Delay between segments -->
                             <div style="margin-bottom: 10px;">
                                 <label class="checkbox-row" style="padding: 6px 0;">
@@ -1487,7 +2708,8 @@
                                     <span>Delay between segments</span>
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-left: 24px;">
-                                    <input type="number" class="form-input" id="delayJoinTime" value="1.0" step="0.1" min="0" max="10" style="width: 70px; padding: 4px 6px; font-size: 11px;">
+                                    <input type="number" class="form-input" id="delayJoinTime" value="1.0" step="0.1"
+                                        min="0" max="10" style="width: 70px; padding: 4px 6px; font-size: 11px;">
                                     <span style="font-size: 11px; color: #666;">(s) khi ghép file</span>
                                 </div>
                             </div>
@@ -1499,19 +2721,24 @@
                                     <span>Silent by Character</span>
                                 </label>
                                 <!-- Row 1: ,; -> 0.3s -->
-                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-left: 24px;">
+                                <div
+                                    style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-left: 24px;">
                                     <span style="font-size: 11px; color: #888; width: 60px;">Ký tự:</span>
-                                    <input type="text" class="form-input" id="silentChars1" value=",;" style="width: 50px; padding: 4px 6px; font-size: 11px;">
+                                    <input type="text" class="form-input" id="silentChars1" value=",;"
+                                        style="width: 50px; padding: 4px 6px; font-size: 11px;">
                                     <span style="font-size: 11px; color: #888;">→</span>
-                                    <input type="number" class="form-input" id="silentTime1" value="0.3" step="0.1" min="0" max="5" style="width: 55px; padding: 4px 6px; font-size: 11px;">
+                                    <input type="number" class="form-input" id="silentTime1" value="0.3" step="0.1"
+                                        min="0" max="5" style="width: 55px; padding: 4px 6px; font-size: 11px;">
                                     <span style="font-size: 11px; color: #666;">(s)</span>
                                 </div>
                                 <!-- Row 2: .:?! -> 0.5s -->
                                 <div style="display: flex; align-items: center; gap: 6px; margin-left: 24px;">
                                     <span style="font-size: 11px; color: #888; width: 60px;">Ký tự:</span>
-                                    <input type="text" class="form-input" id="silentChars2" value=".:?!" style="width: 50px; padding: 4px 6px; font-size: 11px;">
+                                    <input type="text" class="form-input" id="silentChars2" value=".:?!"
+                                        style="width: 50px; padding: 4px 6px; font-size: 11px;">
                                     <span style="font-size: 11px; color: #888;">→</span>
-                                    <input type="number" class="form-input" id="silentTime2" value="0.5" step="0.1" min="0" max="5" style="width: 55px; padding: 4px 6px; font-size: 11px;">
+                                    <input type="number" class="form-input" id="silentTime2" value="0.5" step="0.1"
+                                        min="0" max="5" style="width: 55px; padding: 4px 6px; font-size: 11px;">
                                     <span style="font-size: 11px; color: #666;">(s)</span>
                                 </div>
                             </div>
@@ -1527,18 +2754,22 @@
                                 <label class="checkbox-row" style="padding: 0; flex-shrink: 0; margin: 0;">
                                     <input type="checkbox" id="optLoop">
                                     <span>Split by Characters</span>
-                                    <i class="bi bi-info-circle info-tip" data-tip="Chia kịch bản theo số lượng ký tự được nhập trong ô bên cạnh"></i>
+                                    <i class="bi bi-info-circle info-tip"
+                                        data-tip="Chia kịch bản theo số lượng ký tự được nhập trong ô bên cạnh"></i>
                                 </label>
-                                <input type="number" class="form-input" id="maxChars" value="10000" style="width: 80px; padding: 6px 8px; font-size: 12px;">
+                                <input type="number" class="form-input" id="maxChars" value="10000"
+                                    style="width: 80px; padding: 6px 8px; font-size: 12px;">
                             </div>
                             <!-- Auto Split với input ký tự -->
                             <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
                                 <label class="checkbox-row" style="padding: 0; flex-shrink: 0; margin: 0;">
                                     <input type="checkbox" id="optAutoSplit">
                                     <span>Auto Split</span>
-                                    <i class="bi bi-info-circle info-tip" data-tip="Chia kịch bản theo ký tự được nhập trong ô bên cạnh"></i>
+                                    <i class="bi bi-info-circle info-tip"
+                                        data-tip="Chia kịch bản theo ký tự được nhập trong ô bên cạnh"></i>
                                 </label>
-                                <input type="text" class="form-input" id="autoSplitChars" value="。、,:.!?" style="flex: 1; padding: 6px 8px; font-size: 12px;" placeholder="Ký tự tách...">
+                                <input type="text" class="form-input" id="autoSplitChars" value="。、,:.!?"
+                                    style="flex: 1; padding: 6px 8px; font-size: 12px;" placeholder="Ký tự tách...">
                             </div>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="opt1Line1File">
@@ -1555,16 +2786,17 @@
                             <label class="form-label">Threads (1-10)</label>
                             <input type="number" class="form-input" id="threadCount" value="3" min="1" max="10">
                         </div>
-                        <button class="btn btn-sm" style="width: 100%; margin-top: 10px; color: #f55;" onclick="resetAllSettings()">
+                        <button class="btn btn-sm" style="width: 100%; margin-top: 10px; color: #f55;"
+                            onclick="resetAllSettings()">
                             <i class="bi bi-trash3"></i> Reset All Settings
                         </button>
                     </div>
-                    
+
                 </div>
-                
+
                 <!-- Tool Content -->
                 <div class="tool-content">
-                    
+
                     <!-- Toolbar -->
                     <div class="toolbar">
                         <div class="toolbar-group">
@@ -1581,22 +2813,23 @@
                                 <span class="tooltip">Import MP3 để nối</span>
                             </button>
                         </div>
-                        
+
                         <div class="toolbar-divider"></div>
-                        
+
                         <div class="toolbar-group">
                             <button class="toolbar-btn primary has-tooltip" onclick="startProcessing()" id="btnStart">
                                 <i class="bi bi-play-fill"></i> Start
                                 <span class="tooltip">Bắt đầu xử lý</span>
                             </button>
-                            <button class="toolbar-btn danger has-tooltip" onclick="stopProcessing()" id="btnStop" disabled>
+                            <button class="toolbar-btn danger has-tooltip" onclick="stopProcessing()" id="btnStop"
+                                disabled>
                                 <i class="bi bi-stop-fill"></i> Stop
                                 <span class="tooltip">Dừng xử lý</span>
                             </button>
                         </div>
-                        
+
                         <div class="toolbar-divider"></div>
-                        
+
                         <div class="toolbar-group">
                             <button class="toolbar-btn has-tooltip" onclick="joinMp3AndSrt()">
                                 <i class="bi bi-link"></i> Join Mp3 & SRT
@@ -1619,16 +2852,19 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- Selection Actions Bar (hiện khi chọn tasks) -->
-                    <div id="selectionActions" style="display: none; padding: 8px 14px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; align-items: center; gap: 8px;"></div>
-                    
+                    <div id="selectionActions"
+                        style="display: none; padding: 8px 14px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; align-items: center; gap: 8px;">
+                    </div>
+
                     <!-- Task Area -->
                     <div class="task-area">
                         <table class="task-table" id="taskTable">
                             <thead>
                                 <tr>
-                                    <th style="width: 36px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                    <th style="width: 36px;"><input type="checkbox" id="selectAll"
+                                            onchange="toggleSelectAll()"></th>
                                     <th style="width: 40px;">#</th>
                                     <th style="width: 100px;">Output Name</th>
                                     <th>Content</th>
@@ -1641,7 +2877,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <!-- Footer -->
                     <div class="tool-footer">
                         <div style="display: flex; align-items: center;">
@@ -1654,7 +2890,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Voice Library Modal -->
     <div class="modal" id="voiceLibraryModal">
         <div class="modal-box" style="max-width: 1200px; max-height: 90vh;">
@@ -1665,19 +2901,24 @@
 
             <!-- Tabs with logos -->
             <div style="display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 16px; gap: 8px;">
-                <button class="lib-tab active" data-provider="elevenlabs" onclick="switchLibraryTab('elevenlabs')" style="padding: 10px 16px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500; display: flex; align-items: center; gap: 8px;">
-                    <img src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4" style="width: 20px; height: 20px; border-radius: 4px;">
+                <button class="lib-tab active" data-provider="elevenlabs" onclick="switchLibraryTab('elevenlabs')"
+                    style="padding: 10px 16px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                    <img src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4"
+                        style="width: 20px; height: 20px; border-radius: 4px;">
                     <span>ElevenLabs</span>
                 </button>
-                <button class="lib-tab" data-provider="minimax" onclick="switchLibraryTab('minimax')" style="padding: 10px 16px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 8px;">
-                    <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png" style="width: 20px; height: 20px; border-radius: 4px;">
+                <button class="lib-tab" data-provider="minimax" onclick="switchLibraryTab('minimax')"
+                    style="padding: 10px 16px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 8px;">
+                    <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png"
+                        style="width: 20px; height: 20px; border-radius: 4px;">
                     <span>Minimax</span>
                 </button>
             </div>
 
             <div class="modal-body" style="padding: 16px; overflow-x: auto;">
                 <div class="info-text" style="margin-bottom: 12px;">
-                    Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu mỗi dòng để dùng voice tương ứng cho hội thoại nhiều người.
+                    Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu mỗi dòng để dùng voice tương ứng cho hội
+                    thoại nhiều người.
                 </div>
 
                 <!-- ElevenLabs Library -->
@@ -1730,7 +2971,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Voices Modal -->
     <div class="modal" id="voicesModal">
         <div class="modal-box" style="max-width: 700px;">
@@ -1740,13 +2981,16 @@
             </div>
             <!-- Tabs -->
             <div class="voice-tabs" style="display: flex; border-bottom: 1px solid #2a2a2a; padding: 0 16px;">
-                <button class="voice-tab active" data-tab="default" onclick="proTool.switchVoiceTab('default')" style="padding: 12px 20px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500;">
+                <button class="voice-tab active" data-tab="default" onclick="proTool.switchVoiceTab('default')"
+                    style="padding: 12px 20px; background: transparent; border: none; color: #fff; cursor: pointer; border-bottom: 2px solid #a855f7; font-weight: 500;">
                     <i class="bi bi-cloud-download"></i> Mặc định
                 </button>
-                <button class="voice-tab" data-tab="library" onclick="proTool.switchVoiceTab('library')" style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent;">
+                <button class="voice-tab" data-tab="library" onclick="proTool.switchVoiceTab('library')"
+                    style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent;">
                     <i class="bi bi-collection"></i> Thư viện
                 </button>
-                <button class="voice-tab" data-tab="clones" onclick="proTool.switchVoiceTab('clones')" style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: none;">
+                <button class="voice-tab" data-tab="clones" onclick="proTool.switchVoiceTab('clones')"
+                    style="padding: 12px 20px; background: transparent; border: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; display: none;">
                     <i class="bi bi-mic"></i> My Clones
                 </button>
             </div>
@@ -1758,7 +3002,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Backup Modal - Giống Lịch Sử Chi Tiết -->
     <div class="bk-modal-overlay" id="backupModal" style="display: none;">
         <div class="bk-modal-content">
@@ -1776,11 +3020,23 @@
                 <button class="bk-btn-action" id="bkBulkDownload" onclick="bulkDownloadBackup()" disabled>
                     <i class="bi bi-download"></i> Tải xuống (<span id="bkSelectedCount">0</span>)
                 </button>
-                <button class="bk-btn-action" id="bkBulkDelete" onclick="bulkDeleteBackup()" disabled style="color: #ef4444;">
+                <button class="bk-btn-action" id="bkBulkDelete" onclick="bulkDeleteBackup()" disabled
+                    style="color: #ef4444;">
                     <i class="bi bi-trash"></i> Xóa (<span id="bkSelectedCount2">0</span>)
                 </button>
                 <div style="flex: 1;"></div>
-                <button class="bk-btn-action" onclick="openOutputFolder()">
+
+                <button class="bk-btn-action" id="bkBulkDownloadAudio" onclick="bulkDownloadBackup('audio')" disabled>
+                    <i class="bi bi-music-note-beamed"></i> Tải xuống (<span id="bkSelectedCountAudio">0</span>) Audio
+                </button>
+                <button class="bk-btn-action" id="bkBulkDownloadSrt" onclick="bulkDownloadBackup('srt')" disabled>
+                    <i class="bi bi-file-earmark-text"></i> Tải xuống (<span id="bkSelectedCountSrt">0</span>) SRT
+                </button>
+                <button class="bk-btn-action" id="bkBulkDownloadJson" onclick="bulkDownloadBackup('json')" disabled>
+                    <i class="bi bi-file-earmark-code"></i> Tải xuống (<span id="bkSelectedCountJson">0</span>) JSON
+                </button>
+
+                <button class="bk-btn-action" onclick="openBackupFolder()">
                     <i class="bi bi-folder2-open"></i> Mở thư mục
                 </button>
                 <button class="bk-btn-action" onclick="deleteAllBackupTasks()" style="color: #f55;">
@@ -1838,7 +3094,8 @@
                 <div class="form-group">
                     <label class="form-label">Audio File</label>
                     <div style="display: flex; gap: 8px;">
-                        <input type="text" class="form-input" id="cloneAudioPath" placeholder="Chọn file audio..." readonly style="flex: 1;">
+                        <input type="text" class="form-input" id="cloneAudioPath" placeholder="Chọn file audio..."
+                            readonly style="flex: 1;">
                         <button class="btn" onclick="selectCloneAudioFile()">
                             <i class="bi bi-folder2-open"></i> Browse
                         </button>
@@ -1848,13 +3105,17 @@
                 <!-- Preview Text -->
                 <div class="form-group">
                     <label class="form-label">Preview Text (để test sau khi clone)</label>
-                    <textarea class="form-input" id="clonePreviewText" rows="3" placeholder="Nhập text để preview giọng sau khi clone...">Xin chào, tôi rất vui được hỗ trợ bạn với các dịch vụ giọng nói của chúng tôi.</textarea>
+                    <textarea class="form-input" id="clonePreviewText" rows="3"
+                        placeholder="Nhập text để preview giọng sau khi clone...">Xin chào, tôi rất vui được hỗ trợ bạn với các dịch vụ giọng nói của chúng tôi.</textarea>
                 </div>
 
                 <!-- Clone Status -->
-                <div id="cloneStatus" style="display: none; padding: 12px; background: #0a0a0a; border-radius: 6px; margin-top: 12px;">
+                <div id="cloneStatus"
+                    style="display: none; padding: 12px; background: #0a0a0a; border-radius: 6px; margin-top: 12px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="spinner" style="width: 20px; height: 20px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <div class="spinner"
+                            style="width: 20px; height: 20px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;">
+                        </div>
                         <span id="cloneStatusText">Đang clone...</span>
                     </div>
                 </div>
@@ -1902,15 +3163,18 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="form-group" style="margin: 0;">
                             <label class="form-label">Speed</label>
-                            <input type="number" class="form-input" id="libSpeed" value="1" step="0.1" min="0.5" max="2">
+                            <input type="number" class="form-input" id="libSpeed" value="1" step="0.1" min="0.5"
+                                max="2">
                         </div>
                         <div class="form-group" style="margin: 0;">
                             <label class="form-label">Stability</label>
-                            <input type="number" class="form-input" id="libStability" value="0.5" step="0.05" min="0" max="1">
+                            <input type="number" class="form-input" id="libStability" value="0.5" step="0.05" min="0"
+                                max="1">
                         </div>
                         <div class="form-group" style="margin: 0;">
                             <label class="form-label">Similarity</label>
-                            <input type="number" class="form-input" id="libSimilarity" value="0.75" step="0.05" min="0" max="1">
+                            <input type="number" class="form-input" id="libSimilarity" value="0.75" step="0.05" min="0"
+                                max="1">
                         </div>
                         <div class="form-group" style="margin: 0;">
                             <label class="form-label">Style</label>
@@ -1927,7 +3191,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Projects Modal -->
     <div class="modal" id="projectsModal">
         <div class="modal-box" style="max-width: 600px;">
@@ -1971,7 +3235,7 @@
     <script src="js/api-handler.js"></script>
     <script src="js/shared-ui.js"></script>
     <script src="js/tool.js"></script>
-    
+
     <script>
         // ==================== THEME TOGGLE ====================
         function initTheme() {
@@ -2012,7 +3276,7 @@
         }
 
         // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!e.target.closest('.provider-dropdown')) {
                 document.getElementById('providerDropdown').classList.remove('open');
             }
@@ -2022,31 +3286,32 @@
 
         // Floating tooltip for info icons
         const floatingTip = document.getElementById('floatingTip');
-        
+
         document.querySelectorAll('.info-tip').forEach(icon => {
-            icon.addEventListener('mouseenter', function(e) {
+            icon.addEventListener('mouseenter', function (e) {
                 const tip = this.getAttribute('data-tip');
                 if (!tip) return;
-                
+
                 floatingTip.textContent = tip;
                 floatingTip.style.display = 'block';
-                
+
                 // Position tooltip
                 const rect = this.getBoundingClientRect();
                 floatingTip.style.left = (rect.right + 10) + 'px';
                 floatingTip.style.top = (rect.top - 5) + 'px';
-                
+
                 // Check if tooltip goes off screen
                 const tipRect = floatingTip.getBoundingClientRect();
                 if (tipRect.right > window.innerWidth) {
                     floatingTip.style.left = (rect.left - tipRect.width - 10) + 'px';
                 }
             });
-            
-            icon.addEventListener('mouseleave', function() {
+
+            icon.addEventListener('mouseleave', function () {
                 floatingTip.style.display = 'none';
             });
         });
     </script>
 </body>
+
 </html>

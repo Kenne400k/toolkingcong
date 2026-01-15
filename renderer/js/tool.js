@@ -202,7 +202,7 @@ class ProToolManager {
             this.saveSettings();
         }
     }
-    
+
     init() {
         this.setupFileInputs();
         this.setupModelSelect();
@@ -404,7 +404,7 @@ class ProToolManager {
             document.getElementById(id)?.addEventListener('change', () => this.saveSettings());
         });
     }
-    
+
     // Import file using Electron dialog
     async importFilesDialog() {
         console.log('📂 Import files dialog...');
@@ -509,21 +509,21 @@ class ProToolManager {
             this.currentImportSource = null;
         }
     }
-    
+
     // Import audio files using Electron dialog
     async importAudioDialog() {
         try {
             const result = await window.electronAPI.selectAudioFiles();
-            
+
             if (!result.success || result.canceled) return;
-            
+
             // Sort by filename (1.mp3, 2.mp3, etc.)
             const sortedFiles = result.filePaths.sort((a, b) => {
                 const numA = parseInt(a.match(/\d+/)?.[0] || '0');
                 const numB = parseInt(b.match(/\d+/)?.[0] || '0');
                 return numA - numB;
             });
-            
+
             for (const filePath of sortedFiles) {
                 const fileName = filePath.split(/[\\/]/).pop().replace('.mp3', '');
                 this.addTask({
@@ -536,7 +536,7 @@ class ProToolManager {
                     isAudioImport: true
                 });
             }
-            
+
             this.updateTaskDisplay();
             this.showNotification(`Đã import ${sortedFiles.length} file MP3`, 'success');
         } catch (error) {
@@ -544,21 +544,21 @@ class ProToolManager {
             this.showNotification('Lỗi khi import audio', 'error');
         }
     }
-    
+
     // Process imported text with options
     async processImportedText(text, fileName) {
         console.log('📄 Processing text:', fileName, '| Length:', text?.length);
-        
+
         const optLoop = document.getElementById('optLoop')?.checked;
         const optAutoSplit = document.getElementById('optAutoSplit')?.checked;
         const opt1Line1File = document.getElementById('opt1Line1File')?.checked;
-        
+
         console.log('⚙️ Options - Loop:', optLoop, '| AutoSplit:', optAutoSplit, '| 1Line1File:', opt1Line1File);
-        
+
         // Check for multi-voice format (#1, #2, #3)
         const hasMultiVoice = /#\d+\s/.test(text);
         console.log('👥 Has multi-voice format:', hasMultiVoice);
-        
+
         if (hasMultiVoice) {
             console.log('📄 Processing as multi-voice');
             await this.processMultiVoiceText(text, fileName);
@@ -575,7 +575,7 @@ class ProToolManager {
             console.log('📄 Processing as single task');
             const voiceId = document.getElementById('selectedVoiceId')?.value || '';
             console.log('📄 Using voiceId:', voiceId);
-            
+
             this.addTask({
                 id: this.generateTaskId(),
                 content: text,
@@ -585,14 +585,14 @@ class ProToolManager {
             });
         }
     }
-    
+
     updateModelOptions() {
         // Populate ElevenLabs model dropdown
         const modelSelect = document.getElementById('modelSelect');
         if (modelSelect && this.loadedModels?.elevenlabs?.length > 0) {
             const currentVal = modelSelect.value;
             modelSelect.innerHTML = this.loadedModels.elevenlabs.map(m =>
-                `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1-m.cost_factor)*100)}% rẻ hơn)` : ''}</option>`
+                `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1 - m.cost_factor) * 100)}% rẻ hơn)` : ''}</option>`
             ).join('');
             // Restore selection if exists
             if (currentVal && [...modelSelect.options].some(o => o.value === currentVal)) {
@@ -605,7 +605,7 @@ class ProToolManager {
         if (minimaxModelSelect && this.loadedModels?.minimax?.length > 0) {
             const currentVal = minimaxModelSelect.value;
             minimaxModelSelect.innerHTML = this.loadedModels.minimax.map(m =>
-                `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1-m.cost_factor)*100)}% rẻ hơn)` : ''}</option>`
+                `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1 - m.cost_factor) * 100)}% rẻ hơn)` : ''}</option>`
             ).join('');
             // Restore selection if exists
             if (currentVal && [...minimaxModelSelect.options].some(o => o.value === currentVal)) {
@@ -626,29 +626,29 @@ class ProToolManager {
             this.model = minimaxModelSelect?.value || 'speech-02-hd';
         }
     }
-    
+
     // Load resources khi khởi động
     async loadResourcesOnInit() {
         try {
             const res = await window.electronAPI.getResources();
             console.log('📦 Resources loaded:', res);
-            
+
             if (res && res.status === 'success' && res.data) {
                 // Lưu models
                 this.loadedModels = {
                     elevenlabs: res.data.elevenlabs?.models || [],
                     minimax: res.data.minimax?.models || []
                 };
-                
+
                 // Lưu voices
                 this.loadedVoices = {
                     elevenlabs: res.data.elevenlabs?.voices || [],
                     minimax: res.data.minimax?.voices || []
                 };
-                
+
                 console.log('✅ Models:', this.loadedModels);
                 console.log('✅ Voices:', this.loadedVoices);
-                
+
                 // Update model dropdown
                 this.updateModelOptions();
             }
@@ -656,7 +656,7 @@ class ProToolManager {
             console.error('❌ Load resources error:', error);
         }
     }
-    
+
     // Load voices from server - mở cửa sổ riêng
     async loadVoicesFromServer() {
         // Open separate window
@@ -724,13 +724,13 @@ class ProToolManager {
             <div style="font-size: 12px; color: #666; margin-bottom: 10px;">${voices.length} voices</div>
             <div id="voicesList" style="max-height: 400px; overflow-y: auto;">
                 ${voices.map(voice => {
-                    const voiceId = voice.voice_id || voice.id;
-                    // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
-                    const voiceName = (voice.voice_name || voice.name || 'Unknown').replace(/'/g, "\\'");
-                    const previewUrl = (voice.preview_url || voice.sample_audio || '').replace(/'/g, "\\'");
-                    const labels = voice.labels ? Object.values(voice.labels).join(' • ') : '';
+            const voiceId = voice.voice_id || voice.id;
+            // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
+            const voiceName = (voice.voice_name || voice.name || 'Unknown').replace(/'/g, "\\'");
+            const previewUrl = (voice.preview_url || voice.sample_audio || '').replace(/'/g, "\\'");
+            const labels = voice.labels ? Object.values(voice.labels).join(' • ') : '';
 
-                    return `
+            return `
                     <div class="voice-item" style="display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid #1a1a1a; cursor: pointer;"
                          onclick="proTool.selectVoice('${voiceId}', '${voiceName}')"
                          onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
@@ -745,21 +745,21 @@ class ProToolManager {
                             <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); proTool.selectVoice('${voiceId}', '${voiceName}')">Chọn</button>
                         </div>
                     </div>`;
-                }).join('')}
+        }).join('')}
             </div>
         `;
     }
-    
+
     filterVoices(query) {
         const items = document.querySelectorAll('#voicesList .voice-item');
         query = query.toLowerCase();
-        
+
         items.forEach(item => {
             const text = item.textContent.toLowerCase();
             item.style.display = text.includes(query) ? 'flex' : 'none';
         });
     }
-    
+
     selectVoice(voiceId, voiceName) {
         document.getElementById('selectedVoiceId').value = voiceId;
         // Lưu voice name để dùng khi add to library
@@ -767,7 +767,7 @@ class ProToolManager {
         this.showNotification(`Selected: ${voiceName}`, 'success');
         document.getElementById('voicesModal').classList.remove('show');
     }
-    
+
     closeVoicesModal() {
         document.getElementById('voicesModal').classList.remove('show');
     }
@@ -878,14 +878,14 @@ class ProToolManager {
             </div>
             <div id="clonedVoicesList" style="max-height: 400px; overflow-y: auto;">
                 ${voices.map(voice => {
-                    const voiceId = voice.voice_id || voice.id;
-                    // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
-                    const voiceName = (voice.voice_name || voice.name || 'Unnamed').replace(/'/g, "\\'");
-                    const previewUrl = (voice.sample_audio || voice.preview_url || '').replace(/'/g, "\\'");
-                    const language = voice.language || 'VN';
-                    const createdAt = voice.created_at || '';
+            const voiceId = voice.voice_id || voice.id;
+            // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
+            const voiceName = (voice.voice_name || voice.name || 'Unnamed').replace(/'/g, "\\'");
+            const previewUrl = (voice.sample_audio || voice.preview_url || '').replace(/'/g, "\\'");
+            const language = voice.language || 'VN';
+            const createdAt = voice.created_at || '';
 
-                    return `
+            return `
                     <div class="voice-item" data-name="${voiceName.toLowerCase()}" style="display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid #1a1a1a; border-radius: 8px; margin-bottom: 8px; cursor: pointer; background: #0a0a0a;"
                          onclick="proTool.selectVoice('${voiceId}', '${voiceName}')"
                          onmouseover="this.style.background='#111'; this.style.borderColor='#333'"
@@ -903,7 +903,7 @@ class ProToolManager {
                             <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); proTool.selectVoice('${voiceId}', '${voiceName}')">Chọn</button>
                         </div>
                     </div>`;
-                }).join('')}
+        }).join('')}
             </div>
         `;
     }
@@ -1147,21 +1147,21 @@ class ProToolManager {
     }
 
     // ==================== FILE HANDLING ====================
-    
+
     async handleFileImport(files) {
         if (!files || files.length === 0) return;
-        
+
         const optLoop = document.getElementById('optLoop')?.checked;
         const optAutoSplit = document.getElementById('optAutoSplit')?.checked;
         const opt1Line1File = document.getElementById('opt1Line1File')?.checked;
-        
+
         for (const file of files) {
             const text = await this.readFileAsText(file);
             const fileName = file.name.replace(/\.[^/.]+$/, '');
-            
+
             // Check for multi-voice format (#1, #2, #3)
             const hasMultiVoice = /#\d+\s/.test(text);
-            
+
             if (hasMultiVoice) {
                 // Case 5: Multi-voice conversation
                 this.processMultiVoiceText(text, fileName);
@@ -1185,22 +1185,22 @@ class ProToolManager {
                 });
             }
         }
-        
+
         this.updateTaskDisplay();
         document.getElementById('fileInput').value = '';
     }
-    
+
     async handleFolderImport(files) {
         if (!files || files.length === 0) return;
-        
-        const textFiles = Array.from(files).filter(f => 
+
+        const textFiles = Array.from(files).filter(f =>
             f.name.endsWith('.txt') || f.name.endsWith('.srt')
         );
-        
+
         for (const file of textFiles) {
             const text = await this.readFileAsText(file);
             const fileName = file.name.replace(/\.[^/.]+$/, '');
-            
+
             this.addTask({
                 id: this.generateTaskId(),
                 content: text,
@@ -1209,14 +1209,14 @@ class ProToolManager {
                 status: 'pending'
             });
         }
-        
+
         this.updateTaskDisplay();
         document.getElementById('folderInput').value = '';
     }
-    
+
     handleVoiceImport(files) {
         if (!files || files.length === 0) return;
-        
+
         // Filter MP3 files and sort by name (1.mp3, 2.mp3, etc.)
         const mp3Files = Array.from(files)
             .filter(f => f.name.endsWith('.mp3'))
@@ -1225,12 +1225,12 @@ class ProToolManager {
                 const numB = parseInt(b.name.match(/\d+/)?.[0] || '0');
                 return numA - numB;
             });
-        
+
         if (mp3Files.length === 0) {
             this.showNotification('Không tìm thấy file MP3!', 'error');
             return;
         }
-        
+
         // Add to tasks for joining
         mp3Files.forEach((file, index) => {
             this.addTask({
@@ -1244,14 +1244,14 @@ class ProToolManager {
                 file: file
             });
         });
-        
+
         this.updateTaskDisplay();
         this.showNotification(`Đã import ${mp3Files.length} file MP3`, 'success');
         document.getElementById('voiceInput').value = '';
     }
-    
+
     // ==================== TEXT PROCESSING ====================
-    
+
     async processMultiVoiceText(text, baseFileName) {
         // Parse text with #1, #2, #3 markers
         const lines = text.split('\n');
@@ -1323,7 +1323,7 @@ class ProToolManager {
             this.showNotification(`Đã có ${completedCount}/${segments.length} file hoàn thành`, 'info');
         }
     }
-    
+
     async processLoopText(text, baseFileName) {
         const maxChars = parseInt(document.getElementById('maxChars')?.value) || 10000;
         const chunks = this.splitByCharCount(text, maxChars);
@@ -1456,16 +1456,16 @@ class ProToolManager {
         }
         return {};
     }
-    
+
     splitByCharCount(text, maxChars) {
         const chunks = [];
         let remaining = text;
-        
+
         while (remaining.length > maxChars) {
             // Find good split point (end of sentence/word)
             let splitPoint = maxChars;
             const goodBreaks = ['. ', '! ', '? ', '。', '\n', ' '];
-            
+
             for (const brk of goodBreaks) {
                 const pos = remaining.lastIndexOf(brk, maxChars);
                 if (pos > maxChars * 0.7) {
@@ -1473,18 +1473,18 @@ class ProToolManager {
                     break;
                 }
             }
-            
+
             chunks.push(remaining.substring(0, splitPoint).trim());
             remaining = remaining.substring(splitPoint).trim();
         }
-        
+
         if (remaining.trim()) {
             chunks.push(remaining.trim());
         }
-        
+
         return chunks;
     }
-    
+
     applySilentCharacter(text) {
         const provider = this.provider;
 
@@ -1511,7 +1511,7 @@ class ProToolManager {
 
         return text;
     }
-    
+
     removeSpecialCharacters(text) {
         // Remove special characters that might cause issues with TTS
         // Keep basic punctuation: . , ! ? : ; ' "
@@ -1522,9 +1522,9 @@ class ProToolManager {
             .replace(/\s+/g, ' ')
             .trim();
     }
-    
+
     // ==================== TASK MANAGEMENT ====================
-    
+
     addTask(task) {
         task.createdAt = new Date().toISOString();
         // Auto-add importSource if not set and currentImportSource is available
@@ -1541,11 +1541,11 @@ class ProToolManager {
             importSource: task.importSource
         });
     }
-    
+
     generateTaskId() {
         return `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
-    
+
     updateTaskDisplay() {
         const taskTableBody = document.getElementById('taskTableBody');
         const progressText = document.getElementById('progressText');
@@ -1606,29 +1606,29 @@ class ProToolManager {
             task[field] = value;
         }
     }
-    
+
     // Khi checkbox thay đổi
     onTaskCheckChange() {
         this.updateSelectionActions();
     }
-    
+
     // Lấy các tasks đã chọn
     getSelectedTasks() {
         const checkboxes = document.querySelectorAll('.task-checkbox:checked');
         const selectedIds = Array.from(checkboxes).map(cb => cb.dataset.id);
         return this.tasks.filter(t => selectedIds.includes(t.id));
     }
-    
+
     // Update hiển thị action bar khi có selection
     updateSelectionActions() {
         const selectedTasks = this.getSelectedTasks();
         const selectionBar = document.getElementById('selectionActions');
-        
+
         if (!selectionBar) return;
-        
+
         if (selectedTasks.length > 0) {
             const doneCount = selectedTasks.filter(t => t.status === 'done' && t.resultUrl).length;
-            
+
             selectionBar.innerHTML = `
                 <span style="color: #888; margin-right: 10px;">Đã chọn: ${selectedTasks.length}</span>
                 ${doneCount > 0 ? `
@@ -1645,32 +1645,32 @@ class ProToolManager {
             selectionBar.style.display = 'none';
         }
     }
-    
+
     // Download tất cả tasks đã chọn
     async downloadSelected() {
         const selectedTasks = this.getSelectedTasks();
         const doneTasks = selectedTasks.filter(t => t.status === 'done' && t.resultUrl);
-        
+
         if (doneTasks.length === 0) {
             this.showNotification('Không có file hoàn thành để tải!', 'warning');
             return;
         }
-        
+
         this.showNotification(`Đang tải ${doneTasks.length} file...`, 'info');
-        
+
         for (const task of doneTasks) {
             await this.downloadFromUrl(task.resultUrl, (task.fileName || 'audio') + '.mp3');
             await new Promise(r => setTimeout(r, 500)); // Delay giữa các file
         }
-        
+
         this.showNotification(`Đã tải ${doneTasks.length} file!`, 'success');
     }
-    
+
     // Xóa tất cả tasks đã chọn
     deleteSelected() {
         const selectedTasks = this.getSelectedTasks();
         if (selectedTasks.length === 0) return;
-        
+
         if (confirm(`Xóa ${selectedTasks.length} tasks đã chọn?`)) {
             const selectedIds = selectedTasks.map(t => t.id);
             this.tasks = this.tasks.filter(t => !selectedIds.includes(t.id));
@@ -1678,7 +1678,7 @@ class ProToolManager {
             this.showNotification(`Đã xóa ${selectedTasks.length} tasks`, 'success');
         }
     }
-    
+
     getStatusIcon(status) {
         const icons = {
             pending: '⏳',
@@ -1688,7 +1688,7 @@ class ProToolManager {
         };
         return icons[status] || '⏳';
     }
-    
+
     getStatusText(status) {
         const texts = {
             pending: 'Chờ xử lý',
@@ -1698,12 +1698,12 @@ class ProToolManager {
         };
         return texts[status] || status;
     }
-    
+
     updateProgress() {
         const done = this.tasks.filter(t => t.status === 'done').length;
         const processing = this.tasks.filter(t => t.status === 'processing').length;
         const total = this.tasks.length;
-        
+
         const progressText = document.getElementById('progressText');
         if (progressText) {
             if (total === 0) {
@@ -1713,12 +1713,12 @@ class ProToolManager {
             }
         }
     }
-    
+
     removeTask(taskId) {
         this.tasks = this.tasks.filter(t => t.id !== taskId);
         this.updateTaskDisplay();
     }
-    
+
     clearTasks() {
         if (this.isProcessing) {
             this.showNotification('Không thể xóa khi đang xử lý!', 'warning');
@@ -1729,7 +1729,7 @@ class ProToolManager {
             this.updateTaskDisplay();
         }
     }
-    
+
     // ==================== PROCESSING ====================
 
     async startProcessing() {
@@ -1818,8 +1818,8 @@ class ProToolManager {
                 } else {
                     // Check for rate limit error
                     const isRateLimit = result.error?.includes('giới hạn') ||
-                                       result.error?.includes('rate limit') ||
-                                       result.error?.includes('10 yêu cầu');
+                        result.error?.includes('rate limit') ||
+                        result.error?.includes('10 yêu cầu');
 
                     if (isRateLimit && retryCount < 3) {
                         const waitTime = 60 + (retryCount * 10); // 60s, 70s, 80s
@@ -1888,7 +1888,7 @@ class ProToolManager {
 
         this.finishProcessing();
     }
-    
+
     async createTTSTask(content, voiceId) {
         try {
             const optAutoSRT = document.getElementById('optAutoSRT')?.checked;
@@ -1934,20 +1934,20 @@ class ProToolManager {
                 params.style = style;
                 params.use_boost = speakerBoost; // ✅ Giống TTS tab (boolean không phải string)
             }
-            
+
             console.log('📤 API Request:', {
                 ...params,
                 text: content.substring(0, 100) + (content.length > 100 ? '...' : '')
             });
             console.log('📤 Full text length:', content.length);
-            
+
             const response = await window.electronAPI.apiRequest(
                 'https://kingcongstudio.com/ajaxs/tts3.php',
                 params
             );
-            
+
             console.log('📥 API Response:', response);
-            
+
             // Check response (server trả về status: 'success' không phải success: true)
             if (response.status === 'success' && (response.task_id || response.history_id || response.queue_id)) {
                 const taskId = response.task_id || response.history_id;
@@ -1962,19 +1962,19 @@ class ProToolManager {
             return { success: false, error: error.message };
         }
     }
-    
+
     async pollTaskStatus(task, maxAttempts = 60) {
         console.log('⏳ Starting poll for task:', task.taskId);
-        
+
         for (let i = 0; i < maxAttempts; i++) {
             if (!this.isProcessing) {
                 console.log('⏸️ Processing stopped, breaking poll');
                 break;
             }
-            
+
             try {
                 console.log(`🔄 Poll attempt ${i + 1}/${maxAttempts} for task:`, task.taskId);
-                
+
                 const response = await window.electronAPI.apiRequest(
                     'https://kingcongstudio.com/ajaxs/tts3.php',
                     {
@@ -1982,15 +1982,15 @@ class ProToolManager {
                         task_id: task.taskId
                     }
                 );
-                
+
                 console.log('📥 Poll response:', response);
-                
+
                 // Check task_status field (giống TTS tab)
                 const taskStatus = response.task_status || response.status;
                 const progress = parseInt(response.progress) || 0;
-                
+
                 console.log(`📊 Task ${task.taskId}: status=${taskStatus}, progress=${progress}%`);
-                
+
                 if (taskStatus === 'completed' || taskStatus === 'done') {
                     console.log('✅ Task completed:', task.taskId);
                     task.status = 'done';
@@ -2010,45 +2010,45 @@ class ProToolManager {
                     this.updateTaskDisplay();
                     return;
                 }
-                
+
                 // Update progress
                 task.progress = progress;
                 this.updateTaskDisplay();
-                
+
                 // Still processing, wait
                 await new Promise(r => setTimeout(r, 2000));
             } catch (error) {
                 console.error('❌ Poll error:', error);
             }
         }
-        
+
         console.log('⏰ Poll timeout for task:', task.taskId);
         // Timeout - mark as still processing (can check backup later)
         task.status = 'processing';
     }
-    
+
     stopProcessing() {
         this.isProcessing = false;
         document.getElementById('btnStart').disabled = false;
         document.getElementById('btnStop').disabled = true;
         document.getElementById('statusText').textContent = 'Đã dừng';
     }
-    
+
     finishProcessing() {
         this.isProcessing = false;
         document.getElementById('btnStart').disabled = false;
         document.getElementById('btnStop').disabled = true;
-        
+
         const done = this.tasks.filter(t => t.status === 'done').length;
         const failed = this.tasks.filter(t => t.status === 'failed').length;
-        
+
         document.getElementById('statusText').textContent = `Hoàn tất - ${done} thành công, ${failed} thất bại`;
-        
+
         if (done > 0) {
             this.showNotification(`Đã xử lý ${done} tác vụ thành công!`, 'success');
         }
     }
-    
+
     // ==================== VOICE LIBRARY ====================
 
     loadVoiceLibrary() {
@@ -2261,7 +2261,7 @@ class ProToolManager {
             </tr>`;
         }).join('');
     }
-    
+
     // ==================== JOIN MP3 & SRT ====================
 
     async joinMp3AndSrt() {
@@ -2475,52 +2475,52 @@ class ProToolManager {
         // Redirect to new function
         return this.joinMp3AndSrt();
     }
-    
+
     async createSRTFromTasks() {
         const doneTasks = this.tasks.filter(t => t.status === 'done' && t.duration);
-        
+
         if (doneTasks.length === 0) {
             this.showNotification('Không có task hoàn thành để tạo SRT!', 'warning');
             return;
         }
-        
+
         let srtContent = '';
         let currentTime = 0;
-        
+
         doneTasks.forEach((task, index) => {
             const duration = parseFloat(task.duration) || 5;
             const startTime = this.formatSRTTime(currentTime);
             const endTime = this.formatSRTTime(currentTime + duration);
-            
+
             srtContent += `${index + 1}\n`;
             srtContent += `${startTime} --> ${endTime}\n`;
             srtContent += `${task.content.substring(0, 200)}\n\n`;
-            
+
             currentTime += duration;
-            
+
             // Add delay
             const delay = parseFloat(document.getElementById('delayBetween')?.value) || 1;
             currentTime += delay;
         });
-        
+
         const outputName = `subtitle_${Date.now()}.srt`;
         await window.electronAPI.saveFile({
             fileName: outputName,
             content: srtContent
         });
-        
+
         this.showNotification(`Đã tạo file ${outputName}`, 'success');
     }
-    
+
     formatSRTTime(seconds) {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = Math.floor(seconds % 60);
         const ms = Math.floor((seconds % 1) * 1000);
-        
+
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(ms).padStart(3, '0')}`;
     }
-    
+
     // ==================== BACKUP/HISTORY ====================
 
     async openBackup() {
@@ -2537,7 +2537,7 @@ class ProToolManager {
             modal.classList.remove('closing');
         }, 200);
     }
-    
+
     async loadBackupHistory() {
         const backupBody = document.getElementById('backupBody');
         backupBody.innerHTML = `<div style="padding: 40px; text-align: center; color: #666;">
@@ -2578,7 +2578,7 @@ class ProToolManager {
             </div>`;
         }
     }
-    
+
     renderBackupHistory(tasks) {
         const backupBody = document.getElementById('backupBody');
 
@@ -2782,6 +2782,8 @@ class ProToolManager {
                 <div class="bk-checkbox-wrapper">
                     <input type="checkbox" class="bk-item-checkbox" value="${taskId}"
                         data-audio="${audioUrl}"
+                        data-srt="${srtUrl}"
+                        data-json="${jsonUrl}"
                         onchange="updateBkBulkActions()">
                 </div>
 
@@ -2822,7 +2824,7 @@ class ProToolManager {
 
         backupBody.innerHTML = html;
     }
-    
+
     async refreshBackup() {
         await this.loadBackupHistory();
     }
@@ -2849,17 +2851,17 @@ class ProToolManager {
     }
 
     // ==================== UTILITIES ====================
-    
+
     async downloadTask(taskId) {
         const task = this.tasks.find(t => t.id === taskId);
         if (!task?.resultUrl) {
             this.showNotification('Không có file để tải!', 'warning');
             return;
         }
-        
+
         this.downloadFromUrl(task.resultUrl, task.fileName + '.mp3');
     }
-    
+
     downloadFromUrl(url, filename = 'audio.mp3') {
         const a = document.createElement('a');
         a.href = url;
@@ -2889,7 +2891,7 @@ class ProToolManager {
             this.downloadFromUrl(url, filename);
         }
     }
-    
+
     readFileAsText(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -2898,13 +2900,13 @@ class ProToolManager {
             reader.readAsText(file);
         });
     }
-    
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-    
+
     showNotification(message, type = 'info') {
         // Create toast notification
         const toast = document.createElement('div');
@@ -2920,24 +2922,24 @@ class ProToolManager {
             animation: slideIn 0.3s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         `;
-        
+
         const colors = {
             success: '#4ade80',
             error: '#ef4444',
             warning: '#fbbf24',
             info: '#667eea'
         };
-        
+
         toast.style.background = colors[type] || colors.info;
         toast.textContent = message;
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
-    
+
     loadSettings() {
         // Load saved settings from localStorage
         const saved = localStorage.getItem('proToolSettings');
@@ -3074,12 +3076,23 @@ class ProToolManager {
         };
         localStorage.setItem('proToolSettings', JSON.stringify(settings));
     }
-    
+
     async openOutputFolder() {
         try {
             await window.electronAPI.openOutputFolder();
         } catch (error) {
             console.error('Failed to open output folder:', error);
+        }
+    }
+
+    async openBackupFolder() {
+        try {
+            // Open specifically the Backup folder
+            // Assuming openOutputFolder supports a subfolder argument or we need a new API.
+            // Based on typical implementation patterns here:
+            await window.electronAPI.openOutputFolder('Backup');
+        } catch (error) {
+            console.error('Failed to open backup folder:', error);
         }
     }
 
@@ -3728,6 +3741,10 @@ function openOutputFolder() {
     proTool.openOutputFolder();
 }
 
+function openBackupFolder() {
+    proTool.openBackupFolder();
+}
+
 // Project Management
 function saveProject() {
     proTool.saveProject();
@@ -4229,7 +4246,7 @@ function toggleBkDownloadMenu(event, taskId) {
 }
 
 // Close dropdown when clicking outside
-$(document).on('click', function(e) {
+$(document).on('click', function (e) {
     if (!$(e.target).closest('.bk-download-wrapper').length) {
         $('.bk-download-menu').hide();
     }
@@ -4286,6 +4303,50 @@ function playBkAudio(taskId, audioUrl) {
     };
 }
 
+// Global handlers for HTML string onClick events
+function toggleBkDownloadMenu(event, taskId) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById(`bk-download-menu-${taskId}`);
+    if (menu) {
+        // Toggle this menu
+        const isVisible = menu.style.display === 'block';
+
+        // Close all others first
+        document.querySelectorAll('.bk-download-menu').forEach(el => el.style.display = 'none');
+
+        // Toggle current
+        if (!isVisible) {
+            menu.style.display = 'block';
+        }
+    }
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function (event) {
+    if (!event.target.closest('.bk-download-wrapper')) {
+        document.querySelectorAll('.bk-download-menu').forEach(el => el.style.display = 'none');
+    }
+});
+
+function copyBkVoiceId(voiceId) {
+    if (!voiceId) return;
+    navigator.clipboard.writeText(voiceId).then(() => {
+        proTool.showNotification(`Đã copy Voice ID: ${voiceId}`, 'success');
+    }).catch(err => {
+        console.error('Copy failed', err);
+        // Fallback
+        const textArea = document.createElement("textarea");
+        textArea.value = voiceId;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        proTool.showNotification(`Đã copy Voice ID: ${voiceId}`, 'success');
+    });
+}
+
+
+
 // Seek audio
 function seekBkAudio(event, taskId) {
     if (bkCurrentTaskId !== taskId || !bkCurrentAudio) return;
@@ -4329,35 +4390,78 @@ function deleteBkTask(taskId, textPreview, status, creditCost) {
     });
 }
 
+
 // Update bulk action buttons
 function updateBkBulkActions() {
     const checkboxes = document.querySelectorAll('.bk-item-checkbox:checked');
-    const count = checkboxes.length;
+    const totalCount = checkboxes.length;
 
-    document.getElementById('bkSelectedCount').textContent = count;
-    document.getElementById('bkSelectedCount2').textContent = count;
-    document.getElementById('bkBulkDownload').disabled = count === 0;
-    document.getElementById('bkBulkDelete').disabled = count === 0;
+    let audioCount = 0;
+    let srtCount = 0;
+    let jsonCount = 0;
+
+    checkboxes.forEach(cb => {
+        if (cb.dataset.audio && cb.dataset.audio !== 'null' && cb.dataset.audio !== 'undefined' && cb.dataset.audio.trim() !== '') audioCount++;
+        if (cb.dataset.srt && cb.dataset.srt !== 'null' && cb.dataset.srt !== 'undefined' && cb.dataset.srt.trim() !== '') srtCount++;
+        if (cb.dataset.json && cb.dataset.json !== 'null' && cb.dataset.json !== 'undefined' && cb.dataset.json.trim() !== '') jsonCount++;
+    });
+
+    document.getElementById('bkSelectedCount').textContent = totalCount;
+    document.getElementById('bkSelectedCount2').textContent = totalCount;
+
+    // Update counts for individual download buttons
+    document.getElementById('bkSelectedCountAudio').textContent = audioCount;
+    document.getElementById('bkSelectedCountSrt').textContent = srtCount;
+    document.getElementById('bkSelectedCountJson').textContent = jsonCount;
+
+    // Enable/Disable buttons based on specific file availability
+    const btnAudio = document.getElementById('bkBulkDownloadAudio');
+    const btnSrt = document.getElementById('bkBulkDownloadSrt');
+    const btnJson = document.getElementById('bkBulkDownloadJson');
+
+    btnAudio.disabled = audioCount === 0;
+    btnSrt.disabled = srtCount === 0;
+    btnJson.disabled = jsonCount === 0;
+
+    // Dim opacity for disabled buttons to make it clear
+    btnAudio.style.opacity = audioCount === 0 ? '0.5' : '1';
+    btnSrt.style.opacity = srtCount === 0 ? '0.5' : '1';
+    btnJson.style.opacity = jsonCount === 0 ? '0.5' : '1';
+
+    document.getElementById('bkBulkDelete').disabled = totalCount === 0;
 }
 
 // Bulk download
-async function bulkDownloadBackup() {
+async function bulkDownloadBackup(type = 'audio') {
     const checkboxes = document.querySelectorAll('.bk-item-checkbox:checked');
     if (checkboxes.length === 0) {
         proTool.showNotification('Chưa chọn task nào!', 'warning');
         return;
     }
 
-    proTool.showNotification(`Đang tải ${checkboxes.length} file...`, 'info');
+    proTool.showNotification(`Đang tải ${checkboxes.length} file ${type.toUpperCase()}...`, 'info');
 
     let successCount = 0;
     for (const cb of checkboxes) {
-        const audioUrl = cb.dataset.audio;
-        if (audioUrl) {
+        let url = '';
+        let ext = '';
+
+        if (type === 'audio') {
+            url = cb.dataset.audio;
+            ext = '.mp3';
+        } else if (type === 'srt') {
+            url = cb.dataset.srt;
+            ext = '.srt';
+        } else if (type === 'json') {
+            url = cb.dataset.json;
+            ext = '.json';
+        }
+
+        if (url) {
             try {
-                const fileName = cb.value.substring(0, 8) + '.mp3';
+                const fileName = cb.value.substring(0, 12) + ext;
                 const result = await window.electronAPI.downloadFile({
-                    url: audioUrl,
+                    url: url,
                     fileName: fileName,
                     subfolder: 'Backup'
                 });
@@ -4368,7 +4472,7 @@ async function bulkDownloadBackup() {
         }
     }
 
-    proTool.showNotification(`Đã tải ${successCount}/${checkboxes.length} file`, 'success');
+    proTool.showNotification(`Đã tải ${successCount}/${checkboxes.length} file ${type.toUpperCase()}`, 'success');
 }
 
 // Bulk delete

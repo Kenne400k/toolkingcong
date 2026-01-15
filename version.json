@@ -1,9 +1,10 @@
 {
-  "version": "1.10.20",
+  "version": "1.10.21",
   "changelog": [
-    "Fixed slider knob color to adapt to theme.",
-    "Fixed v3 stability labels being invisible in light mode.",
-    "Reordered toolbar buttons in Pro Tool tab."
+    "Fixed detailed history modal toolbar buttons showing only numbers without labels",
+    "Synced renderDetailedList function from web version to Electron",
+    "Added bulk action functions for detailed history (download, delete)",
+    "Improved detailed history UI with proper button text display"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

@@ -236,9 +236,9 @@ function createMainWindow() {
 
   if (savedSession) {
     console.log('✅ Session found, loading Dashboard...');
-    
+
     mainWindow.loadFile('renderer/dashboard.html');
-    
+
     mainWindow.webContents.once('did-finish-load', () => {
       mainWindow.webContents.executeJavaScript(`
         window.__SESSION__ = ${JSON.stringify(savedSession)};
@@ -339,7 +339,7 @@ function injectLoginDetection() {
       };
     })();
   `;
-  
+
   mainWindow.webContents.executeJavaScript(injectionScript);
 }
 // =================== IPC HANDLERS ===================
@@ -347,17 +347,17 @@ ipcMain.on('login-success', (event, loginData) => {
   // 🔥 THÊM ĐOẠN LOG NÀY:
   console.log('=============================================');
   console.log('🔍 SOI DATA SERVER TRẢ VỀ (RAW):');
-  console.log(JSON.stringify(loginData._debug_data, null, 2)); 
+  console.log(JSON.stringify(loginData._debug_data, null, 2));
   console.log('=============================================');
 
   console.log('✅ LOGIN SUCCESS | User:', loginData.username);
-  
+
   saveSession(loginData);
-  
+
   setTimeout(() => {
     console.log('🔄 Loading Dashboard...');
     mainWindow.loadFile('renderer/dashboard.html');
-    
+
     mainWindow.webContents.once('did-finish-load', () => {
       mainWindow.webContents.executeJavaScript(`
         window.__SESSION__ = ${JSON.stringify(loginData)};
@@ -403,7 +403,7 @@ ipcMain.handle('get-session', async () => {
 // Updated to support dynamic URL
 ipcMain.handle('api-request', async (event, urlOrObject, data) => {
   const sessionData = loadSession();
-  
+
   // 1. Kiểm tra session file
   if (!sessionData) {
     return { status: 'error', message: 'No session data found on disk' };
@@ -411,11 +411,11 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
 
   const FormData = require('form-data');
   const fetch = require('node-fetch');
-  
+
   // Support both old format {action, data} and new format (url, data)
   let API_ENDPOINT;
   let requestData;
-  
+
   if (typeof urlOrObject === 'string') {
     // New format: api-request(url, data)
     API_ENDPOINT = urlOrObject;
@@ -430,16 +430,16 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
 
   try {
     const form = new FormData();
-    
+
     // Thêm thông tin xác thực vào Body
     form.append('session_id', sessionData.session_id);
     form.append('user_id', sessionData.user_id);
     form.append('username', sessionData.username);
-    
+
     // 🔥 Thêm source để backend biết request từ Electron Tool
     // Backend check: if ($_POST['source'] === 'electron-tool') → rate limit 20/min
     form.append('source', 'electron-tool');
-    
+
     // Thêm data tùy chỉnh
     if (requestData) {
       Object.keys(requestData).forEach(key => {
@@ -474,7 +474,7 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
     if (cookieHeader) {
       headers['Cookie'] = cookieHeader;
     }
-    
+
     // 🔥 Thêm header để backend biết đây là request từ Electron Tool
     // Backend có thể check header này để áp dụng rate limit 20/min thay vì 10/min
     headers['X-Client'] = 'kingcong-electron-tool';
@@ -490,29 +490,29 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
     });
 
     const result = await response.json();
-    
+
     // 4. XỬ LÝ KHI SERVER TỪ CHỐI (AUTO LOGOUT)
     if (result.status === 'error' && result.message && (result.message.includes('login') || result.message.includes('Session'))) {
-       console.log('❌ Session expired. Auto logging out...');
-       
-       if (fs.existsSync(SESSION_FILE)) {
-           fs.unlinkSync(SESSION_FILE);
-       }
-       
-       // Load lại trang login
-       if (mainWindow) {
-           mainWindow.loadURL('https://kingcongstudio.com/serverkingcong_tools/login.php');
-       }
-       return { status: 'error', message: 'Session expired. Please login again.' };
+      console.log('❌ Session expired. Auto logging out...');
+
+      if (fs.existsSync(SESSION_FILE)) {
+        fs.unlinkSync(SESSION_FILE);
+      }
+
+      // Load lại trang login
+      if (mainWindow) {
+        mainWindow.loadURL('https://kingcongstudio.com/serverkingcong_tools/login.php');
+      }
+      return { status: 'error', message: 'Session expired. Please login again.' };
     }
 
     return result;
 
   } catch (error) {
     console.error('❌ API Error:', error);
-    return { 
-      status: 'error', 
-      message: error.message 
+    return {
+      status: 'error',
+      message: error.message
     };
   }
 });
@@ -520,7 +520,7 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
 // 🔥 GET RESOURCES (Voices, Models)
 ipcMain.handle('get-resources', async () => {
   const fetch = require('node-fetch');
-  
+
   const RESOURCES_ENDPOINT = Buffer.from(
     'aHR0cHM6Ly9raW5nY29uZ3N0dWRpby5jb20vYWpheHMvZ2V0X3Jlc291cmNlczMucGhw',
     'base64'
@@ -549,9 +549,9 @@ ipcMain.handle('get-resources', async () => {
 
   } catch (error) {
     console.error('❌ Get Resources Error:', error);
-    return { 
-      status: 'error', 
-      message: error.message 
+    return {
+      status: 'error',
+      message: error.message
     };
   }
 });
@@ -560,14 +560,14 @@ ipcMain.handle('get-resources', async () => {
 ipcMain.handle('load-tts-page', async () => {
   mainWindow.loadFile('renderer/tts.html');
   const session = loadSession();
-  
+
   mainWindow.webContents.once('did-finish-load', () => {
     mainWindow.webContents.executeJavaScript(`
       window.__SESSION__ = ${JSON.stringify(session)};
       if (window.initTTS) window.initTTS();
     `);
   });
-  
+
   return { success: true };
 });
 
@@ -575,13 +575,13 @@ ipcMain.handle('load-tts-page', async () => {
 ipcMain.handle('load-dashboard', async () => {
   mainWindow.loadFile('renderer/dashboard.html');
   const session = loadSession();
-  
+
   mainWindow.webContents.once('did-finish-load', () => {
     mainWindow.webContents.executeJavaScript(`
       window.__SESSION__ = ${JSON.stringify(session)};
     `);
   });
-  
+
   return { success: true };
 });
 
@@ -612,8 +612,8 @@ function loadSession() {
 // =================== PRO TOOL HANDLERS ===================
 
 // Open output folder
-ipcMain.handle('open-output-folder', async () => {
-  const outputPath = path.join(__dirname, 'output');
+ipcMain.handle('open-output-folder', async (event, subfolder) => {
+  let outputPath = path.join(__dirname, 'output');
 
   // Create output folder and subfolders if not exist
   const subfolders = ['Backup', 'ImportFile', 'ImportFolder', 'Join'];
@@ -626,6 +626,16 @@ ipcMain.handle('open-output-folder', async () => {
       fs.mkdirSync(subPath, { recursive: true });
     }
   });
+
+  // If subfolder is provided, append it to path
+  if (subfolder && typeof subfolder === 'string') {
+    // Basic sanitization
+    const safeSub = subfolder.replace(/[\\/.]/g, ''); // Prevent directory traversal
+    const specificPath = path.join(outputPath, subfolder);
+    if (fs.existsSync(specificPath)) {
+      outputPath = specificPath;
+    }
+  }
 
   shell.openPath(outputPath);
   return { success: true, path: outputPath };
@@ -640,11 +650,11 @@ ipcMain.handle('select-files', async (event, options = {}) => {
       { name: 'All Files', extensions: ['*'] }
     ]
   });
-  
+
   if (result.canceled) {
     return { success: false, canceled: true };
   }
-  
+
   return { success: true, filePaths: result.filePaths };
 });
 
@@ -653,17 +663,17 @@ ipcMain.handle('select-folder', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openDirectory']
   });
-  
+
   if (result.canceled) {
     return { success: false, canceled: true };
   }
-  
+
   // Read all text files in folder
   const folderPath = result.filePaths[0];
   const files = fs.readdirSync(folderPath)
     .filter(f => f.endsWith('.txt') || f.endsWith('.srt'))
     .map(f => path.join(folderPath, f));
-  
+
   return { success: true, folderPath, files };
 });
 
@@ -675,11 +685,11 @@ ipcMain.handle('select-audio-files', async () => {
       { name: 'Audio Files', extensions: ['mp3', 'wav', 'ogg'] }
     ]
   });
-  
+
   if (result.canceled) {
     return { success: false, canceled: true };
   }
-  
+
   return { success: true, filePaths: result.filePaths };
 });
 
@@ -724,14 +734,14 @@ ipcMain.handle('read-file-base64', async (event, filePath) => {
 ipcMain.handle('save-file', async (event, { fileName, content, dir }) => {
   try {
     const outputDir = dir || path.join(__dirname, 'output');
-    
+
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
-    
+
     const filePath = path.join(outputDir, fileName);
     fs.writeFileSync(filePath, content);
-    
+
     return { success: true, filePath };
   } catch (error) {
     return { success: false, error: error.message };

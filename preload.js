@@ -4,11 +4,11 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // Login handling
   loginSuccess: (data) => ipcRenderer.send('login-success', data),
-  
+
   // Session management
   getSession: () => ipcRenderer.invoke('get-session'),
   logout: () => ipcRenderer.invoke('logout'),
-  
+
   // 🔥 API CALLS - Support both formats:
   // 1. apiRequest(url, data) - New format for TTS JS
   // 2. apiRequest({action, data}) - Old format for backwards compatibility
@@ -24,17 +24,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return ipcRenderer.invoke('api-request', { action: urlOrAction, data });
     }
   },
-  
+
   // 🔥 GET RESOURCES (Voices, Models)
   getResources: () => ipcRenderer.invoke('get-resources'),
-  
+
   // Navigation
   loadTTSPage: () => ipcRenderer.invoke('load-tts-page'),
   loadDashboard: () => ipcRenderer.invoke('load-dashboard'),
   loadToolPage: () => ipcRenderer.invoke('load-tool-page'),
-  
+
   // 🔥 PRO TOOL - File Operations
-  openOutputFolder: () => ipcRenderer.invoke('open-output-folder'),
+  openOutputFolder: (subfolder) => ipcRenderer.invoke('open-output-folder', subfolder),
   selectFiles: (options) => ipcRenderer.invoke('select-files', options),
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   selectAudioFiles: () => ipcRenderer.invoke('select-audio-files'),
