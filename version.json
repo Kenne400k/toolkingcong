@@ -1,7 +1,7 @@
 {
-  "version": "1.10.24",
+  "version": "1.10.25",
   "changelog": [
-    "UI: Added light/dark mode support across renderer windows"
+    "UI: Keep Text to Speech inner dark in light mode"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
