@@ -410,12 +410,13 @@
 
             document.getElementById('voicesList').innerHTML = voices.map(voice => {
                 const voiceId = voice.voice_id || voice.id;
-                const voiceName = escapeHtml(voice.name || 'Unknown');
+                // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
+                const voiceName = escapeHtml(voice.voice_name || voice.name || 'Unknown');
                 const previewUrl = (voice.preview_url || voice.sample_audio || '').replace(/'/g, "\\'");
                 const labels = voice.labels ? Object.values(voice.labels).join(' • ') : '';
 
                 return `
-                <div class="voice-item" onclick="selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">
+                <div class="voice-item" onclick="selectVoice('${voiceId}', '${escapeAttr(voice.voice_name || voice.name)}')">
                     <div class="info">
                         <div class="name">${voiceName}</div>
                         <div class="id">${voiceId}</div>
@@ -423,7 +424,7 @@
                     </div>
                     <div class="actions">
                         ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
-                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">Chọn</button>
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.voice_name || voice.name)}')">Chọn</button>
                     </div>
                 </div>`;
             }).join('');

@@ -721,7 +721,8 @@ class ProToolManager {
             <div id="voicesList" style="max-height: 400px; overflow-y: auto;">
                 ${voices.map(voice => {
                     const voiceId = voice.voice_id || voice.id;
-                    const voiceName = (voice.name || 'Unknown').replace(/'/g, "\\'");
+                    // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
+                    const voiceName = (voice.voice_name || voice.name || 'Unknown').replace(/'/g, "\\'");
                     const previewUrl = (voice.preview_url || voice.sample_audio || '').replace(/'/g, "\\'");
                     const labels = voice.labels ? Object.values(voice.labels).join(' • ') : '';
 
@@ -730,7 +731,7 @@ class ProToolManager {
                          onclick="proTool.selectVoice('${voiceId}', '${voiceName}')"
                          onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
                         <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 13px; color: #fff; font-weight: 500;">${voice.name}</div>
+                            <div style="font-size: 13px; color: #fff; font-weight: 500;">${voice.voice_name || voice.name || 'Unknown'}</div>
                             <div style="font-size: 10px; color: #555; margin-top: 2px;">${voiceId}</div>
                             ${labels ? `<div style="font-size: 10px; color: #666; margin-top: 4px;">${labels}</div>` : ''}
                         </div>
@@ -872,7 +873,8 @@ class ProToolManager {
             <div id="clonedVoicesList" style="max-height: 400px; overflow-y: auto;">
                 ${voices.map(voice => {
                     const voiceId = voice.voice_id || voice.id;
-                    const voiceName = (voice.name || voice.voice_name || 'Unnamed').replace(/'/g, "\\'");
+                    // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
+                    const voiceName = (voice.voice_name || voice.name || 'Unnamed').replace(/'/g, "\\'");
                     const previewUrl = (voice.sample_audio || voice.preview_url || '').replace(/'/g, "\\'");
                     const language = voice.language || 'VN';
                     const createdAt = voice.created_at || '';
@@ -883,7 +885,7 @@ class ProToolManager {
                          onmouseover="this.style.background='#111'; this.style.borderColor='#333'"
                          onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#1a1a1a'">
                         <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 14px; color: #fff; font-weight: 500;">${voice.name || voice.voice_name || 'Unnamed'}</div>
+                            <div style="font-size: 14px; color: #fff; font-weight: 500;">${voice.voice_name || voice.name || 'Unnamed'}</div>
                             <div style="font-size: 10px; color: #555; margin-top: 3px;">${voiceId}</div>
                             <div style="font-size: 10px; color: #666; margin-top: 4px;">
                                 ${[language, createdAt].filter(x => x).join(' • ')}

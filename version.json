@@ -1,7 +1,8 @@
 {
-  "version": "1.10.9",
+  "version": "1.10.10",
   "changelog": [
-    "Backup modal: Align columns with CSS Grid and header row"
+    "Fix Voice Library: Name column showing Voice ID instead of name",
+    "Prioritize voice_name field over name field for Minimax voices"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
