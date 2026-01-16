@@ -1900,7 +1900,7 @@ class ProToolManager {
                 activeCount++;
 
                 // Update status
-                const processingSummary = this.t('processingSummary')
+                let processingSummary = this.t('processingSummary')
                     .replace('{done}', completedCount)
                     .replace('{total}', totalTasks)
                     .replace('{active}', activeCount);
@@ -1912,7 +1912,7 @@ class ProToolManager {
                 completedCount++;
 
                 // Update status after completion
-                const processingSummary = this.t('processingSummary')
+                processingSummary = this.t('processingSummary')
                     .replace('{done}', completedCount)
                     .replace('{total}', totalTasks)
                     .replace('{active}', activeCount);
