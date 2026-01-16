@@ -23,6 +23,7 @@ const LANGUAGES = {
         refresh: 'Refresh',
         close: 'Close',
         cancel: 'Cancel',
+        ok: 'OK',
         confirm: 'Confirm',
 
         // Sections
@@ -113,6 +114,7 @@ const LANGUAGES = {
         refresh: 'Làm mới',
         close: 'Đóng',
         cancel: 'Hủy',
+        ok: 'OK',
         confirm: 'Xác nhận',
 
         // Sections
@@ -2090,6 +2092,10 @@ class ProToolManager {
             .replace('{failed}', failed);
         document.getElementById('statusText').textContent = completedSummary;
 
+        if (done + failed > 0) {
+            openInfoModal(completedSummary);
+        }
+
         if (done > 0) {
             this.showNotification(`Đã xử lý ${done} tác vụ thành công!`, 'success');
         }
@@ -2389,6 +2395,7 @@ class ProToolManager {
                     msg += ' + SRT';
                 }
                 this.showNotification(msg, 'success');
+                openInfoModal(msg);
             } else {
                 this.showNotification(joinResult?.message || 'Lỗi khi nối file', 'warning');
             }
@@ -3388,8 +3395,27 @@ function openConfirmModal(message, onConfirm) {
 
     confirmModalCallback = onConfirm;
     messageEl.textContent = message || '';
+    cancelBtn.style.display = 'inline-flex';
     cancelBtn.textContent = proTool?.t ? proTool.t('cancel') : 'Cancel';
     confirmBtn.textContent = proTool?.t ? proTool.t('confirm') : 'Confirm';
+
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden', 'false');
+}
+
+function openInfoModal(message) {
+    initConfirmModal();
+    const overlay = document.getElementById('confirmModal');
+    const messageEl = document.getElementById('confirmModalMessage');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const confirmBtn = document.getElementById('confirmOkBtn');
+
+    if (!overlay || !messageEl || !cancelBtn || !confirmBtn) return;
+
+    confirmModalCallback = null;
+    messageEl.textContent = message || '';
+    cancelBtn.style.display = 'none';
+    confirmBtn.textContent = proTool?.t ? proTool.t('ok') : 'OK';
 
     overlay.style.display = 'flex';
     overlay.setAttribute('aria-hidden', 'false');
@@ -4546,29 +4572,35 @@ function updateBkBulkActions() {
         if (cb.dataset.json && cb.dataset.json !== 'null' && cb.dataset.json !== 'undefined' && cb.dataset.json.trim() !== '') jsonCount++;
     });
 
-    document.getElementById('bkSelectedCount').textContent = totalCount;
-    document.getElementById('bkSelectedCount2').textContent = totalCount;
+    const selectedCountEl = document.getElementById('bkSelectedCount');
+    const selectedCount2El = document.getElementById('bkSelectedCount2');
+    if (selectedCountEl) selectedCountEl.textContent = totalCount;
+    if (selectedCount2El) selectedCount2El.textContent = totalCount;
 
     // Update counts for individual download buttons
-    document.getElementById('bkSelectedCountAudio').textContent = audioCount;
-    document.getElementById('bkSelectedCountSrt').textContent = srtCount;
-    document.getElementById('bkSelectedCountJson').textContent = jsonCount;
+    const audioCountEl = document.getElementById('bkSelectedCountAudio');
+    const srtCountEl = document.getElementById('bkSelectedCountSrt');
+    const jsonCountEl = document.getElementById('bkSelectedCountJson');
+    if (audioCountEl) audioCountEl.textContent = audioCount;
+    if (srtCountEl) srtCountEl.textContent = srtCount;
+    if (jsonCountEl) jsonCountEl.textContent = jsonCount;
 
     // Enable/Disable buttons based on specific file availability
     const btnAudio = document.getElementById('bkBulkDownloadAudio');
     const btnSrt = document.getElementById('bkBulkDownloadSrt');
     const btnJson = document.getElementById('bkBulkDownloadJson');
 
-    btnAudio.disabled = audioCount === 0;
-    btnSrt.disabled = srtCount === 0;
-    btnJson.disabled = jsonCount === 0;
+    if (btnAudio) btnAudio.disabled = audioCount === 0;
+    if (btnSrt) btnSrt.disabled = srtCount === 0;
+    if (btnJson) btnJson.disabled = jsonCount === 0;
 
     // Dim opacity for disabled buttons to make it clear
-    btnAudio.style.opacity = audioCount === 0 ? '0.5' : '1';
-    btnSrt.style.opacity = srtCount === 0 ? '0.5' : '1';
-    btnJson.style.opacity = jsonCount === 0 ? '0.5' : '1';
+    if (btnAudio) btnAudio.style.opacity = audioCount === 0 ? '0.5' : '1';
+    if (btnSrt) btnSrt.style.opacity = srtCount === 0 ? '0.5' : '1';
+    if (btnJson) btnJson.style.opacity = jsonCount === 0 ? '0.5' : '1';
 
-    document.getElementById('bkBulkDelete').disabled = totalCount === 0;
+    const bulkDeleteBtn = document.getElementById('bkBulkDelete');
+    if (bulkDeleteBtn) bulkDeleteBtn.disabled = totalCount === 0;
 }
 
 // Bulk download
