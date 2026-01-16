@@ -1,7 +1,7 @@
 {
-  "version": "1.10.31",
+  "version": "1.10.32",
   "changelog": [
-    "TTS: Fix bulk confirm language handling"
+    "Voice Library: Minimax Speed/Volume display 2 decimal places (1.00)"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
