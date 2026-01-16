@@ -23,6 +23,7 @@ const LANGUAGES = {
         refresh: 'Refresh',
         close: 'Close',
         cancel: 'Cancel',
+        confirm: 'Confirm',
 
         // Sections
         project: 'Project',
@@ -58,6 +59,15 @@ const LANGUAGES = {
         downloadSuccess: 'Downloaded: {0}',
         deleteConfirm: 'Delete {0} tasks?',
         clearConfirm: 'Clear all tasks?',
+        confirmDeleteSelected: 'Delete {count} selected tasks?',
+        confirmClearAll: 'Delete all tasks?',
+        confirmDeleteBackupAll: 'Delete all backup tasks? This cannot be undone!',
+        confirmDeleteBackupSelected: 'Delete {count} selected backup tasks?',
+        confirmDeleteProject: 'Delete this project?',
+        confirmDeleteClonedVoice: 'Delete voice "{name}"? This cannot be undone!',
+        confirmDeleteLibraryVoice: 'Delete this voice from library?',
+        confirmDeleteTask: 'Delete this task?\n\n"{preview}..."',
+        confirmResetAllSettings: 'Reset ALL settings?\n\nThis will clear:\n- Voice Library\n- All voice settings\n- Provider & Model preferences\n- All saved configurations\n\nThe app will reload after reset.',
         tasks: 'tasks',
         selectedCount: 'Selected: {count}',
         outputNamePlaceholder: 'Output name...',
@@ -103,6 +113,7 @@ const LANGUAGES = {
         refresh: 'Làm mới',
         close: 'Đóng',
         cancel: 'Hủy',
+        confirm: 'Xác nhận',
 
         // Sections
         project: 'Dự án',
@@ -138,6 +149,15 @@ const LANGUAGES = {
         downloadSuccess: 'Đã tải: {0}',
         deleteConfirm: 'Xóa {0} tác vụ?',
         clearConfirm: 'Xóa tất cả tác vụ?',
+        confirmDeleteSelected: 'Xóa {count} tác vụ đã chọn?',
+        confirmClearAll: 'Xóa tất cả tác vụ?',
+        confirmDeleteBackupAll: 'Xóa tất cả tasks trong backup? Hành động này không thể hoàn tác!',
+        confirmDeleteBackupSelected: 'Xóa {count} tasks đã chọn?',
+        confirmDeleteProject: 'Xóa project này?',
+        confirmDeleteClonedVoice: 'Xóa voice "{name}"? Hành động này không thể hoàn tác!',
+        confirmDeleteLibraryVoice: 'Xóa voice này khỏi thư viện?',
+        confirmDeleteTask: 'Xóa task này?\n\n"{preview}..."',
+        confirmResetAllSettings: 'Bạn có chắc muốn reset TẤT CẢ cài đặt?\n\nĐiều này sẽ xóa:\n- Thư viện giọng nói\n- Tất cả cài đặt giọng\n- Tùy chọn Provider & Model\n- Các cấu hình đã lưu\n\nỨng dụng sẽ tải lại sau khi reset.',
         tasks: 'tác vụ',
         selectedCount: 'Đã chọn: {count}',
         outputNamePlaceholder: 'Tên output...',
@@ -1691,12 +1711,13 @@ class ProToolManager {
         const selectedTasks = this.getSelectedTasks();
         if (selectedTasks.length === 0) return;
 
-        if (confirm(`Xóa ${selectedTasks.length} tasks đã chọn?`)) {
+        const message = this.t('confirmDeleteSelected').replace('{count}', selectedTasks.length);
+        openConfirmModal(message, () => {
             const selectedIds = selectedTasks.map(t => t.id);
             this.tasks = this.tasks.filter(t => !selectedIds.includes(t.id));
             this.updateTaskDisplay();
             this.showNotification(`Đã xóa ${selectedTasks.length} tasks`, 'success');
-        }
+        });
     }
 
     getStatusIcon(status) {
@@ -1739,10 +1760,11 @@ class ProToolManager {
             this.showNotification('Không thể xóa khi đang xử lý!', 'warning');
             return;
         }
-        if (confirm('Xóa tất cả tác vụ?')) {
+        const message = this.t('confirmClearAll');
+        openConfirmModal(message, () => {
             this.tasks = [];
             this.updateTaskDisplay();
-        }
+        });
     }
 
     // ==================== PROCESSING ====================
@@ -3256,14 +3278,15 @@ class ProToolManager {
     }
 
     deleteProject(projectId) {
-        if (!confirm('Xóa project này?')) return;
+        const message = this.t('confirmDeleteProject');
+        openConfirmModal(message, () => {
+            const projects = this.loadProjects();
+            const filtered = projects.filter(p => p.id !== projectId);
+            this.saveProjectsToStorage(filtered);
 
-        const projects = this.loadProjects();
-        const filtered = projects.filter(p => p.id !== projectId);
-        this.saveProjectsToStorage(filtered);
-
-        this.renderProjectsModal();
-        this.showNotification('Đã xóa project', 'success');
+            this.renderProjectsModal();
+            this.showNotification('Đã xóa project', 'success');
+        });
     }
 
     openProjectsModal() {
@@ -3318,9 +3341,71 @@ class ProToolManager {
 // ==================== GLOBAL FUNCTIONS ====================
 
 let proTool;
+let confirmModalCallback = null;
+let confirmModalInitialized = false;
+
+function initConfirmModal() {
+    if (confirmModalInitialized) return;
+    const overlay = document.getElementById('confirmModal');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const confirmBtn = document.getElementById('confirmOkBtn');
+
+    if (!overlay || !cancelBtn || !confirmBtn) {
+        console.error('Confirm modal elements not found');
+        return;
+    }
+
+    confirmModalInitialized = true;
+
+    cancelBtn.addEventListener('click', () => closeConfirmModal());
+    confirmBtn.addEventListener('click', () => {
+        const callback = confirmModalCallback;
+        closeConfirmModal();
+        if (typeof callback === 'function') callback();
+    });
+
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            closeConfirmModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && overlay.style.display === 'flex') {
+            closeConfirmModal();
+        }
+    });
+}
+
+function openConfirmModal(message, onConfirm) {
+    initConfirmModal();
+    const overlay = document.getElementById('confirmModal');
+    const messageEl = document.getElementById('confirmModalMessage');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const confirmBtn = document.getElementById('confirmOkBtn');
+
+    if (!overlay || !messageEl || !cancelBtn || !confirmBtn) return;
+
+    confirmModalCallback = onConfirm;
+    messageEl.textContent = message || '';
+    cancelBtn.textContent = proTool?.t ? proTool.t('cancel') : 'Cancel';
+    confirmBtn.textContent = proTool?.t ? proTool.t('confirm') : 'Confirm';
+
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeConfirmModal() {
+    const overlay = document.getElementById('confirmModal');
+    if (!overlay) return;
+    overlay.style.display = 'none';
+    overlay.setAttribute('aria-hidden', 'true');
+    confirmModalCallback = null;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     proTool = new ProToolManager();
+    initConfirmModal();
 });
 
 document.addEventListener('app:language-changed', (event) => {
@@ -3490,15 +3575,36 @@ function addLibraryRow(provider) {
 
 // Remove row from library - now accepts index directly
 function removeLibraryRow(provider, index) {
-    if (provider === 'elevenlabs') {
-        proTool.voiceLibraryElevenlabs.splice(index, 1);
-        proTool.renderElevenlabsLibrary();
-    } else {
-        proTool.voiceLibraryMinimax.splice(index, 1);
-        proTool.renderMinimaxLibrary();
-    }
-    // Mark as unsaved
-    proTool.voiceLibrary = [...(proTool.voiceLibraryElevenlabs || []), ...(proTool.voiceLibraryMinimax || [])];
+    const message = proTool.t('confirmDeleteLibraryVoice');
+    openConfirmModal(message, () => {
+        let resolvedIndex = index;
+        let rowElement = null;
+
+        if (typeof index !== 'number') {
+            rowElement = index?.closest?.('tr') || null;
+            if (rowElement) {
+                const dataIdx = rowElement.getAttribute('data-idx');
+                if (dataIdx !== null && dataIdx !== '') {
+                    resolvedIndex = parseInt(dataIdx, 10);
+                } else {
+                    rowElement.remove();
+                    return;
+                }
+            }
+        }
+
+        if (!Number.isFinite(resolvedIndex) || resolvedIndex < 0) return;
+
+        if (provider === 'elevenlabs') {
+            proTool.voiceLibraryElevenlabs.splice(resolvedIndex, 1);
+            proTool.renderElevenlabsLibrary();
+        } else {
+            proTool.voiceLibraryMinimax.splice(resolvedIndex, 1);
+            proTool.renderMinimaxLibrary();
+        }
+        // Mark as unsaved
+        proTool.voiceLibrary = [...(proTool.voiceLibraryElevenlabs || []), ...(proTool.voiceLibraryMinimax || [])];
+    });
 }
 
 // Update voice field in library (project, name, voiceId, model)
@@ -4201,37 +4307,36 @@ function selectClonedVoice(voiceId) {
 }
 
 async function deleteClonedVoice(voiceId, voiceName) {
-    if (!confirm(`Xóa voice "${voiceName}"? Hành động này không thể hoàn tác!`)) {
-        return;
-    }
+    const message = proTool.t('confirmDeleteClonedVoice').replace('{name}', voiceName);
+    openConfirmModal(message, async () => {
+        // Delete from localStorage first
+        const localVoices = getLocalClonedVoices();
+        const updatedVoices = localVoices.filter(v => (v.voice_id || v.id) !== voiceId);
+        saveLocalClonedVoices(updatedVoices);
 
-    // Delete from localStorage first
-    const localVoices = getLocalClonedVoices();
-    const updatedVoices = localVoices.filter(v => (v.voice_id || v.id) !== voiceId);
-    saveLocalClonedVoices(updatedVoices);
+        try {
+            const response = await window.electronAPI.apiRequest(
+                'https://kingcongstudio.com/ajaxs/tts3.php',
+                {
+                    action: 'delete_cloned_voice',
+                    provider: 'minimax',
+                    voice_id: voiceId
+                }
+            );
 
-    try {
-        const response = await window.electronAPI.apiRequest(
-            'https://kingcongstudio.com/ajaxs/tts3.php',
-            {
-                action: 'delete_cloned_voice',
-                provider: 'minimax',
-                voice_id: voiceId
+            if (response.success || response.status === 'success') {
+                proTool.showNotification(`Đã xóa voice "${voiceName}"`, 'success');
+            } else {
+                proTool.showNotification(`Đã xóa voice "${voiceName}" locally`, 'success');
             }
-        );
-
-        if (response.success || response.status === 'success') {
-            proTool.showNotification(`Đã xóa voice "${voiceName}"`, 'success');
-        } else {
+        } catch (error) {
+            console.error('Delete cloned voice error:', error);
             proTool.showNotification(`Đã xóa voice "${voiceName}" locally`, 'success');
         }
-    } catch (error) {
-        console.error('Delete cloned voice error:', error);
-        proTool.showNotification(`Đã xóa voice "${voiceName}" locally`, 'success');
-    }
 
-    // Reload list
-    openClonedVoicesModal();
+        // Reload list
+        openClonedVoicesModal();
+    });
 }
 
 // ==================== BACKUP FUNCTIONS ====================
@@ -4241,11 +4346,10 @@ let bkCurrentAudio = null;
 let bkCurrentTaskId = null;
 
 function deleteAllBackupTasks() {
-    if (!confirm('Xóa tất cả tasks trong backup? Hành động này không thể hoàn tác!')) {
-        return;
-    }
-
-    proTool.deleteAllBackupTasks();
+    const message = proTool.t('confirmDeleteBackupAll');
+    openConfirmModal(message, () => {
+        proTool.deleteAllBackupTasks();
+    });
 }
 
 // Copy Voice ID to clipboard
@@ -4401,26 +4505,28 @@ function formatBkTime(seconds) {
 
 // Delete task from backup
 function deleteBkTask(taskId, textPreview, status, creditCost) {
-    if (!confirm(`Xóa task này?\n\n"${textPreview.substring(0, 100)}..."`)) return;
-
-    // Call delete API
-    window.electronAPI.apiRequest(
-        'https://kingcongstudio.com/ajaxs/tts3.php',
-        {
-            action: status === 'done' || status === 'failed' ? 'delete_history' : 'cancel_task',
-            task_id: taskId
-        }
-    ).then(response => {
-        if (response.success || response.status === 'success') {
-            // Remove row from UI
-            const row = document.getElementById(`bk-row-${taskId}`);
-            if (row) row.remove();
-            proTool.showNotification('Đã xóa task', 'success');
-        } else {
-            proTool.showNotification(response.message || 'Lỗi xóa task', 'error');
-        }
-    }).catch(error => {
-        proTool.showNotification('Lỗi: ' + error.message, 'error');
+    const preview = textPreview.substring(0, 100);
+    const message = proTool.t('confirmDeleteTask').replace('{preview}', preview);
+    openConfirmModal(message, () => {
+        // Call delete API
+        window.electronAPI.apiRequest(
+            'https://kingcongstudio.com/ajaxs/tts3.php',
+            {
+                action: status === 'done' || status === 'failed' ? 'delete_history' : 'cancel_task',
+                task_id: taskId
+            }
+        ).then(response => {
+            if (response.success || response.status === 'success') {
+                // Remove row from UI
+                const row = document.getElementById(`bk-row-${taskId}`);
+                if (row) row.remove();
+                proTool.showNotification('Đã xóa task', 'success');
+            } else {
+                proTool.showNotification(response.message || 'Lỗi xóa task', 'error');
+            }
+        }).catch(error => {
+            proTool.showNotification('Lỗi: ' + error.message, 'error');
+        });
     });
 }
 
@@ -4517,32 +4623,33 @@ async function bulkDeleteBackup() {
         return;
     }
 
-    if (!confirm(`Xóa ${checkboxes.length} tasks đã chọn?`)) return;
+    const message = proTool.t('confirmDeleteBackupSelected').replace('{count}', checkboxes.length);
+    openConfirmModal(message, async () => {
+        proTool.showNotification(`Đang xóa ${checkboxes.length} tasks...`, 'info');
 
-    proTool.showNotification(`Đang xóa ${checkboxes.length} tasks...`, 'info');
-
-    let successCount = 0;
-    for (const cb of checkboxes) {
-        try {
-            const response = await window.electronAPI.apiRequest(
-                'https://kingcongstudio.com/ajaxs/tts3.php',
-                {
-                    action: 'delete_history',
-                    task_id: cb.value
+        let successCount = 0;
+        for (const cb of checkboxes) {
+            try {
+                const response = await window.electronAPI.apiRequest(
+                    'https://kingcongstudio.com/ajaxs/tts3.php',
+                    {
+                        action: 'delete_history',
+                        task_id: cb.value
+                    }
+                );
+                if (response.success || response.status === 'success') {
+                    successCount++;
+                    const row = document.getElementById(`bk-row-${cb.value}`);
+                    if (row) row.remove();
                 }
-            );
-            if (response.success || response.status === 'success') {
-                successCount++;
-                const row = document.getElementById(`bk-row-${cb.value}`);
-                if (row) row.remove();
+            } catch (e) {
+                console.error('Delete error:', e);
             }
-        } catch (e) {
-            console.error('Delete error:', e);
         }
-    }
 
-    proTool.showNotification(`Đã xóa ${successCount}/${checkboxes.length} tasks`, 'success');
-    updateBkBulkActions();
+        proTool.showNotification(`Đã xóa ${successCount}/${checkboxes.length} tasks`, 'success');
+        updateBkBulkActions();
+    });
 }
 
 // Add CSS animation
@@ -4702,37 +4809,36 @@ function onMinimaxModelChange() {
 
 // Reset all settings - clear localStorage and reload
 function resetAllSettings() {
-    if (!confirm('Are you sure you want to reset ALL settings?\n\nThis will clear:\n- Voice Library\n- All voice settings\n- Provider & Model preferences\n- All saved configurations\n\nThe app will reload after reset.')) {
-        return;
-    }
+    const message = proTool.t('confirmResetAllSettings');
+    openConfirmModal(message, () => {
+        try {
+            // Clear all localStorage
+            localStorage.removeItem('proToolSettings');
+            localStorage.removeItem('voiceLibrary');
+            localStorage.removeItem('ttsSettings');
+            localStorage.removeItem('lastVoiceId');
+            localStorage.removeItem('lastProvider');
+            localStorage.removeItem('lastModel');
 
-    try {
-        // Clear all localStorage
-        localStorage.removeItem('proToolSettings');
-        localStorage.removeItem('voiceLibrary');
-        localStorage.removeItem('ttsSettings');
-        localStorage.removeItem('lastVoiceId');
-        localStorage.removeItem('lastProvider');
-        localStorage.removeItem('lastModel');
+            // Clear all localStorage items (in case there are more)
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) keysToRemove.push(key);
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
 
-        // Clear all localStorage items (in case there are more)
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key) keysToRemove.push(key);
+            // Show success message
+            proTool?.showNotification?.('All settings have been reset!', 'success');
+
+            // Reload page after short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+
+        } catch (error) {
+            console.error('Error resetting settings:', error);
+            proTool?.showNotification?.('Failed to reset settings: ' + error.message, 'error');
         }
-        keysToRemove.forEach(key => localStorage.removeItem(key));
-
-        // Show success message
-        proTool?.showNotification?.('All settings have been reset!', 'success');
-
-        // Reload page after short delay
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
-
-    } catch (error) {
-        console.error('Error resetting settings:', error);
-        proTool?.showNotification?.('Failed to reset settings: ' + error.message, 'error');
-    }
+    });
 }
