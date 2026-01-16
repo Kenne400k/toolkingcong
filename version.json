@@ -1,7 +1,7 @@
 {
-  "version": "1.10.32",
+  "version": "1.10.33",
   "changelog": [
-    "Voice Library: Minimax Speed/Volume display 2 decimal places (1.00)"
+    "Pro Tool: Remove duplicate download button in Backup toolbar"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
