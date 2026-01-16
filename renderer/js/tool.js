@@ -1288,12 +1288,15 @@ class ProToolManager {
         // Check which files already exist
         const completedFiles = await this.checkCompletedFiles(fileNames, importSource);
 
-        // Create tasks with voice library mapping
+        // Create tasks with provider-specific voice library mapping
         // #1 = voice at position 1 (index 0), #2 = position 2 (index 1), etc.
+        const providerLibrary = this.provider === 'minimax'
+            ? (this.voiceLibraryMinimax || [])
+            : (this.voiceLibraryElevenlabs || []);
         let completedCount = 0;
         segments.forEach((seg, index) => {
             const voiceIndex = seg.voiceNum - 1; // #1 = index 0, #2 = index 1
-            const voice = this.voiceLibrary[voiceIndex];
+            const voice = providerLibrary[voiceIndex];
             const fileName = `${baseFileName}_${index + 1}`;
             const isCompleted = completedFiles[fileName]?.exists;
 
