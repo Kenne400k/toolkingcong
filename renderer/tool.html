@@ -2509,6 +2509,52 @@
             transform: scale(1.005);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
+
+        /* Confirm Modal */
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 10000;
+            padding: 16px;
+        }
+
+        .confirm-modal-content {
+            width: min(420px, 92vw);
+            background: #000;
+            color: #fff;
+            border-radius: 12px;
+            border: 1px solid #1f1f1f;
+            padding: 18px 20px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+        }
+
+        html.light .confirm-modal-content {
+            background: #fff;
+            color: #000;
+            border-color: #d1d5db;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
+        }
+
+        .confirm-modal-message {
+            font-size: 14px;
+            line-height: 1.45;
+            white-space: pre-line;
+            margin-bottom: 16px;
+        }
+
+        .confirm-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .confirm-modal-actions .btn {
+            min-width: 96px;
+        }
     </style>
     <link rel="stylesheet" href="css/theme.css">
 </head>
@@ -3295,6 +3341,17 @@
                 <button class="btn" onclick="openVoiceCloneModal()"><i class="bi bi-plus"></i> <span
                         data-i18n="pt_clone_new_voice">Clone New Voice</span></button>
                 <button class="btn" onclick="closeClonedVoicesModal()" data-i18n="pt_close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="confirm-modal-overlay" id="confirmModal" style="display: none;" aria-hidden="true">
+        <div class="confirm-modal-content" role="dialog" aria-modal="true">
+            <div class="confirm-modal-message" id="confirmModalMessage"></div>
+            <div class="confirm-modal-actions">
+                <button class="btn" id="confirmCancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmOkBtn">Confirm</button>
             </div>
         </div>
     </div>
