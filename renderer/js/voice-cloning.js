@@ -109,7 +109,7 @@ function filterLang(input) {
 
 function updateCharCount() {
     const count = $('#previewText').val().length;
-    $('#charCount').text(`${count} / 500 ky tu`);
+    $('#charCount').text(`${count} / 500`);
 }
 
 // ==========================================
