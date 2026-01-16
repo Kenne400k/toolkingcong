@@ -1,7 +1,7 @@
 {
-  "version": "1.10.38",
+  "version": "1.10.39",
   "changelog": [
-    "Pro Tool: Add language switching"
+    "Pro Tool: Add custom confirm modals"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
