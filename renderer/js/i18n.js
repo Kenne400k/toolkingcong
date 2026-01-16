@@ -7,10 +7,10 @@ const i18n = {
     translations: {
         vi: {
             // Common
-            dashboard: 'Dashboard',
-            text_to_speech: 'Text to Speech',
-            voice_cloning: 'Voice Cloning',
-            pro_tool: 'Pro Tool',
+            dashboard: 'Trang chủ',
+            text_to_speech: 'Chuyển đổi văn bản thành giọng nói',
+            voice_cloning: 'Giọng nhân bản',
+            pro_tool: 'Công cụ nâng cao',
             logout: 'Đăng xuất',
             credits: 'Credits',
 
@@ -73,7 +73,7 @@ const i18n = {
             db_tbl_loading: 'Đang tải tác vụ...',
 
             // TTS Page
-            tts_title: 'Text to Speech',
+            tts_title: 'Chuyển đổi văn bản thành giọng nói',
             tts_enter_text: 'Nhập văn bản của bạn tại đây.',
             tts_no_limit: 'Không giới hạn ký tự văn bản.',
             tts_select_voice: 'Chọn giọng nói...',
@@ -146,7 +146,7 @@ const i18n = {
             tts_drop_overlay_desc: 'Hỗ trợ .txt, .srt, .zip',
 
             // Pro Tool
-            pt_title: 'Pro Tool',
+            pt_title: 'Công cụ nâng cao',
             pt_ready: 'Sẵn sàng',
             pt_tasks: 'tác vụ',
             
