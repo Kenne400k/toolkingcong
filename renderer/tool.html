@@ -2589,7 +2589,7 @@
 
                     <!-- Provider -->
                     <div class="tool-section">
-                        <div class="section-title">Provider</div>
+                        <div class="section-title" data-i18n="pt_provider">Provider</div>
                         <div class="provider-dropdown" id="providerDropdown">
                             <div class="provider-select" onclick="toggleProviderDropdown()">
                                 <img id="providerImg" src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4"
@@ -2616,42 +2616,43 @@
 
                     <!-- Voice -->
                     <div class="tool-section">
-                        <div class="section-title">Voice</div>
+                        <div class="section-title" data-i18n="pt_voice">Voice</div>
                         <!-- Clone / My Clones buttons (Minimax only) -->
                         <div id="voiceCloneSection" style="display: none; margin-bottom: 8px;">
                             <div class="btn-group">
                                 <button class="btn" onclick="openVoiceCloneModal()">
-                                    <i class="bi bi-mic"></i> Clone
+                                    <i class="bi bi-mic"></i> <span data-i18n="pt_clone">Clone</span>
                                 </button>
                                 <button class="btn" onclick="openClonedVoicesModal()">
-                                    <i class="bi bi-collection-play"></i> My Clones
+                                    <i class="bi bi-collection-play"></i> <span data-i18n="pt_my_clones">My Clones</span>
                                 </button>
                             </div>
                         </div>
                         <!-- Load / Library buttons -->
                         <div class="btn-group" style="margin-bottom: 8px;">
                             <button class="btn" onclick="loadVoicesFromServer()">
-                                <i class="bi bi-cloud-download"></i> Load
+                                <i class="bi bi-cloud-download"></i> <span data-i18n="pt_load">Load</span>
                             </button>
                             <button class="btn" onclick="openVoiceLibrary()">
-                                <i class="bi bi-collection"></i> Library
+                                <i class="bi bi-collection"></i> <span data-i18n="pt_library">Library</span>
                             </button>
                         </div>
                         <!-- Voice ID -->
                         <div class="form-group">
-                            <label class="form-label">Voice ID</label>
+                            <label class="form-label" data-i18n="pt_voice_id">Voice ID</label>
                             <div style="display: flex; gap: 6px;">
                                 <input type="text" class="form-input" id="selectedVoiceId" placeholder="Voice ID..."
-                                    style="flex: 1;">
+                                    data-i18n-placeholder="pt_voice_id_placeholder" style="flex: 1;">
                                 <input type="hidden" id="selectedVoiceName" value="">
-                                <button class="btn btn-sm" onclick="addToLibrary()" title="Add to Library">
+                                <button class="btn btn-sm" onclick="addToLibrary()" title="Add to Library"
+                                    data-i18n-title="pt_add_to_library">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                             </div>
                         </div>
                         <!-- Model - ElevenLabs -->
                         <div class="form-group" id="elevenlabsModelGroup" style="margin-top: 12px;">
-                            <label class="form-label">Model</label>
+                            <label class="form-label" data-i18n="pt_model">Model</label>
                             <select class="form-select" id="modelSelect" onchange="onModelChange()">
                                 <option value="eleven_v3">Eleven V3 (Alpha)</option>
                                 <option value="eleven_multilingual_v2">Multilingual V2</option>
@@ -2663,7 +2664,7 @@
                         </div>
                         <!-- Model - Minimax -->
                         <div class="form-group" id="minimaxModelGroup" style="display: none;">
-                            <label class="form-label">Model</label>
+                            <label class="form-label" data-i18n="pt_model">Model</label>
                             <select class="form-select" id="minimaxModelSelect" onchange="onMinimaxModelChange()">
                                 <option value="speech-02-hd">Speech HD 2.6</option>
                                 <option value="speech-02-turbo">Speech Turbo 2.6</option>
@@ -2677,9 +2678,10 @@
                     <div class="tool-section">
                         <div class="section-title"
                             style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>Voice Settings</span>
-                            <button class="btn btn-sm" onclick="resetVoiceSettings()" title="Reset về mặc định">
-                                <i class="bi bi-arrow-counterclockwise"></i> Reset
+                            <span data-i18n="pt_voice_settings">Voice Settings</span>
+                            <button class="btn btn-sm" onclick="resetVoiceSettings()" title="Reset về mặc định"
+                                data-i18n-title="pt_reset_defaults">
+                                <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="pt_reset">Reset</span>
                             </button>
                         </div>
 
@@ -2687,7 +2689,7 @@
                         <div id="elevenlabsSettings">
                             <div class="slider-group" id="slider-speed">
                                 <div class="slider-header">
-                                    <span>Speed</span>
+                                    <span data-i18n="pt_speed">Speed</span>
                                     <span class="slider-value" id="speedValue">1.00</span>
                                 </div>
                                 <input type="range" id="voiceSpeed" min="0.7" max="1.2" step="0.01" value="1"
@@ -2695,21 +2697,21 @@
                             </div>
                             <div class="slider-group" id="slider-stability">
                                 <div class="slider-header">
-                                    <span>Stability</span>
+                                    <span data-i18n="pt_stability">Stability</span>
                                     <span class="slider-value" id="stabilityValue">50%</span>
                                 </div>
                                 <input type="range" id="voiceStability" min="0" max="100" step="1" value="50"
                                     oninput="updateSlider('stability')">
                                 <div id="stability-labels"
                                     style="display:none; justify-content:space-between; font-size:11px; margin-top:6px;">
-                                    <span>Creative</span>
-                                    <span>Natural</span>
-                                    <span>Robust</span>
+                                    <span data-i18n="pt_creative">Creative</span>
+                                    <span data-i18n="pt_natural">Natural</span>
+                                    <span data-i18n="pt_robust">Robust</span>
                                 </div>
                             </div>
                             <div class="slider-group" id="slider-similarity">
                                 <div class="slider-header">
-                                    <span>Similarity</span>
+                                    <span data-i18n="pt_similarity">Similarity</span>
                                     <span class="slider-value" id="similarityValue">75%</span>
                                 </div>
                                 <input type="range" id="voiceSimilarity" min="0" max="100" step="1" value="75"
@@ -2717,7 +2719,7 @@
                             </div>
                             <div class="slider-group" id="slider-style">
                                 <div class="slider-header">
-                                    <span>Style</span>
+                                    <span data-i18n="pt_style">Style</span>
                                     <span class="slider-value" id="styleValue">0%</span>
                                 </div>
                                 <input type="range" id="voiceStyle" min="0" max="100" step="1" value="0"
@@ -2725,7 +2727,7 @@
                             </div>
                             <label class="checkbox-row" id="toggle-boost">
                                 <input type="checkbox" id="speakerBoost" checked>
-                                Speaker Boost
+                                <span data-i18n="pt_speaker_boost">Speaker Boost</span>
                             </label>
                         </div>
 
@@ -2733,7 +2735,7 @@
                         <div id="minimaxSettings" style="display: none;">
                             <div class="slider-group">
                                 <div class="slider-header">
-                                    <span>Speed</span>
+                                    <span data-i18n="pt_speed">Speed</span>
                                     <span class="slider-value" id="mmSpeedValue">1.00</span>
                                 </div>
                                 <input type="range" id="mmVoiceSpeed" min="0.5" max="2" step="0.01" value="1"
@@ -2741,7 +2743,7 @@
                             </div>
                             <div class="slider-group">
                                 <div class="slider-header">
-                                    <span>Pitch</span>
+                                    <span data-i18n="pt_pitch">Pitch</span>
                                     <span class="slider-value" id="mmPitchValue">0</span>
                                 </div>
                                 <input type="range" id="mmVoicePitch" min="-12" max="12" step="1" value="0"
@@ -2749,7 +2751,7 @@
                             </div>
                             <div class="slider-group">
                                 <div class="slider-header">
-                                    <span>Volume</span>
+                                    <span data-i18n="pt_volume">Volume</span>
                                     <span class="slider-value" id="mmVolValue">1.00</span>
                                 </div>
                                 <input type="range" id="mmVoiceVol" min="0.01" max="10" step="0.01" value="1"
@@ -2759,14 +2761,15 @@
 
                         <label class="checkbox-row">
                             <input type="checkbox" id="optAutoSRT">
-                            <span>Auto SRT</span>
-                            <i class="bi bi-info-circle info-tip" data-tip="Tự động tạo file phụ đề .srt"></i>
+                            <span data-i18n="pt_auto_srt">Auto SRT</span>
+                            <i class="bi bi-info-circle info-tip" data-tip="Tự động tạo file phụ đề .srt"
+                                data-i18n-tip="pt_auto_srt_tip"></i>
                         </label>
 
                         <!-- Advanced Settings Toggle -->
                         <button class="btn btn-sm" style="width: 100%; margin-top: 8px;"
                             onclick="toggleAdvancedSettings()">
-                            <i class="bi bi-gear"></i> Advanced Settings
+                            <i class="bi bi-gear"></i> <span data-i18n="pt_advanced_settings">Advanced Settings</span>
                             <i class="bi bi-chevron-down" id="advSettingsIcon"></i>
                         </button>
 
@@ -2777,12 +2780,12 @@
                             <div style="margin-bottom: 10px;">
                                 <label class="checkbox-row" style="padding: 6px 0;">
                                     <input type="checkbox" id="optDelayJoin" checked>
-                                    <span>Delay between segments</span>
+                                    <span data-i18n="pt_delay_between_segments">Delay between segments</span>
                                 </label>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-left: 24px;">
                                     <input type="number" class="form-input" id="delayJoinTime" value="1.0" step="0.1"
                                         min="0" max="10" style="width: 70px; padding: 4px 6px; font-size: 11px;">
-                                    <span style="font-size: 11px; color: #666;">(s) khi ghép file</span>
+                                    <span style="font-size: 11px; color: #666;" data-i18n="pt_delay_unit">(s) khi ghép file</span>
                                 </div>
                             </div>
 
@@ -2790,12 +2793,12 @@
                             <div style="border: 1px solid #1a1a1a; border-radius: 6px; padding: 10px;">
                                 <label class="checkbox-row" style="padding: 4px 0; margin-bottom: 8px;">
                                     <input type="checkbox" id="optSilentChar">
-                                    <span>Silent by Character</span>
+                                    <span data-i18n="pt_silent_by_character">Silent by Character</span>
                                 </label>
                                 <!-- Row 1: ,; -> 0.3s -->
                                 <div
                                     style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; margin-left: 24px;">
-                                    <span style="font-size: 11px; color: #888; width: 60px;">Ký tự:</span>
+                                    <span style="font-size: 11px; color: #888; width: 60px;" data-i18n="pt_character_label">Ký tự:</span>
                                     <input type="text" class="form-input" id="silentChars1" value=",;"
                                         style="width: 50px; padding: 4px 6px; font-size: 11px;">
                                     <span style="font-size: 11px; color: #888;">→</span>
@@ -2819,15 +2822,16 @@
 
                     <!-- Options -->
                     <div class="tool-section">
-                        <div class="section-title">Options</div>
+                        <div class="section-title" data-i18n="pt_options">Options</div>
                         <div class="checkbox-list">
                             <!-- Split by Characters + Max Chars cùng hàng -->
                             <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
                                 <label class="checkbox-row" style="padding: 0; flex-shrink: 0; margin: 0;">
                                     <input type="checkbox" id="optLoop">
-                                    <span>Split by Characters</span>
+                                    <span data-i18n="pt_split_by_chars">Split by Characters</span>
                                     <i class="bi bi-info-circle info-tip"
-                                        data-tip="Chia kịch bản theo số lượng ký tự được nhập trong ô bên cạnh"></i>
+                                        data-tip="Chia kịch bản theo số lượng ký tự được nhập trong ô bên cạnh"
+                                        data-i18n-tip="pt_split_by_chars_tip"></i>
                                 </label>
                                 <input type="number" class="form-input" id="maxChars" value="10000"
                                     style="width: 80px; padding: 6px 8px; font-size: 12px;">
@@ -2836,31 +2840,34 @@
                             <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0;">
                                 <label class="checkbox-row" style="padding: 0; flex-shrink: 0; margin: 0;">
                                     <input type="checkbox" id="optAutoSplit">
-                                    <span>Auto Split</span>
+                                    <span data-i18n="pt_auto_split">Auto Split</span>
                                     <i class="bi bi-info-circle info-tip"
-                                        data-tip="Chia kịch bản theo ký tự được nhập trong ô bên cạnh"></i>
+                                        data-tip="Chia kịch bản theo ký tự được nhập trong ô bên cạnh"
+                                        data-i18n-tip="pt_auto_split_tip"></i>
                                 </label>
                                 <input type="text" class="form-input" id="autoSplitChars" value="。、,:.!?"
-                                    style="flex: 1; padding: 6px 8px; font-size: 12px;" placeholder="Ký tự tách...">
+                                    style="flex: 1; padding: 6px 8px; font-size: 12px;" placeholder="Ký tự tách..."
+                                    data-i18n-placeholder="pt_auto_split_placeholder">
                             </div>
                             <label class="checkbox-row">
                                 <input type="checkbox" id="opt1Line1File">
-                                <span>1 Line = 1 File</span>
-                                <i class="bi bi-info-circle info-tip" data-tip="Mỗi dòng = 1 file audio riêng"></i>
+                                <span data-i18n="pt_one_line_one_file">1 Line = 1 File</span>
+                                <i class="bi bi-info-circle info-tip" data-tip="Mỗi dòng = 1 file audio riêng"
+                                    data-i18n-tip="pt_one_line_tip"></i>
                             </label>
                         </div>
                     </div>
 
                     <!-- Advanced -->
                     <div class="tool-section">
-                        <div class="section-title">Advanced</div>
+                        <div class="section-title" data-i18n="pt_advanced">Advanced</div>
                         <div class="form-group">
-                            <label class="form-label">Threads (1-10)</label>
+                            <label class="form-label" data-i18n="pt_threads">Threads (1-10)</label>
                             <input type="number" class="form-input" id="threadCount" value="3" min="1" max="10">
                         </div>
                         <button class="btn btn-sm" style="width: 100%; margin-top: 10px; color: #f55;"
                             onclick="resetAllSettings()">
-                            <i class="bi bi-trash3"></i> Reset All Settings
+                            <i class="bi bi-trash3"></i> <span data-i18n="pt_reset_all_settings">Reset All Settings</span>
                         </button>
                     </div>
 
@@ -2873,16 +2880,16 @@
                     <div class="toolbar">
                         <div class="toolbar-group">
                             <button class="toolbar-btn has-tooltip" onclick="importFile()">
-                                <i class="bi bi-file-text"></i> File
-                                <span class="tooltip">Import .txt, .srt</span>
+                                <i class="bi bi-file-text"></i> <span data-i18n="pt_toolbar_file">File</span>
+                                <span class="tooltip" data-i18n="pt_toolbar_file_tip">Import .txt, .srt</span>
                             </button>
                             <button class="toolbar-btn has-tooltip" onclick="importFolder()">
-                                <i class="bi bi-folder"></i> Folder
-                                <span class="tooltip">Import cả thư mục</span>
+                                <i class="bi bi-folder"></i> <span data-i18n="pt_toolbar_folder">Folder</span>
+                                <span class="tooltip" data-i18n="pt_toolbar_folder_tip">Import cả thư mục</span>
                             </button>
                             <button class="toolbar-btn has-tooltip" onclick="importVoice()">
-                                <i class="bi bi-music-note"></i> MP3
-                                <span class="tooltip">Import MP3 để nối</span>
+                                <i class="bi bi-music-note"></i> <span data-i18n="pt_toolbar_mp3">MP3</span>
+                                <span class="tooltip" data-i18n="pt_toolbar_mp3_tip">Import MP3 để nối</span>
                             </button>
                         </div>
 
@@ -2890,13 +2897,13 @@
 
                         <div class="toolbar-group">
                             <button class="toolbar-btn primary has-tooltip" onclick="startProcessing()" id="btnStart">
-                                <i class="bi bi-play-fill"></i> Start
-                                <span class="tooltip">Bắt đầu xử lý</span>
+                                <i class="bi bi-play-fill"></i> <span data-i18n="pt_start">Start</span>
+                                <span class="tooltip" data-i18n="pt_start_tip">Bắt đầu xử lý</span>
                             </button>
                             <button class="toolbar-btn danger has-tooltip" onclick="stopProcessing()" id="btnStop"
                                 disabled>
-                                <i class="bi bi-stop-fill"></i> Stop
-                                <span class="tooltip">Dừng xử lý</span>
+                                <i class="bi bi-stop-fill"></i> <span data-i18n="pt_stop">Stop</span>
+                                <span class="tooltip" data-i18n="pt_stop_tip">Dừng xử lý</span>
                             </button>
                         </div>
 
@@ -2904,23 +2911,23 @@
 
                         <div class="toolbar-group">
                             <button class="toolbar-btn has-tooltip" onclick="joinMp3AndSrt()">
-                                <i class="bi bi-link"></i> Join Mp3 & SRT
-                                <span class="tooltip">Nối MP3 + tạo SRT</span>
+                                <i class="bi bi-link"></i> <span data-i18n="pt_join_mp3_srt">Join Mp3 & SRT</span>
+                                <span class="tooltip" data-i18n="pt_join_mp3_srt_tip">Nối MP3 + tạo SRT</span>
                             </button>
                             <button class="toolbar-btn has-tooltip" onclick="openBackup()">
-                                <i class="bi bi-clock-history"></i> Backup
-                                <span class="tooltip">Lịch sử / Backup</span>
+                                <i class="bi bi-clock-history"></i> <span data-i18n="pt_backup">Backup</span>
+                                <span class="tooltip" data-i18n="pt_backup_tip">Lịch sử / Backup</span>
                             </button>
                             <button class="toolbar-btn has-tooltip" onclick="openOutputFolder()">
                                 <i class="bi bi-folder2-open"></i>
-                                <span class="tooltip">Mở output</span>
+                                <span class="tooltip" data-i18n="pt_open_output_tip">Mở output</span>
                             </button>
                         </div>
 
                         <div style="margin-left: auto; display: flex; gap: 4px;">
                             <button class="toolbar-btn has-tooltip" onclick="clearTasks()">
                                 <i class="bi bi-trash"></i>
-                                <span class="tooltip">Xóa tất cả</span>
+                                <span class="tooltip" data-i18n="pt_clear_all_tip">Xóa tất cả</span>
                             </button>
                         </div>
                     </div>
@@ -2938,10 +2945,10 @@
                                     <th style="width: 36px;"><input type="checkbox" id="selectAll"
                                             onchange="toggleSelectAll()"></th>
                                     <th style="width: 40px;">#</th>
-                                    <th style="width: 100px;">Output Name</th>
-                                    <th>Content</th>
-                                    <th style="width: 120px;">Voice ID</th>
-                                    <th style="width: 80px;">Status</th>
+                                    <th style="width: 100px;" data-i18n="pt_output_name">Output Name</th>
+                                    <th data-i18n="pt_content">Content</th>
+                                    <th style="width: 120px;" data-i18n="pt_voice_id">Voice ID</th>
+                                    <th style="width: 80px;" data-i18n="pt_status">Status</th>
                                     <th style="width: 70px;"></th>
                                 </tr>
                             </thead>
@@ -2954,7 +2961,7 @@
                     <div class="tool-footer">
                         <div style="display: flex; align-items: center;">
                             <span class="status-dot"></span>
-                            <span id="statusText">Ready</span>
+                            <span id="statusText" data-i18n="pt_ready">Ready</span>
                         </div>
                         <div id="progressText">0 tasks</div>
                     </div>
@@ -2967,7 +2974,7 @@
     <div class="modal" id="voiceLibraryModal">
         <div class="modal-box" style="max-width: 1200px; max-height: 90vh;">
             <div class="modal-header">
-                <h3><i class="bi bi-collection"></i> Voice Library</h3>
+                <h3><i class="bi bi-collection"></i> <span data-i18n="pt_voice_library">Voice Library</span></h3>
                 <button class="modal-close" onclick="closeVoiceLibrary()">×</button>
             </div>
 
@@ -2987,8 +2994,8 @@
 
             <div class="modal-body" style="padding: 16px; overflow-x: auto;">
                 <div class="info-text" style="margin-bottom: 12px;">
-                    Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu mỗi dòng để dùng voice tương ứng cho hội
-                    thoại nhiều người.
+                    <span data-i18n="pt_voice_library_hint">Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu
+                        mỗi dòng để dùng voice tương ứng cho hội thoại nhiều người.</span>
                 </div>
 
                 <!-- ElevenLabs Library -->
@@ -2997,16 +3004,16 @@
                         <thead>
                             <tr>
                                 <th style="width: 40px;">#</th>
-                                <th style="width: 80px;">Project</th>
-                                <th style="min-width: 100px;">Name</th>
-                                <th style="min-width: 160px;">Voice ID</th>
-                                <th style="min-width: 110px;">Model</th>
-                                <th style="width: 60px;">Speed</th>
-                                <th style="width: 65px;">Stability</th>
-                                <th style="width: 65px;">Similarity</th>
-                                <th style="width: 55px;">Style</th>
-                                <th style="width: 45px;">Boost</th>
-                                <th style="width: 90px;">Actions</th>
+                                <th style="width: 80px;" data-i18n="pt_project">Project</th>
+                                <th style="min-width: 100px;" data-i18n="pt_name">Name</th>
+                                <th style="min-width: 160px;" data-i18n="pt_voice_id">Voice ID</th>
+                                <th style="min-width: 110px;" data-i18n="pt_model">Model</th>
+                                <th style="width: 60px;" data-i18n="pt_speed">Speed</th>
+                                <th style="width: 65px;" data-i18n="pt_stability">Stability</th>
+                                <th style="width: 65px;" data-i18n="pt_similarity">Similarity</th>
+                                <th style="width: 55px;" data-i18n="pt_style">Style</th>
+                                <th style="width: 45px;" data-i18n="pt_boost">Boost</th>
+                                <th style="width: 90px;" data-i18n="pt_actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="elevenlabsLibraryBody">
@@ -3020,14 +3027,14 @@
                         <thead>
                             <tr>
                                 <th style="width: 40px;">#</th>
-                                <th style="width: 80px;">Project</th>
-                                <th style="min-width: 100px;">Name</th>
-                                <th style="min-width: 160px;">Voice ID</th>
-                                <th style="min-width: 110px;">Model</th>
-                                <th style="width: 60px;">Speed</th>
-                                <th style="width: 60px;">Pitch</th>
-                                <th style="width: 60px;">Volume</th>
-                                <th style="width: 90px;">Actions</th>
+                                <th style="width: 80px;" data-i18n="pt_project">Project</th>
+                                <th style="min-width: 100px;" data-i18n="pt_name">Name</th>
+                                <th style="min-width: 160px;" data-i18n="pt_voice_id">Voice ID</th>
+                                <th style="min-width: 110px;" data-i18n="pt_model">Model</th>
+                                <th style="width: 60px;" data-i18n="pt_speed">Speed</th>
+                                <th style="width: 60px;" data-i18n="pt_pitch">Pitch</th>
+                                <th style="width: 60px;" data-i18n="pt_volume">Volume</th>
+                                <th style="width: 90px;" data-i18n="pt_actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="minimaxLibraryBody">
@@ -3036,8 +3043,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeVoiceLibrary()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveVoiceLibrary()"><i class="bi bi-save"></i> Save</button>
+                <button class="btn" onclick="closeVoiceLibrary()" data-i18n="pt_cancel">Cancel</button>
+                <button class="btn btn-primary" onclick="saveVoiceLibrary()"><i class="bi bi-save"></i> <span
+                        data-i18n="pt_save">Save</span></button>
             </div>
         </div>
     </div>
@@ -3046,27 +3054,27 @@
     <div class="modal keep-dark" id="voicesModal">
         <div class="modal-box" style="max-width: 700px;">
             <div class="modal-header">
-                <h3><i class="bi bi-mic"></i> Chọn Giọng Nói</h3>
+                <h3><i class="bi bi-mic"></i> <span data-i18n="pt_choose_voice">Chọn Giọng Nói</span></h3>
                 <button class="modal-close" onclick="closeVoicesModal()">×</button>
             </div>
             <!-- Tabs -->
             <div class="voice-tabs">
                 <button class="voice-tab active" data-tab="default" onclick="proTool.switchVoiceTab('default')">
-                    <i class="bi bi-cloud-download"></i> Mặc định
+                    <i class="bi bi-cloud-download"></i> <span data-i18n="pt_default">Mặc định</span>
                 </button>
                 <button class="voice-tab" data-tab="library" onclick="proTool.switchVoiceTab('library')">
-                    <i class="bi bi-collection"></i> Thư viện
+                    <i class="bi bi-collection"></i> <span data-i18n="pt_library">Thư viện</span>
                 </button>
                 <button class="voice-tab" data-tab="clones" onclick="proTool.switchVoiceTab('clones')"
                     style="display: none;">
-                    <i class="bi bi-mic"></i> My Clones
+                    <i class="bi bi-mic"></i> <span data-i18n="pt_my_clones">My Clones</span>
                 </button>
             </div>
             <div class="modal-body" id="voicesModalBody">
-                <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
+                <div style="text-align: center; padding: 40px; color: #555;" data-i18n="pt_loading">Loading...</div>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeVoicesModal()">Close</button>
+                <button class="btn" onclick="closeVoicesModal()" data-i18n="pt_close">Close</button>
             </div>
         </div>
     </div>
@@ -3249,9 +3257,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeAddToLibraryModal()">Cancel</button>
+                <button class="btn" onclick="closeAddToLibraryModal()" data-i18n="pt_cancel">Cancel</button>
                 <button class="btn btn-primary" onclick="saveToLibrary()">
-                    <i class="bi bi-save"></i> Save
+                    <i class="bi bi-save"></i> <span data-i18n="pt_save">Save</span>
                 </button>
             </div>
         </div>
@@ -3261,14 +3269,14 @@
     <div class="modal" id="projectsModal">
         <div class="modal-box" style="max-width: 600px;">
             <div class="modal-header">
-                <h3><i class="bi bi-folder2"></i> Saved Projects</h3>
+                <h3><i class="bi bi-folder2"></i> <span data-i18n="pt_saved_projects">Saved Projects</span></h3>
                 <button class="modal-close" onclick="closeProjectsModal()">×</button>
             </div>
             <div class="modal-body" id="projectsModalBody">
-                <div style="text-align: center; padding: 40px; color: #555;">No projects saved</div>
+                <div style="text-align: center; padding: 40px; color: #555;" data-i18n="pt_no_projects">No projects saved</div>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="closeProjectsModal()">Close</button>
+                <button class="btn" onclick="closeProjectsModal()" data-i18n="pt_close">Close</button>
             </div>
         </div>
     </div>
@@ -3277,15 +3285,16 @@
     <div class="modal" id="clonedVoicesModal">
         <div class="modal-box" style="max-width: 700px;">
             <div class="modal-header">
-                <h3><i class="bi bi-collection-play"></i> My Cloned Voices (Minimax)</h3>
+                <h3><i class="bi bi-collection-play"></i> <span data-i18n="pt_cloned_voices_title">My Cloned Voices (Minimax)</span></h3>
                 <button class="modal-close" onclick="closeClonedVoicesModal()">×</button>
             </div>
             <div class="modal-body" id="clonedVoicesBody">
-                <div style="text-align: center; padding: 40px; color: #555;">Loading...</div>
+                <div style="text-align: center; padding: 40px; color: #555;" data-i18n="pt_loading">Loading...</div>
             </div>
             <div class="modal-footer">
-                <button class="btn" onclick="openVoiceCloneModal()"><i class="bi bi-plus"></i> Clone New Voice</button>
-                <button class="btn" onclick="closeClonedVoicesModal()">Close</button>
+                <button class="btn" onclick="openVoiceCloneModal()"><i class="bi bi-plus"></i> <span
+                        data-i18n="pt_clone_new_voice">Clone New Voice</span></button>
+                <button class="btn" onclick="closeClonedVoicesModal()" data-i18n="pt_close">Close</button>
             </div>
         </div>
     </div>
