@@ -58,6 +58,14 @@ const LANGUAGES = {
         downloadSuccess: 'Downloaded: {0}',
         deleteConfirm: 'Delete {0} tasks?',
         clearConfirm: 'Clear all tasks?',
+        tasks: 'tasks',
+        selectedCount: 'Selected: {count}',
+        outputNamePlaceholder: 'Output name...',
+        voiceIdPlaceholder: 'Voice ID...',
+        stopped: 'Stopped',
+        completedSummary: 'Completed - {done} success, {failed} failed',
+        processingSummary: 'Processing... ({done}/{total} done, {active} active)',
+        processingShort: 'processing',
 
         // Backup
         backup: 'Backup',
@@ -130,6 +138,14 @@ const LANGUAGES = {
         downloadSuccess: 'Đã tải: {0}',
         deleteConfirm: 'Xóa {0} tác vụ?',
         clearConfirm: 'Xóa tất cả tác vụ?',
+        tasks: 'tác vụ',
+        selectedCount: 'Đã chọn: {count}',
+        outputNamePlaceholder: 'Tên output...',
+        voiceIdPlaceholder: 'Voice ID...',
+        stopped: 'Đã dừng',
+        completedSummary: 'Hoàn tất - {done} thành công, {failed} thất bại',
+        processingSummary: 'Đang xử lý... ({done}/{total} hoàn thành, {active} đang xử lý)',
+        processingShort: 'đang xử lý',
 
         // Backup
         backup: 'Sao lưu',
@@ -212,6 +228,7 @@ class ProToolManager {
         this.setupVoiceLibraryListener();
         this.loadResourcesOnInit(); // Load models & voices từ server
         this.updateVoiceSettingsUI(); // Initialize provider-specific settings
+        this.updateProgress();
         console.log('✅ ProToolManager initialized');
     }
 
@@ -1545,6 +1562,10 @@ class ProToolManager {
     updateTaskDisplay() {
         const taskTableBody = document.getElementById('taskTableBody');
         const progressText = document.getElementById('progressText');
+        const outputNamePlaceholder = this.escapeHtml(this.t('outputNamePlaceholder'));
+        const voiceIdPlaceholder = this.escapeHtml(this.t('voiceIdPlaceholder'));
+        const downloadTitle = this.escapeHtml(this.t('download'));
+        const deleteTitle = this.escapeHtml(this.t('delete'));
 
         // Render tasks
         taskTableBody.innerHTML = this.tasks.map((task, index) => `
@@ -1556,7 +1577,7 @@ class ProToolManager {
                            value="${this.escapeHtml(task.outputName || task.fileName || '')}"
                            data-id="${task.id}"
                            onchange="proTool.updateTaskField('${task.id}', 'outputName', this.value)"
-                           placeholder="Output name..."
+                           placeholder="${outputNamePlaceholder}"
                            style="padding: 4px 6px; font-size: 11px; width: 90px;">
                 </td>
                 <td>
@@ -1571,7 +1592,7 @@ class ProToolManager {
                            value="${this.escapeHtml(task.voiceId || '')}"
                            data-id="${task.id}"
                            onchange="proTool.updateTaskField('${task.id}', 'voiceId', this.value)"
-                           placeholder="Voice ID..."
+                           placeholder="${voiceIdPlaceholder}"
                            style="padding: 4px 6px; font-size: 11px; width: 110px;">
                 </td>
                 <td>
@@ -1585,8 +1606,8 @@ class ProToolManager {
                     ` : `<span class="status ${task.status}">${this.getStatusText(task.status)}</span>`}
                 </td>
                 <td>
-                    ${task.resultUrl ? `<button class="btn btn-sm" onclick="proTool.downloadTask('${task.id}')" title="Tải xuống"><i class="bi bi-download"></i></button>` : ''}
-                    <button class="btn btn-sm" onclick="proTool.removeTask('${task.id}')" title="Xóa"><i class="bi bi-x"></i></button>
+                    ${task.resultUrl ? `<button class="btn btn-sm" onclick="proTool.downloadTask('${task.id}')" title="${downloadTitle}"><i class="bi bi-download"></i></button>` : ''}
+                    <button class="btn btn-sm" onclick="proTool.removeTask('${task.id}')" title="${deleteTitle}"><i class="bi bi-x"></i></button>
                 </td>
             </tr>
         `).join('');
@@ -1624,16 +1645,19 @@ class ProToolManager {
 
         if (selectedTasks.length > 0) {
             const doneCount = selectedTasks.filter(t => t.status === 'done' && t.resultUrl).length;
+            const selectedLabel = this.t('selectedCount').replace('{count}', selectedTasks.length);
+            const downloadLabel = this.t('download');
+            const deleteLabel = this.t('delete');
 
             selectionBar.innerHTML = `
-                <span style="color: #888; margin-right: 10px;">Đã chọn: ${selectedTasks.length}</span>
+                <span style="color: #888; margin-right: 10px;">${this.escapeHtml(selectedLabel)}</span>
                 ${doneCount > 0 ? `
-                    <button class="btn btn-sm" onclick="proTool.downloadSelected()" title="Tải tất cả">
-                        <i class="bi bi-download"></i> Tải (${doneCount})
+                    <button class="btn btn-sm" onclick="proTool.downloadSelected()" title="${this.escapeHtml(downloadLabel)}">
+                        <i class="bi bi-download"></i> ${this.escapeHtml(downloadLabel)} (${doneCount})
                     </button>
                 ` : ''}
-                <button class="btn btn-sm" onclick="proTool.deleteSelected()" title="Xóa đã chọn">
-                    <i class="bi bi-trash"></i> Xóa
+                <button class="btn btn-sm" onclick="proTool.deleteSelected()" title="${this.escapeHtml(deleteLabel)}">
+                    <i class="bi bi-trash"></i> ${this.escapeHtml(deleteLabel)}
                 </button>
             `;
             selectionBar.style.display = 'flex';
@@ -1686,13 +1710,7 @@ class ProToolManager {
     }
 
     getStatusText(status) {
-        const texts = {
-            pending: 'Chờ xử lý',
-            processing: 'Đang xử lý',
-            done: 'Hoàn thành',
-            failed: 'Thất bại'
-        };
-        return texts[status] || status;
+        return this.t(status) || status;
     }
 
     updateProgress() {
@@ -1703,9 +1721,10 @@ class ProToolManager {
         const progressText = document.getElementById('progressText');
         if (progressText) {
             if (total === 0) {
-                progressText.textContent = '0 tasks';
+                progressText.textContent = `0 ${this.t('tasks')}`;
             } else {
-                progressText.textContent = `${done}/${total} done` + (processing > 0 ? ` • ${processing} processing` : '');
+                progressText.textContent = `${done}/${total} ${this.t('done')}` +
+                    (processing > 0 ? ` • ${processing} ${this.t('processingShort')}` : '');
             }
         }
     }
@@ -1760,7 +1779,7 @@ class ProToolManager {
         this.isProcessing = true;
         document.getElementById('btnStart').disabled = true;
         document.getElementById('btnStop').disabled = false;
-        document.getElementById('statusText').textContent = 'Đang xử lý...';
+        document.getElementById('statusText').textContent = this.t('processing');
 
         const optSilentChar = document.getElementById('optSilentChar')?.checked;
 
@@ -1859,8 +1878,11 @@ class ProToolManager {
                 activeCount++;
 
                 // Update status
-                document.getElementById('statusText').textContent =
-                    `Đang xử lý... (${completedCount}/${totalTasks} done, ${activeCount} active)`;
+                const processingSummary = this.t('processingSummary')
+                    .replace('{done}', completedCount)
+                    .replace('{total}', totalTasks)
+                    .replace('{active}', activeCount);
+                document.getElementById('statusText').textContent = processingSummary;
 
                 await processTask(task);
 
@@ -1868,8 +1890,11 @@ class ProToolManager {
                 completedCount++;
 
                 // Update status after completion
-                document.getElementById('statusText').textContent =
-                    `Đang xử lý... (${completedCount}/${totalTasks} done, ${activeCount} active)`;
+                const processingSummary = this.t('processingSummary')
+                    .replace('{done}', completedCount)
+                    .replace('{total}', totalTasks)
+                    .replace('{active}', activeCount);
+                document.getElementById('statusText').textContent = processingSummary;
             }
         };
 
@@ -2027,7 +2052,7 @@ class ProToolManager {
         this.isProcessing = false;
         document.getElementById('btnStart').disabled = false;
         document.getElementById('btnStop').disabled = true;
-        document.getElementById('statusText').textContent = 'Đã dừng';
+        document.getElementById('statusText').textContent = this.t('stopped');
     }
 
     finishProcessing() {
@@ -2038,7 +2063,10 @@ class ProToolManager {
         const done = this.tasks.filter(t => t.status === 'done').length;
         const failed = this.tasks.filter(t => t.status === 'failed').length;
 
-        document.getElementById('statusText').textContent = `Hoàn tất - ${done} thành công, ${failed} thất bại`;
+        const completedSummary = this.t('completedSummary')
+            .replace('{done}', done)
+            .replace('{failed}', failed);
+        document.getElementById('statusText').textContent = completedSummary;
 
         if (done > 0) {
             this.showNotification(`Đã xử lý ${done} tác vụ thành công!`, 'success');
@@ -3040,6 +3068,12 @@ class ProToolManager {
                 console.error('Failed to load settings:', e);
             }
         }
+
+        const appLang = localStorage.getItem('app_language');
+        if (appLang && LANGUAGES[appLang]) {
+            this.currentLang = appLang;
+            this.lang = LANGUAGES[appLang];
+        }
     }
 
     saveSettings() {
@@ -3246,10 +3280,11 @@ class ProToolManager {
         const projects = this.loadProjects();
 
         if (projects.length === 0) {
+            const noProjectsText = (window.i18n?.t && window.i18n.t('pt_no_projects')) || 'No projects saved';
             modalBody.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: #555;">
                     <i class="bi bi-folder2" style="font-size: 48px; opacity: 0.3;"></i>
-                    <p style="margin-top: 12px;">Chưa có project nào được lưu</p>
+                    <p style="margin-top: 12px;">${this.escapeHtml(noProjectsText)}</p>
                 </div>
             `;
             return;
@@ -3286,6 +3321,16 @@ let proTool;
 
 document.addEventListener('DOMContentLoaded', () => {
     proTool = new ProToolManager();
+});
+
+document.addEventListener('app:language-changed', (event) => {
+    const lang = event.detail?.lang;
+    if (proTool && lang && LANGUAGES[lang]) {
+        proTool.currentLang = lang;
+        proTool.lang = LANGUAGES[lang];
+        proTool.updateTaskDisplay();
+        proTool.updateProgress();
+    }
 });
 
 function importFile() {
