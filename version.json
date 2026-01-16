@@ -1,7 +1,7 @@
 {
-  "version": "1.10.36",
+  "version": "1.10.37",
   "changelog": [
-    "Pro Tool: Fix Minimax multi-voice import mapping"
+    "UI: Localize header/sidebar tab labels"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
