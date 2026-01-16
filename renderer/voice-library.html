@@ -227,6 +227,52 @@
             margin-bottom: 16px;
         }
 
+        /* Confirm Modal */
+        .confirm-modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 10000;
+            padding: 16px;
+        }
+
+        .confirm-modal-content {
+            width: min(420px, 92vw);
+            background: #000;
+            color: #fff;
+            border-radius: 12px;
+            border: 1px solid #1f1f1f;
+            padding: 18px 20px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+        }
+
+        html.light .confirm-modal-content {
+            background: #fff;
+            color: #000;
+            border-color: #d1d5db;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15);
+        }
+
+        .confirm-modal-message {
+            font-size: 14px;
+            line-height: 1.45;
+            white-space: pre-line;
+            margin-bottom: 16px;
+        }
+
+        .confirm-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .confirm-modal-actions .btn {
+            min-width: 96px;
+        }
+
         /* Hidden audio */
         #previewAudio { display: none; }
     </style>
@@ -305,6 +351,17 @@
     </div>
 
     <audio id="previewAudio"></audio>
+
+    <!-- Confirm Modal -->
+    <div class="confirm-modal-overlay" id="confirmModal" style="display: none;" aria-hidden="true">
+        <div class="confirm-modal-content" role="dialog" aria-modal="true">
+            <div class="confirm-modal-message" id="confirmModalMessage"></div>
+            <div class="confirm-modal-actions">
+                <button class="btn" id="confirmCancelBtn">Hủy</button>
+                <button class="btn btn-primary" id="confirmOkBtn">Xác nhận</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let elevenlabsVoices = [];
@@ -566,15 +623,15 @@
         }
 
         function removeVoice(provider, idx) {
-            if (!confirm('Xóa voice này?')) return;
-
-            if (provider === 'elevenlabs') {
-                elevenlabsVoices.splice(idx, 1);
-                renderElevenlabsLibrary();
-            } else {
-                minimaxVoices.splice(idx, 1);
-                renderMinimaxLibrary();
-            }
+            openConfirmModal('Xóa voice này?', () => {
+                if (provider === 'elevenlabs') {
+                    elevenlabsVoices.splice(idx, 1);
+                    renderElevenlabsLibrary();
+                } else {
+                    minimaxVoices.splice(idx, 1);
+                    renderMinimaxLibrary();
+                }
+            });
         }
 
         function saveAndClose() {
@@ -605,6 +662,59 @@
             return div.innerHTML;
         }
 
+        let confirmModalCallback = null;
+        let confirmModalInitialized = false;
+
+        function initConfirmModal() {
+            if (confirmModalInitialized) return;
+            const overlay = document.getElementById('confirmModal');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+            const confirmBtn = document.getElementById('confirmOkBtn');
+
+            if (!overlay || !cancelBtn || !confirmBtn) return;
+
+            confirmModalInitialized = true;
+
+            cancelBtn.addEventListener('click', () => closeConfirmModal());
+            confirmBtn.addEventListener('click', () => {
+                const callback = confirmModalCallback;
+                closeConfirmModal();
+                if (typeof callback === 'function') callback();
+            });
+
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) {
+                    closeConfirmModal();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && overlay.style.display === 'flex') {
+                    closeConfirmModal();
+                }
+            });
+        }
+
+        function openConfirmModal(message, onConfirm) {
+            initConfirmModal();
+            const overlay = document.getElementById('confirmModal');
+            const messageEl = document.getElementById('confirmModalMessage');
+            if (!overlay || !messageEl) return;
+
+            confirmModalCallback = onConfirm;
+            messageEl.textContent = message || '';
+            overlay.style.display = 'flex';
+            overlay.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeConfirmModal() {
+            const overlay = document.getElementById('confirmModal');
+            if (!overlay) return;
+            overlay.style.display = 'none';
+            overlay.setAttribute('aria-hidden', 'true');
+            confirmModalCallback = null;
+        }
+
         // Listen for voice library updates
         if (window.electronAPI && window.electronAPI.onVoiceLibraryUpdated) {
             window.electronAPI.onVoiceLibraryUpdated((data) => {
@@ -621,6 +731,7 @@
         }
 
         init();
+        initConfirmModal();
     </script>
 </body>
 </html>
