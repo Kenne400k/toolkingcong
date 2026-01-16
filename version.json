@@ -1,7 +1,7 @@
 {
-  "version": "1.10.35",
+  "version": "1.10.36",
   "changelog": [
-    "TTS: Remove extra colons from voice settings labels"
+    "Pro Tool: Fix Minimax multi-voice import mapping"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
