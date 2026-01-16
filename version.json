@@ -1,7 +1,7 @@
 {
-  "version": "1.10.40",
+  "version": "1.10.41",
   "changelog": [
-    "Pro Tool: Fix processing status update"
+    "Pro Tool: Improve completion and delete dialogs"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
