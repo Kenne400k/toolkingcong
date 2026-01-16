@@ -1,7 +1,7 @@
 {
-  "version": "1.10.37",
+  "version": "1.10.38",
   "changelog": [
-    "UI: Localize header/sidebar tab labels"
+    "Pro Tool: Add language switching"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
