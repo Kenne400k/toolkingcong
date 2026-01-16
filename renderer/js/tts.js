@@ -7571,8 +7571,8 @@ function processElectronFiles(files) {
         return;
     }
 
-    if (validFiles.length > 20) {
-        alert('Tối đa 20 file!');
+    if (validFiles.length > 10) {
+        alert('Tối đa 10 file!');
         return;
     }
 
@@ -7641,7 +7641,7 @@ function processElectronFiles(files) {
         $('#bulkDropZone').html(`
             <i class="bi bi-cloud-upload" style="font-size: 48px; color: #667eea; display: block; margin-bottom: 16px;"></i>
             <h4 style="margin-bottom: 8px;">Kéo thả file hoặc click để chọn</h4>
-            <p style="color: #888; font-size: 13px;">Hỗ trợ: .txt, .zip (tối đa 20 file, mỗi file < 5MB)</p>
+            <p style="color: #888; font-size: 13px;">Hỗ trợ: .txt, .zip (tối đa 10 file, mỗi file < 5MB)</p>
         `);
 
         renderFileList();
@@ -7834,7 +7834,7 @@ function setupBulkDropZone() {
 // 🔥 HÀM HIỂN THỊ POPUP XÁC NHẬN FOLDER
 function showFolderConfirmPopup(files, $input) {
     // Render danh sách file
-    let fileListHtml = files.slice(0, 20).map((f, i) => `
+    let fileListHtml = files.slice(0, 10).map((f, i) => `
         <div style="padding: 6px 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; color: #333; display: flex; align-items: center; gap: 8px;">
             <i class="bi bi-file-earmark-text" style="color: #666;"></i>
             <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${f.name}</span>
@@ -7842,8 +7842,8 @@ function showFolderConfirmPopup(files, $input) {
         </div>
     `).join('');
 
-    if (files.length > 20) {
-        fileListHtml += `<div style="padding: 8px; text-align: center; color: #999; font-size: 11px;">... và ${files.length - 20} file khác</div>`;
+    if (files.length > 10) {
+        fileListHtml += `<div style="padding: 8px; text-align: center; color: #999; font-size: 11px;">... và ${files.length - 10} file khác</div>`;
     }
 
     $('#folderFileList').html(fileListHtml);
@@ -7962,8 +7962,8 @@ async function handleBulkFiles(files) {
         return;
     }
 
-    if (bulkFiles.length + validFiles.length > 20) {
-        alert('Tối đa 20 file!');
+    if (bulkFiles.length + validFiles.length > 10) {
+        alert('Tối đa 10 file!');
         return;
     }
 
