@@ -4127,12 +4127,7 @@ function saveToLibrary() {
 let cloneAudioFilePath = null;
 
 function openVoiceCloneModal() {
-    cloneAudioFilePath = null;
-    document.getElementById('cloneVoiceName').value = '';
-    document.getElementById('cloneAudioPath').value = '';
-    document.getElementById('cloneStatus').style.display = 'none';
-    document.getElementById('btnStartClone').disabled = false;
-    document.getElementById('voiceCloneModal').classList.add('show');
+    window.electronAPI.openVoiceCloningToolWindow();
 }
 
 function closeVoiceCloneModal() {

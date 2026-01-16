@@ -1,7 +1,8 @@
 {
-  "version": "1.10.41",
+  "version": "1.10.42",
   "changelog": [
-    "Pro Tool: Improve completion and delete dialogs"
+    "Add Dedicated Voice Cloning Window",
+    "Separate Voice Cloning UI from Pro Tool"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

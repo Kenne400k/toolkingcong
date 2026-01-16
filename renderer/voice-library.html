@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html class="dark" lang="vi">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Voice Library - KingCong</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="js/theme.js"></script>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         :root {
             --primary: #a855f7;
@@ -20,9 +26,19 @@
             --text-dim: #888;
         }
 
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
 
         body {
             background: var(--bg-main);
@@ -60,7 +76,9 @@
             line-height: 1;
         }
 
-        .modal-close:hover { color: #fff; }
+        .modal-close:hover {
+            color: #fff;
+        }
 
         /* Tabs with logos */
         .tabs {
@@ -84,7 +102,9 @@
             font-size: 13px;
         }
 
-        .lib-tab:hover { color: #ccc; }
+        .lib-tab:hover {
+            color: #ccc;
+        }
 
         .lib-tab.active {
             color: #fff;
@@ -144,22 +164,49 @@
             color: #fff;
         }
 
-        .btn:hover { background: #111; border-color: #333; }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: #fff; color: #000; border: none; }
-        .btn-primary:hover { background: #e5e5e5; }
-        .btn-sm { padding: 5px 8px; font-size: 10px; }
-        .btn-sm i { font-size: 12px; }
+        .btn:hover {
+            background: #111;
+            border-color: #333;
+        }
 
-        .library-content { display: none; }
-        .library-content.active { display: block; }
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #e5e5e5;
+        }
+
+        .btn-sm {
+            padding: 5px 8px;
+            font-size: 10px;
+        }
+
+        .btn-sm i {
+            font-size: 12px;
+        }
+
+        .library-content {
+            display: none;
+        }
+
+        .library-content.active {
+            display: block;
+        }
 
         .voice-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .voice-table th, .voice-table td {
+        .voice-table th,
+        .voice-table td {
             padding: 8px 6px;
             text-align: center;
             border-bottom: 1px solid var(--border);
@@ -186,8 +233,14 @@
             font-size: 11px;
         }
 
-        .voice-table input:focus { outline: none; border-color: #444; }
-        .voice-table input[type="number"] { text-align: center; }
+        .voice-table input:focus {
+            outline: none;
+            border-color: #444;
+        }
+
+        .voice-table input[type="number"] {
+            text-align: center;
+        }
 
         /* Hide spinner buttons on number inputs */
         .voice-table input[type="number"]::-webkit-outer-spin-button,
@@ -195,10 +248,17 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
         .voice-table input[type="number"] {
             -moz-appearance: textfield;
         }
-        .voice-table input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+
+        .voice-table input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
 
         .voice-table select {
             padding: 6px 8px;
@@ -210,9 +270,14 @@
             cursor: pointer;
         }
 
-        .voice-table select:focus { outline: none; border-color: #444; }
+        .voice-table select:focus {
+            outline: none;
+            border-color: #444;
+        }
 
-        .voice-table tr:hover td { background: var(--bg-main); }
+        .voice-table tr:hover td {
+            background: var(--bg-main);
+        }
 
         .empty-state {
             text-align: center;
@@ -274,7 +339,9 @@
         }
 
         /* Hidden audio */
-        #previewAudio { display: none; }
+        #previewAudio {
+            display: none;
+        }
     </style>
     <link rel="stylesheet" href="css/theme.css">
 </head>
@@ -292,14 +359,16 @@
             <span>ElevenLabs</span>
         </button>
         <button class="lib-tab" data-provider="minimax" onclick="switchTab('minimax')">
-            <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png" alt="">
+            <img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/minimax-color.png"
+                alt="">
             <span>Minimax</span>
         </button>
     </div>
 
     <div class="modal-body">
         <div class="info-text">
-            Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu mỗi dòng để dùng voice tương ứng cho hội thoại nhiều người.
+            Dùng <code>#1</code> <code>#2</code> <code>#3</code> đầu mỗi dòng để dùng voice tương ứng cho hội thoại
+            nhiều người.
         </div>
 
         <!-- ElevenLabs Library -->
@@ -374,6 +443,7 @@
             elevenlabs: [],
             minimax: []
         };
+        let allApiVoices = { elevenlabs: [], minimax: [] };
 
         async function init() {
             // Load models from API first
@@ -383,13 +453,13 @@
             try {
                 elevenlabsVoices = JSON.parse(localStorage.getItem('voiceLibrary_elevenlabs') || '[]');
                 if (!Array.isArray(elevenlabsVoices)) elevenlabsVoices = [];
-            } catch(e) { elevenlabsVoices = []; }
+            } catch (e) { elevenlabsVoices = []; }
 
             // Load Minimax voices
             try {
                 minimaxVoices = JSON.parse(localStorage.getItem('voiceLibrary_minimax') || '[]');
                 if (!Array.isArray(minimaxVoices)) minimaxVoices = [];
-            } catch(e) { minimaxVoices = []; }
+            } catch (e) { minimaxVoices = []; }
 
             renderElevenlabsLibrary();
             renderMinimaxLibrary();
@@ -403,11 +473,22 @@
                         elevenlabs: res.data.elevenlabs?.models || [],
                         minimax: res.data.minimax?.models || []
                     };
-                    console.log('✅ Models loaded:', loadedModels);
+                    // [Fix] Store all API voices to usage for preview lookup
+                    if (res.data.elevenlabs?.voices) allApiVoices.elevenlabs = res.data.elevenlabs.voices;
+                    if (res.data.elevenlabs?.shared_voices) allApiVoices.elevenlabs = allApiVoices.elevenlabs.concat(res.data.elevenlabs.shared_voices); // If structure differs
+
+                    if (res.data.minimax?.voices) allApiVoices.minimax = res.data.minimax.voices;
+
+                    console.log('✅ Models & Voices loaded:', {
+                        models: loadedModels, voicesCount: {
+                            el: allApiVoices.elevenlabs.length,
+                            mm: allApiVoices.minimax.length
+                        }
+                    });
                 }
             } catch (error) {
                 console.error('❌ Load models error:', error);
-                // Fallback to default models
+                // Fallback models...
                 loadedModels = {
                     elevenlabs: [
                         { id: 'eleven_v3', name: 'Eleven V3' },
@@ -582,21 +663,50 @@
 
             let previewUrl = voice.preview_url || '';
 
-            if (!previewUrl && voice.voiceId) {
+            // [Fix] Minimax uses voice_id or id, not always voiceId
+            const dbVoiceId = voice.voiceId || voice.voice_id || voice.id;
+
+            // 1. Try to find in allApiVoices (Loaded from getResources)
+            if (!previewUrl && dbVoiceId && allApiVoices[provider]) {
+                const foundApiVoice = allApiVoices[provider].find(v => (v.voice_id == dbVoiceId || v.id == dbVoiceId));
+                if (foundApiVoice) {
+                    previewUrl = foundApiVoice.preview_url || foundApiVoice.sample_audio || '';
+                    if (previewUrl) {
+                        // console.log('✅ Found preview in Cache:', previewUrl);
+                        voice.preview_url = previewUrl;
+                    }
+                }
+            }
+
+            // 2. Fallback to API Search if not found
+            if (!previewUrl && dbVoiceId) {
                 try {
                     const res = await window.electronAPI.apiRequest(
-                        'https://kingcongstudio.com/ajaxs/get_resources2.php?action=search_voice_id',
-                        { voice_id: voice.voiceId }
+                        'https://kingcongstudio.com/ajaxs/get_resources3.php?action=search_voice_id',
+                        { voice_id: dbVoiceId }
                     );
+
                     if (res && res.status === 'success' && res.data) {
                         previewUrl = res.data.preview_url || res.data.sample_audio || '';
-                        if (previewUrl) voice.preview_url = previewUrl;
+                        if (previewUrl) {
+                            voice.preview_url = previewUrl;
+
+                            // Save to local storage
+                            if (provider === 'elevenlabs') {
+                                localStorage.setItem('voiceLibrary_elevenlabs', JSON.stringify(elevenlabsVoices));
+                            } else {
+                                localStorage.setItem('voiceLibrary_minimax', JSON.stringify(minimaxVoices));
+                            }
+                        }
                     }
-                } catch(e) {}
+                } catch (e) {
+                    console.error('❌ API Error:', e);
+                }
             }
 
             if (!previewUrl) {
-                alert('Không có audio mẫu!');
+                console.warn('❌ Could not find preview for:', dbVoiceId);
+                alert('Không có audio mẫu! (ID: ' + dbVoiceId + ')');
                 return;
             }
 
@@ -734,4 +844,5 @@
         initConfirmModal();
     </script>
 </body>
+
 </html>

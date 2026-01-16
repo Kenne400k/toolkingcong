@@ -60,6 +60,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // 🔥 Cloned Voices Window
   openClonedVoicesWindow: () => ipcRenderer.invoke('open-cloned-voices-window'),
+  openVoiceCloningToolWindow: () => ipcRenderer.invoke('open-voice-cloning-tool-window'),
 
   // 🔥 Voice Cloning API
   cloneVoice: (data) => ipcRenderer.invoke('clone-voice', data),

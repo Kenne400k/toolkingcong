@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html class="dark" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Voice Cloning Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/theme.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #a855f7;
+            --accent: #667eea;
+            --bg-main: #0a0a0a;
+            --bg-secondary: #121212;
+            --border: #2a2a2a;
+            --text: #e5e5e5;
+            --text-dim: #888;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar Minimal */
+        .top-bar {
+            height: 50px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: var(--bg-secondary);
+            flex-shrink: 0;
+            -webkit-app-region: drag; /* Allow dragging window */
+        }
+
+        .top-bar-title { font-size: 14px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .top-bar-title i { color: var(--primary); }
+        .window-controls { -webkit-app-region: no-drag; }
+
+        /* =================== VOICE CLONING STYLES =================== */
+        .clone-container {
+            flex: 1;
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .form-panel {
+            width: 420px;
+            flex-shrink: 0;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 16px;
+            overflow-y: auto;
+        }
+
+        .form-content-inner {
+            padding: 24px;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(102, 126, 234, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .info-banner strong {
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .form-group label span {
+            color: #ef4444;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        .form-input::placeholder {
+            color: #555;
+        }
+
+        /* Upload Box */
+        .upload-box {
+            border: 2px dashed #333;
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .upload-box.drag-over {
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #444;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #555;
+        }
+
+        /* File Preview */
+        .file-preview-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .file-details-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .file-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .file-meta-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .btn-remove-file {
+            width: 36px;
+            height: 36px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-remove-file:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .audio-player-wrapper audio {
+            width: 100%;
+            height: 36px;
+        }
+
+        /* Row Group */
+        .row-group {
+            display: flex;
+            gap: 16px;
+        }
+
+        .row-group .form-group {
+            flex: 1;
+        }
+
+        /* Custom Dropdown */
+        .custom-dropdown {
+            position: relative;
+        }
+
+        .dropdown-selected {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dropdown-selected:hover {
+            border-color: #333;
+        }
+
+        .dropdown-selected.active {
+            border-color: var(--primary);
+        }
+
+        .dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 4px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown-options.show {
+            display: block;
+        }
+
+        .dropdown-search {
+            padding: 8px;
+            border-bottom: 1px solid #222;
+        }
+
+        .dropdown-search input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .dropdown-list-container {
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .dropdown-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dropdown-item:hover {
+            background: #1a1a1a;
+        }
+
+        .dropdown-item.selected {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--primary);
+        }
+
+        /* Textarea */
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* Form Actions */
+        .form-actions-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .switch-control {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch-control input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            border-radius: 24px;
+            transition: .3s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .3s;
+        }
+
+        .switch-control input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        .switch-control input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .label-with-tooltip {
+            font-size: 13px;
+            color: #ccc;
+            cursor: pointer;
+        }
+
+        .btn-submit-simple {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit-simple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-submit-simple:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Library Area */
+        .library-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .voice-count {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .btn-refresh {
+            padding: 8px 16px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-refresh:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        /* Voice Grid */
+        .voice-grid {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            align-content: start;
+        }
+
+        .voice-card {
+            background: #111;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+
+        .voice-card:hover {
+            border-color: #333;
+            transform: translateY(-2px);
+        }
+
+        .vc-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .vc-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .vc-tag {
+            padding: 4px 8px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 6px;
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .vc-footer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .vc-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .vc-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-icon-action {
+            width: 32px;
+            height: 32px;
+            background: #1a1a1a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-action:hover {
+            background: #222;
+            color: #fff;
+        }
+
+        .btn-icon-action.delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .btn-icon-action.play:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .btn-icon-action:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #555;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .empty-state .title {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .empty-state .hint {
+            font-size: 13px;
+            color: #555;
+        }
+
+        /* Delete Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            animation: slideUp 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .modal-body {
+            margin-bottom: 24px;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .modal-body p {
+            margin: 0 0 8px 0;
+            font-size: 15px;
+        }
+
+        .modal-body strong {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel,
+        .btn-confirm-delete {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid #444;
+            color: #aaa;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #666;
+            color: #fff;
+        }
+
+        .btn-confirm-delete {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .btn-confirm-delete:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .loading-hint {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .loading-progress {
+            width: 300px;
+            height: 4px;
+            background: #222;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Toast */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 99999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-icon.success { color: #22c55e; }
+        .toast-icon.error { color: #ef4444; }
+        .toast-icon.info { color: #3b82f6; }
+        .toast-icon.warning { color: #f59e0b; }
+
+        .toast-text {
+            font-size: 14px;
+            color: #fff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+
+<body>
+            <div class="top-bar" id="app-header">
+                <div class="top-bar-title" data-i18n="voice_cloning"><i class="bi bi-soundwave"></i> Voice Cloning Studio</div>
+                <div class="window-controls"></div>
+            </div>
+
+            <!-- Voice Cloning Content -->
+            <div class="clone-container">
+
+                <div class="form-panel">
+                    <div class="form-content-inner">
+                        <div class="info-banner">
+                            <strong data-i18n="vc_banner">Nhân bản bất cứ giọng nói nào mà bạn muốn, không còn nỗi lo không tìm thấy giọng phù hợp. (sử dụng Minimax)</strong>
+                        </div>
+
+                        <form id="cloneForm" onsubmit="return false;">
+
+                            <div class="form-group">
+                                <label data-i18n="vc_voice_name">Tên Giọng Nói <span>*</span></label>
+                                <input type="text" id="cloneName" class="form-input" data-i18n-placeholder="vc_voice_name_placeholder" placeholder="VD: Giọng đọc tin tức" maxlength="50" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-i18n="vc_upload_audio">Tải Lên File Âm Thanh <span>*</span></label>
+                                <input type="file" id="fileInput" accept="audio/mpeg, .mp3" style="display: none;" onchange="handleFileSelect(this)">
+
+                                <div class="upload-box" id="uploadBox"
+                                     onclick="document.getElementById('fileInput').click()"
+                                     ondragover="handleDragOver(event)"
+                                     ondragleave="handleDragLeave(event)"
+                                     ondrop="handleDrop(event)">
+                                    <div class="upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                                    <div class="upload-text" data-i18n="vc_drag_drop">Kéo thả file hoặc nhấn để chọn</div>
+                                    <div class="upload-hint" data-i18n="vc_duration_hint">Thời lượng 10s - 2 phút, tối đa 20MB</div>
+                                    <div class="upload-hint" data-i18n="vc_format_hint">Hiện chỉ hỗ trợ: .mp3</div>
+                                </div>
+
+                                <div class="file-preview-card" id="fileInfo" style="display: none;">
+                                    <div class="file-details-row">
+                                        <div class="file-icon-wrapper"><i class="bi bi-music-note-beamed"></i></div>
+                                        <div class="file-meta-info">
+                                            <div class="file-name" id="fileName">filename.mp3</div>
+                                            <div class="file-size" id="fileSize">0.00 MB</div>
+                                        </div>
+                                        <button type="button" class="btn-remove-file" onclick="removeFile()" data-i18n-title="vc_remove_file" title="Xóa file"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                    <div class="audio-player-wrapper">
+                                        <audio id="audioPreviewPlayer" controls>Trình duyệt không hỗ trợ phát âm thanh.</audio>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row-group">
+                                <div class="form-group">
+                                    <label data-i18n="vc_select_language">Chọn Ngôn Ngữ</label>
+                                    <div class="custom-dropdown" id="langDropdown">
+                                        <div class="dropdown-selected" onclick="toggleDropdown('langOptions', this)">
+                                            <span id="selectedLangText" data-i18n="vc_auto_detect">Tự xác định</span>
+                                            <i class="bi bi-chevron-down"></i>
+                                        </div>
+                                        <div class="dropdown-options" id="langOptions">
+                                            <div class="dropdown-search">
+                                                <input type="text" data-i18n-placeholder="vc_search" placeholder="Tìm kiếm..." onkeyup="filterLang(this)">
+                                            </div>
+                                            <div class="dropdown-list-container">
+                                                <div class="dropdown-item selected" data-val="Auto" onclick="selectItem('lang', 'Auto', 'Tự xác định', this)" data-i18n="vc_auto_detect">Tự xác định</div>
+                                                <div class="dropdown-item" data-val="Vietnamese" onclick="selectItem('lang', 'Vietnamese', 'Vietnamese', this)">Vietnamese</div>
+                                                <div class="dropdown-item" data-val="English" onclick="selectItem('lang', 'English', 'English', this)">English</div>
+                                                <div class="dropdown-item" data-val="Chinese" onclick="selectItem('lang', 'Chinese', 'Chinese (Mandarin)', this)">Chinese (Mandarin)</div>
+                                                <div class="dropdown-item" data-val="Japanese" onclick="selectItem('lang', 'Japanese', 'Japanese', this)">Japanese</div>
+                                                <div class="dropdown-item" data-val="Korean" onclick="selectItem('lang', 'Korean', 'Korean', this)">Korean</div>
+                                                <div class="dropdown-item" data-val="French" onclick="selectItem('lang', 'French', 'French', this)">French</div>
+                                                <div class="dropdown-item" data-val="German" onclick="selectItem('lang', 'German', 'German', this)">German</div>
+                                                <div class="dropdown-item" data-val="Spanish" onclick="selectItem('lang', 'Spanish', 'Spanish', this)">Spanish</div>
+                                                <div class="dropdown-item" data-val="Portuguese" onclick="selectItem('lang', 'Portuguese', 'Portuguese', this)">Portuguese</div>
+                                                <div class="dropdown-item" data-val="Russian" onclick="selectItem('lang', 'Russian', 'Russian', this)">Russian</div>
+                                                <div class="dropdown-item" data-val="Italian" onclick="selectItem('lang', 'Italian', 'Italian', this)">Italian</div>
+                                                <div class="dropdown-item" data-val="Thai" onclick="selectItem('lang', 'Thai', 'Thai', this)">Thai</div>
+                                                <div class="dropdown-item" data-val="Indonesian" onclick="selectItem('lang', 'Indonesian', 'Indonesian', this)">Indonesian</div>
+                                                <div class="dropdown-item" data-val="Arabic" onclick="selectItem('lang', 'Arabic', 'Arabic', this)">Arabic</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label data-i18n="vc_select_gender">Chọn Giới Tính</label>
+                                    <div class="custom-dropdown" id="genderDropdown">
+                                        <div class="dropdown-selected" onclick="toggleDropdown('genderOptions', this)">
+                                            <span id="selectedGenderText"><i class="bi bi-gender-male"></i> <span data-i18n="vc_male">Nam</span></span>
+                                            <i class="bi bi-chevron-down"></i>
+                                        </div>
+                                        <div class="dropdown-options" id="genderOptions">
+                                            <div class="dropdown-item selected" data-val="male" onclick="selectItem('gender', 'male', '<i class=\'bi bi-gender-male\'></i> Nam', this)"><i class="bi bi-gender-male"></i> <span data-i18n="vc_male">Nam</span></div>
+                                            <div class="dropdown-item" data-val="female" onclick="selectItem('gender', 'female', '<i class=\'bi bi-gender-female\'></i> Nữ', this)"><i class="bi bi-gender-female"></i> <span data-i18n="vc_female">Nữ</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label data-i18n="vc_preview_text">Văn Bản Nghe Trước (Tùy chọn)</label>
+                                <div class="textarea-wrapper">
+                                    <textarea id="previewText" class="form-textarea"
+                                        data-i18n-placeholder="vc_preview_placeholder" placeholder="Nhập văn bản (Nếu để trống, hệ thống sẽ tự dùng mẫu câu mặc định)..."
+                                        maxlength="500" oninput="updateCharCount()"></textarea>
+                                    <div class="char-count" id="charCount">0 / 500 <span data-i18n="vc_chars">ký tự</span></div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions-row">
+                                <div class="toggle-wrapper">
+                                    <label class="switch-control">
+                                        <input type="checkbox" id="removeNoiseToggle" checked>
+                                        <span class="slider"></span>
+                                    </label>
+
+                                    <div class="label-with-tooltip" onclick="document.getElementById('removeNoiseToggle').click()">
+                                        <span data-i18n="vc_remove_noise">Loại Bỏ Tiếng Ồn</span>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="btnCreate" class="btn-submit-simple" onclick="createClone()" data-i18n="vc_clone_btn">
+                                    Nhân Bản
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <div class="library-area">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="bi bi-collection-play-fill"></i>
+                            <span data-i18n="vc_library_title">Thư viện giọng nhân bản</span>
+                            <span class="voice-count"><span id="voiceCount">0</span> <span data-i18n="vc_voices">giọng</span></span>
+                        </div>
+                        <button class="btn-refresh" onclick="loadClonedVoices()">
+                            <i class="bi bi-arrow-clockwise"></i> <span data-i18n="vc_refresh">Làm mới</span>
+                        </button>
+                    </div>
+
+                    <div id="clonedVoiceGrid" class="voice-grid">
+                        <div class="empty-state">
+                            <div class="spinner-border text-secondary" style="margin-bottom: 16px;"></div>
+                            <div class="title" data-i18n="vc_loading">Đang tải danh sách...</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="bi bi-exclamation-triangle-fill" style="color: #ef4444; font-size: 32px;"></i>
+                <h3 data-i18n="vc_confirm_delete">Xác nhận xóa giọng</h3>
+            </div>
+            <div class="modal-body">
+                <p><span data-i18n="vc_confirm_delete_msg">Bạn có chắc chắn muốn xóa giọng</span> "<strong id="voiceNameToDelete"></strong>"?</p>
+                <p style="color: #888; font-size: 14px; margin-top: 8px;" data-i18n="vc_cannot_undo">
+                    Hành động này không thể hoàn tác.
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteModal()">
+                    <i class="bi bi-x-circle"></i>
+                    <span data-i18n="vc_cancel">Hủy</span>
+                </button>
+                <button class="btn-confirm-delete" onclick="confirmDelete()">
+                    <i class="bi bi-trash"></i>
+                    <span data-i18n="vc_delete">Xóa</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO PREVIEW -->
+    <audio id="previewAudio" style="display: none;"></audio>
+
+    <!-- LOADING OVERLAY -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" data-i18n="vc_processing">Đang xử lý...</div>
+        <div class="loading-hint" data-i18n="vc_processing_hint">AI đang học giọng nói của bạn. Quá trình này có thể mất 1-2 phút.</div>
+        <div class="loading-progress">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast-notification">
+        <i class="bi bi-check-circle toast-icon success"></i>
+        <span class="toast-text" data-i18n="vc_notification">Thông báo</span>
+    </div>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/api-handler.js"></script>
+    <script src="js/shared-ui.js"></script>
+    <script src="js/voice-cloning.js"></script>
+</body>
+</html>

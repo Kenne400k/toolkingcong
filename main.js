@@ -949,6 +949,39 @@ ipcMain.handle('open-cloned-voices-window', async () => {
   return { success: true };
 });
 
+// Open Voice Cloning Tool Window (Full Feature)
+let voiceCloningToolWindow = null;
+
+ipcMain.handle('open-voice-cloning-tool-window', async () => {
+  if (voiceCloningToolWindow && !voiceCloningToolWindow.isDestroyed()) {
+    voiceCloningToolWindow.focus();
+    return { success: true };
+  }
+
+  voiceCloningToolWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    title: 'Voice Cloning Studio',
+    parent: mainWindow,
+    modal: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    },
+    backgroundColor: '#0a0a0a'
+  });
+
+  voiceCloningToolWindow.loadFile('renderer/tool-voice-cloning.html');
+
+  voiceCloningToolWindow.on('closed', () => {
+    voiceCloningToolWindow = null;
+  });
+
+  return { success: true };
+});
+
 // Send selected voice back to main window
 ipcMain.handle('select-voice-from-window', async (event, data) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
