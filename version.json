@@ -1,7 +1,7 @@
 {
-  "version": "1.10.39",
+  "version": "1.10.40",
   "changelog": [
-    "Pro Tool: Add custom confirm modals"
+    "Pro Tool: Fix processing status update"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
