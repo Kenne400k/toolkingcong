@@ -1,10 +1,8 @@
 {
-  "version": "1.10.44",
+  "version": "1.10.45",
   "changelog": [
-    "Add Bilingual Support (Vietnamese/English) for all windows",
-    "Synchronize language settings across windows",
-    "Fix default models for ElevenLabs and Minimax",
-    "Remove redundant language selectors"
+    "Fix default model selection for ElevenLabs (pro tool)",
+    "Fix default model selection for Minimax (pro tool)"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
