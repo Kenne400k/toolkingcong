@@ -1,8 +1,9 @@
 {
-  "version": "1.10.45",
+  "version": "1.10.46",
   "changelog": [
-    "Fix default model selection for ElevenLabs (pro tool)",
-    "Fix default model selection for Minimax (pro tool)"
+    "Fix stability settings translation (TTS tab - Vietnamese/English support)",
+    "Fix stability settings translation (Pro Tool tab - Vietnamese/English support)",
+    "Add i18n support for Creative/Natural/Robust labels"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

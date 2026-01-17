@@ -652,8 +652,8 @@ class ProToolManager {
                 `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1 - m.cost_factor) * 100)}% rẻ hơn)` : ''}</option>`
             ).join('');
             
-             // Force default to speech-2.5-hd-preview
-            const defaultMinimax = 'speech-2.5-hd-preview';
+             // Force default to speech-01-hd
+            const defaultMinimax = 'speech-01-hd';
             if (currentVal && [...minimaxModelSelect.options].some(o => o.value === currentVal)) {
                 minimaxModelSelect.value = currentVal;
             } else {
@@ -671,7 +671,7 @@ class ProToolManager {
                 applyNormalModelSettings();
             }
         } else {
-            this.model = minimaxModelSelect?.value || 'speech-2.5-hd-preview';
+            this.model = minimaxModelSelect?.value || 'speech-01-hd';
         }
     }
 
@@ -1137,7 +1137,7 @@ class ProToolManager {
         const provider = this.provider;
         const model = provider === 'elevenlabs'
             ? (document.getElementById('modelSelect')?.value || 'eleven_multilingual_v2')
-            : (document.getElementById('minimaxModelSelect')?.value || 'speech-2.5-hd-preview');
+            : (document.getElementById('minimaxModelSelect')?.value || 'speech-02-hd');
 
         const voiceData = {
             id: Date.now(),
@@ -2209,7 +2209,7 @@ class ProToolManager {
                 project: inputs[0]?.value?.trim() || '',
                 name: inputs[1]?.value?.trim() || '',
                 voiceId: inputs[2]?.value?.trim() || '',
-                model: selects[0]?.value || 'speech-2.5-hd-preview',
+                model: selects[0]?.value || 'speech-02-hd',
                 settings: {
                     speed: parseFloat(inputs[3]?.value) || 1,
                     pitch: parseFloat(inputs[4]?.value) || 0,
@@ -2294,8 +2294,8 @@ class ProToolManager {
             const displayName = voice.voice_name || voice.name || '';
             // Lấy voice ID: ưu tiên voiceId > voice_id > id
             const displayVoiceId = voice.voiceId || voice.voice_id || voice.id || '';
-            // Model: default là speech-2.5-hd-preview nếu không có
-            const currentModel = voice.model || 'speech-2.5-hd-preview';
+            // Model: default là speech-02-hd nếu không có
+            const currentModel = voice.model || 'speech-02-hd';
 
             return `
             <tr data-idx="${idx}" data-provider="minimax">
@@ -2305,14 +2305,10 @@ class ProToolManager {
                 <td><input type="text" value="${displayVoiceId}" placeholder="Voice ID..." style="width: 140px;" onchange="updateLibraryVoice('minimax', ${idx}, 'voiceId', this.value)"></td>
                 <td>
                     <select style="width: 100px; padding: 4px;" onchange="updateLibraryVoice('minimax', ${idx}, 'model', this.value)">
-                        <option value="speech-2.5-hd-preview" ${currentModel === 'speech-2.5-hd-preview' ? 'selected' : ''}>Speech 2.5 HD</option>
-                        <option value="speech-2.5-turbo-preview" ${currentModel === 'speech-2.5-turbo-preview' ? 'selected' : ''}>Speech 2.5 Turbo</option>
-                        <option value="speech-2.6-hd" ${currentModel === 'speech-2.6-hd' ? 'selected' : ''}>Speech 2.6 HD</option>
-                        <option value="speech-2.6-turbo" ${currentModel === 'speech-2.6-turbo' ? 'selected' : ''}>Speech 2.6 Turbo</option>
-                        <option value="speech-02-hd" ${currentModel === 'speech-02-hd' ? 'selected' : ''}>Speech 02 HD</option>
-                        <option value="speech-02-turbo" ${currentModel === 'speech-02-turbo' ? 'selected' : ''}>Speech 02 Turbo</option>
-                        <option value="speech-01-hd" ${currentModel === 'speech-01-hd' ? 'selected' : ''}>Speech 01 HD</option>
-                        <option value="speech-01-turbo" ${currentModel === 'speech-01-turbo' ? 'selected' : ''}>Speech 01 Turbo</option>
+                        <option value="speech-02-hd" ${currentModel === 'speech-02-hd' ? 'selected' : ''}>Speech HD 2.6</option>
+                        <option value="speech-02-turbo" ${currentModel === 'speech-02-turbo' ? 'selected' : ''}>Speech Turbo 2.6</option>
+                        <option value="speech-01-hd" ${currentModel === 'speech-01-hd' ? 'selected' : ''}>Speech HD 2.5</option>
+                        <option value="speech-01-turbo" ${currentModel === 'speech-01-turbo' ? 'selected' : ''}>Speech Turbo 2.5</option>
                     </select>
                 </td>
                 <td><input type="number" value="${voice.settings?.speed || 1}" step="0.1" min="0.5" max="2" style="width: 50px;" onchange="updateLibrarySetting('minimax', ${idx}, 'speed', parseFloat(this.value))"></td>
@@ -3454,6 +3450,18 @@ document.addEventListener('app:language-changed', (event) => {
         proTool.lang = LANGUAGES[lang];
         proTool.updateTaskDisplay();
         proTool.updateProgress();
+
+        // Update voice settings UI after language change
+        if (proTool.provider === 'minimax') {
+            updateSlider('mmSpeed');
+            updateSlider('mmPitch');
+            updateSlider('mmVol');
+        } else {
+            updateSlider('speed');
+            updateSlider('stability');
+            updateSlider('similarity');
+            updateSlider('style');
+        }
     }
 });
 
@@ -3761,7 +3769,7 @@ function useLibraryVoice(provider, index) {
             updateSlider('style');
         }
     } else {
-        document.getElementById('minimaxModelSelect').value = voice.model || 'speech-2.5-hd-preview';
+        document.getElementById('minimaxModelSelect').value = voice.model || 'speech-02-hd';
         // Set settings
         if (voice.settings) {
             document.getElementById('mmVoiceSpeed').value = voice.settings.speed || 1;
@@ -4003,7 +4011,7 @@ async function addToLibrary() {
             }
         };
     } else {
-        const model = document.getElementById('minimaxModelSelect')?.value || 'speech-2.5-hd-preview';
+        const model = document.getElementById('minimaxModelSelect')?.value || 'speech-02-hd';
         voiceData = {
             id: Date.now(),
             voiceId: voiceId,
@@ -4083,7 +4091,7 @@ function saveToLibrary() {
     const voiceId = document.getElementById('libVoiceId')?.value?.trim();
     const voiceName = document.getElementById('libVoiceName')?.value?.trim();
     const provider = document.getElementById('libProvider')?.value || 'elevenlabs';
-    const model = document.getElementById('libModel')?.value || 'speech-2.5-hd-preview';
+    const model = document.getElementById('libModel')?.value;
 
     if (!voiceId) {
         proTool.showNotification('Vui lòng nhập Voice ID!', 'warning');

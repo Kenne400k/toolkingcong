@@ -2775,14 +2775,14 @@ function setupEventListeners() {
         let isV3 = $(this).attr('step') === '50';
 
         if (isV3) {
-            let text = "Natural";
+            let text = window.jsLang?.tts_natural || "Tự nhiên";
             let color = "#5bc0de"; // Blue for Natural
 
             if (val === 0) {
-                text = "Creative";
+                text = window.jsLang?.tts_creative || "Sáng tạo";
                 color = "#f0ad4e"; // Orange for Creative
             } else if (val === 100) {
-                text = "Robust";
+                text = window.jsLang?.tts_robust || "Mạnh mẽ";
                 color = "#5cb85c"; // Green for Robust
             }
 
@@ -3389,16 +3389,18 @@ function updateElevenLabsUI(modelId) {
         if ($('#stability-labels').length === 0) {
             $('#stability').after(`
                 <div id="stability-labels" style="display:flex; justify-content:space-between; font-size:12px; color:#888; margin-top:6px; font-weight:600;">
-                    <span style="color:#f0ad4e;">Creative</span>
-                    <span style="color:#5bc0de;">Natural</span>
-                    <span style="color:#5cb85c;">Robust</span>
+                    <span style="color:#f0ad4e;" data-i18n="tts_creative">${window.jsLang?.tts_creative || 'Sáng tạo'}</span>
+                    <span style="color:#5bc0de;" data-i18n="tts_natural">${window.jsLang?.tts_natural || 'Tự nhiên'}</span>
+                    <span style="color:#5cb85c;" data-i18n="tts_robust">${window.jsLang?.tts_robust || 'Mạnh mẽ'}</span>
                 </div>
             `);
         }
         $('#stability-labels').show();
 
         // 4. Cập nhật header để hiển thị text thay vì %
-        $('#slider-stability .slider-header').html('<span>Stability: <span id="stabilityVal" style="color: #5bc0de; font-weight: bold;">Natural</span></span>');
+        const stabilityLabel = window.jsLang?.tts_stability || 'Độ ổn định';
+        const naturalLabel = window.jsLang?.tts_natural || 'Tự nhiên';
+        $('#slider-stability .slider-header').html(`<span data-i18n="tts_stability">${stabilityLabel}</span>: <span id="stabilityVal" style="color: #5bc0de; font-weight: bold;">${naturalLabel}</span>`);
 
         // 5. Trigger input để cập nhật chữ và màu sắc
         $('#stability').trigger('input');
@@ -3414,7 +3416,8 @@ function updateElevenLabsUI(modelId) {
 
         // Cập nhật lại text %
         let currentVal = $('#stability').val();
-        $('#slider-stability .slider-header').html('<span>Độ ổn định: <span id="stabilityVal" style="color: #ffffff;">' + currentVal + '%</span></span>');
+        const stabilityLabel = window.jsLang?.tts_stability || 'Độ ổn định';
+        $('#slider-stability .slider-header').html(`<span data-i18n="tts_stability">${stabilityLabel}</span> <span id="stabilityVal" style="color: #ffffff;">${currentVal}%</span>`);
 
         // Ẩn nhãn 3 nấc
         $('#stability-labels').hide();
@@ -9139,3 +9142,43 @@ async function startVoiceCloneTTS() {
         document.getElementById('btnStartClone').disabled = false;
     }
 }
+
+// ========== LANGUAGE CHANGE EVENT LISTENER ==========
+// Listen for language change events to update stability labels
+document.addEventListener('app:language-changed', function(event) {
+    console.log('🌐 Language changed to:', event.detail.lang);
+    
+    // Check if we're using ElevenLabs
+    
+    if (currentProvider === 'elevenlabs') {
+        // Get current model from selector
+        const $modelCards = $('#mdContent .md-model-card');
+        let currentModelId = null;
+        
+        $modelCards.each(function() {
+            if ($(this).hasClass('active')) {
+                currentModelId = $(this).attr('data-model-id');
+                return false; // break
+            }
+        });
+        
+        // If we found a model, refresh its UI
+        if (currentModelId) {
+            console.log('🔄 Refreshing UI for model:', currentModelId);
+            updateElevenLabsUI(currentModelId);
+        } else {
+            // Fallback: just trigger the stability slider input to refresh display
+            $('#stability').trigger('input');
+        }
+    }
+    
+    // Also update stability-labels if they exist (for V3 model)
+    if ($('#stability-labels').length > 0) {
+        $('#stability-labels span').each(function(index) {
+            const keys = ['tts_creative', 'tts_natural', 'tts_robust'];
+            if (keys[index] && window.jsLang && window.jsLang[keys[index]]) {
+                $(this).text(window.jsLang[keys[index]]);
+            }
+        });
+    }
+});

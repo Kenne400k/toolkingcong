@@ -144,6 +144,9 @@ const i18n = {
             tts_history_modal_loading: 'Đang tải dữ liệu...',
             tts_drop_overlay_title: 'Thả tệp vào đây',
             tts_drop_overlay_desc: 'Hỗ trợ .txt, .srt, .zip',
+            tts_creative: 'Sáng tạo',
+            tts_natural: 'Tự nhiên',
+            tts_robust: 'Mạnh mẽ',
 
             // Pro Tool
             pt_title: 'Công cụ nâng cao',
@@ -385,6 +388,9 @@ const i18n = {
             tts_history_modal_loading: 'Loading data...',
             tts_drop_overlay_title: 'Drop file here',
             tts_drop_overlay_desc: 'Supports .txt, .srt, .zip',
+            tts_creative: 'Creative',
+            tts_natural: 'Natural',
+            tts_robust: 'Robust',
 
             // Pro Tool
             pt_title: 'Pro Tool',
