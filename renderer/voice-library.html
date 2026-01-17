@@ -861,6 +861,9 @@
             if (window.electronAPI && window.electronAPI.sendVoiceLibrary) {
                 window.electronAPI.sendVoiceLibrary({ action: 'use', voice: voice });
             }
+
+            // Auto-close window after using voice
+            window.close();
         }
 
         function removeVoice(provider, idx) {

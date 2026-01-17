@@ -1,9 +1,7 @@
 {
-  "version": "1.10.46",
+  "version": "1.10.47",
   "changelog": [
-    "Fix stability settings translation (TTS tab - Vietnamese/English support)",
-    "Fix stability settings translation (Pro Tool tab - Vietnamese/English support)",
-    "Add i18n support for Creative/Natural/Robust labels"
+    "Auto-close Voice Library window after clicking 'Use' button"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"
