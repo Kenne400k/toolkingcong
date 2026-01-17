@@ -9,6 +9,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getSession: () => ipcRenderer.invoke('get-session'),
   logout: () => ipcRenderer.invoke('logout'),
 
+  // 🔥 Language Sync
+  setLanguage: (lang) => ipcRenderer.invoke('set-language', lang),
+  onLanguageChanged: (callback) => ipcRenderer.on('language-changed', (event, lang) => callback(lang)),
+
   // 🔥 API CALLS - Support both formats:
   // 1. apiRequest(url, data) - New format for TTS JS
   // 2. apiRequest({action, data}) - Old format for backwards compatibility

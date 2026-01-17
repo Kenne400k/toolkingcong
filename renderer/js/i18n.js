@@ -499,6 +499,12 @@ const i18n = {
             this.currentLang = lang;
             localStorage.setItem('app_language', lang);
             this.applyTranslations();
+            
+            // Broadcast to other windows
+            if (window.electronAPI && window.electronAPI.setLanguage) {
+                window.electronAPI.setLanguage(lang);
+            }
+
             document.dispatchEvent(new CustomEvent('app:language-changed', { detail: { lang } }));
             return true;
         }
@@ -591,4 +597,9 @@ function toggleAppLanguage() {
     const newLang = i18n.toggleLanguage();
     i18n.updateLangButton();
     console.log('Language changed to:', newLang);
+    // Check local storage again in case initialized before UI ready
+    const savedLang = localStorage.getItem('app_language');
+    if (savedLang && i18n.currentLang !== savedLang) {
+        i18n.setLanguage(savedLang);
+    }
 }

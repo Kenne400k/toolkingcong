@@ -633,9 +633,14 @@ class ProToolManager {
             modelSelect.innerHTML = this.loadedModels.elevenlabs.map(m =>
                 `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1 - m.cost_factor) * 100)}% rẻ hơn)` : ''}</option>`
             ).join('');
-            // Restore selection if exists
+            
+            // Force default to eleven_multilingual_v2
+            const defaultModel = 'eleven_multilingual_v2';
+             // If currentVal is empty (loading...) or not in list, use default
             if (currentVal && [...modelSelect.options].some(o => o.value === currentVal)) {
                 modelSelect.value = currentVal;
+            } else {
+                 modelSelect.value = defaultModel;
             }
         }
 
@@ -646,9 +651,13 @@ class ProToolManager {
             minimaxModelSelect.innerHTML = this.loadedModels.minimax.map(m =>
                 `<option value="${m.id}">${m.name}${m.cost_factor && m.cost_factor < 1 ? ` (${Math.round((1 - m.cost_factor) * 100)}% rẻ hơn)` : ''}</option>`
             ).join('');
-            // Restore selection if exists
+            
+             // Force default to speech-01-hd
+            const defaultMinimax = 'speech-01-hd';
             if (currentVal && [...minimaxModelSelect.options].some(o => o.value === currentVal)) {
                 minimaxModelSelect.value = currentVal;
+            } else {
+                minimaxModelSelect.value = defaultMinimax;
             }
         }
 
@@ -662,7 +671,7 @@ class ProToolManager {
                 applyNormalModelSettings();
             }
         } else {
-            this.model = minimaxModelSelect?.value || 'speech-02-hd';
+            this.model = minimaxModelSelect?.value || 'speech-01-hd';
         }
     }
 

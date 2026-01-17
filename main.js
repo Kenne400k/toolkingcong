@@ -6,7 +6,10 @@ const crypto = require('crypto');
 
 let mainWindow;
 let splashWindow;
-const SESSION_FILE = path.join(__dirname, 'sessions', 'session.json');
+// Use userData for writable files (sessions, logs, etc.)
+const USER_DATA_PATH = app.getPath('userData');
+const SESSION_DIR = path.join(USER_DATA_PATH, 'sessions');
+const SESSION_FILE = path.join(SESSION_DIR, 'session.json');
 
 // =================== APP VERSION ===================
 // Read version from local version.json to avoid infinite update loop
@@ -43,8 +46,8 @@ const ENCRYPTION_KEY = crypto.scryptSync(SESSION_SECRET, SESSION_SALT, 32);
 const IV_LENGTH = 16;
 
 // Đảm bảo folder sessions tồn tại
-if (!fs.existsSync(path.join(__dirname, 'sessions'))) {
-  fs.mkdirSync(path.join(__dirname, 'sessions'));
+if (!fs.existsSync(SESSION_DIR)) {
+  fs.mkdirSync(SESSION_DIR, { recursive: true });
 }
 
 // =================== ENCRYPTION HELPERS ===================
@@ -613,7 +616,7 @@ function loadSession() {
 
 // Open output folder
 ipcMain.handle('open-output-folder', async (event, subfolder) => {
-  let outputPath = path.join(__dirname, 'output');
+  let outputPath = path.join(app.getPath('userData'), 'output');
 
   // Create output folder and subfolders if not exist
   const subfolders = ['Backup', 'ImportFile', 'ImportFolder', 'Join'];
@@ -733,7 +736,7 @@ ipcMain.handle('read-file-base64', async (event, filePath) => {
 // Save file
 ipcMain.handle('save-file', async (event, { fileName, content, dir }) => {
   try {
-    const outputDir = dir || path.join(__dirname, 'output');
+    const outputDir = dir || path.join(app.getPath('userData'), 'output');
 
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
@@ -754,7 +757,7 @@ ipcMain.handle('download-file', async (event, { url, fileName, subfolder }) => {
 
   try {
     // Build output directory path with optional subfolder
-    let outputDir = path.join(__dirname, 'output');
+    let outputDir = path.join(app.getPath('userData'), 'output');
 
     if (subfolder) {
       // Sanitize subfolder name (remove invalid characters)
@@ -841,6 +844,29 @@ ipcMain.handle('save-voice-library', async (event, voices) => {
     voiceLibraryWindow.webContents.send('voice-library-updated', voices);
   }
 
+  return { success: true };
+});
+
+// Broadcast language change
+ipcMain.handle('set-language', async (event, lang) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('language-changed', lang);
+  }
+  if (voiceLibraryWindow && !voiceLibraryWindow.isDestroyed()) {
+    voiceLibraryWindow.webContents.send('language-changed', lang);
+  }
+  // Broadcast to Voices Window
+  if (voicesWindow && !voicesWindow.isDestroyed()) {
+    voicesWindow.webContents.send('language-changed', lang);
+  }
+  // Broadcast to Voice Cloning Tool Window
+  if (voiceCloningToolWindow && !voiceCloningToolWindow.isDestroyed()) {
+    voiceCloningToolWindow.webContents.send('language-changed', lang);
+  }
+  // Broadcast to Cloned Voices Window
+  if (clonedVoicesWindow && !clonedVoicesWindow.isDestroyed()) {
+    clonedVoicesWindow.webContents.send('language-changed', lang);
+  }
   return { success: true };
 });
 
@@ -994,41 +1020,41 @@ ipcMain.handle('select-voice-from-window', async (event, data) => {
 // Check which files already exist in output folder (for resume functionality)
 ipcMain.handle('check-completed-files', async (event, { fileNames, subfolder }) => {
   try {
-    const outputDir = path.join(__dirname, 'output', subfolder || 'ImportFile');
+    const outputDir = path.join(app.getPath('userData'), 'output', subfolder || 'ImportFile');
 
     if (!fs.existsSync(outputDir)) {
       return { success: true, completedFiles: {} };
     }
-
+    const files = fs.readdirSync(outputDir);
     const completedFiles = {};
 
-    for (const fileName of fileNames) {
-      // Check for .mp3 file
-      const mp3Path = path.join(outputDir, `${fileName}.mp3`);
-      if (fs.existsSync(mp3Path)) {
-        completedFiles[fileName] = {
-          exists: true,
-          filePath: mp3Path
-        };
-      }
+    if (fileNames && Array.isArray(fileNames)) {
+      fileNames.forEach(fileName => {
+        const found = files.find(f => f === fileName || f === `${fileName}.mp3`);
+        if (found) {
+          completedFiles[fileName] = {
+            exists: true,
+            filePath: path.join(outputDir, found),
+            fileName: found
+          };
+        }
+      });
     }
 
-    console.log(`✅ Found ${Object.keys(completedFiles).length}/${fileNames.length} completed files in ${subfolder}`);
     return { success: true, completedFiles };
   } catch (error) {
-    console.error('❌ Check completed files error:', error);
-    return { success: false, error: error.message, completedFiles: {} };
+    console.error('Check completed files error:', error);
+    return { success: false, error: error.message };
   }
 });
-
 // Join audio files locally (using ffmpeg if available)
 ipcMain.handle('join-audio-local', async (event, { files, delay, outputName, createSrt, taskData }) => {
   const { exec } = require('child_process');
   const util = require('util');
   const execPromise = util.promisify(exec);
 
-  // Save to Join subfolder
-  const outputDir = path.join(__dirname, 'output', 'Join');
+  // Save to Join subfolder in UserData
+  const outputDir = path.join(app.getPath('userData'), 'output', 'Join');
 
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });

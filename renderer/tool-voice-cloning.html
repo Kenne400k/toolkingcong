@@ -1044,6 +1044,124 @@
         <span class="toast-text" data-i18n="vc_notification">Thông báo</span>
     </div>
 
+    <script>
+        let currentLang = localStorage.getItem('app_language') || 'vi';
+
+        const LANGUAGES = {
+            vi: {
+                voice_cloning: 'Voice Cloning Studio',
+                vc_banner: 'Nhân bản bất cứ giọng nói nào mà bạn muốn, không còn nỗi lo không tìm thấy giọng phù hợp. (sử dụng Minimax)',
+                vc_voice_name: 'Tên Giọng Nói',
+                vc_voice_name_placeholder: 'VD: Giọng đọc tin tức',
+                vc_upload_audio: 'Tải Lên File Âm Thanh',
+                vc_drag_drop: 'Kéo thả file hoặc nhấn để chọn',
+                vc_duration_hint: 'Thời lượng 10s - 2 phút, tối đa 20MB',
+                vc_format_hint: 'Hiện chỉ hỗ trợ: .mp3',
+                vc_remove_file: 'Xóa file',
+                vc_select_language: 'Chọn Ngôn Ngữ',
+                vc_auto_detect: 'Tự xác định',
+                vc_search: 'Tìm kiếm...',
+                vc_select_gender: 'Chọn Giới Tính',
+                vc_male: 'Nam',
+                vc_female: 'Nữ',
+                vc_preview_text: 'Văn Bản Nghe Trước (Tùy chọn)',
+                vc_preview_placeholder: 'Nhập văn bản (Nếu để trống, hệ thống sẽ tự dùng mẫu câu mặc định)...',
+                vc_chars: 'ký tự',
+                vc_remove_noise: 'Loại Bỏ Tiếng Ồn',
+                vc_clone_btn: 'Nhân Bản',
+                vc_library_title: 'Thư viện giọng nhân bản',
+                vc_voices: 'giọng',
+                vc_refresh: 'Làm mới',
+                vc_loading: 'Đang tải danh sách...',
+                vc_confirm_delete: 'Xác nhận xóa giọng',
+                vc_confirm_delete_msg: 'Bạn có chắc chắn muốn xóa giọng',
+                vc_cannot_undo: 'Hành động này không thể hoàn tác.',
+                vc_cancel: 'Hủy',
+                vc_delete: 'Xóa',
+                vc_processing: 'Đang xử lý...',
+                vc_processing_hint: 'AI đang học giọng nói của bạn. Quá trình này có thể mất 1-2 phút.',
+                vc_notification: 'Thông báo'
+            },
+            en: {
+                voice_cloning: 'Voice Cloning Studio',
+                vc_banner: 'Clone any voice you want, no more searching for the perfect voice. (using Minimax)',
+                vc_voice_name: 'Voice Name',
+                vc_voice_name_placeholder: 'Ex: News Reader Voice',
+                vc_upload_audio: 'Upload Audio File',
+                vc_drag_drop: 'Drag & drop or click to select',
+                vc_duration_hint: 'Duration 10s - 2 min, max 20MB',
+                vc_format_hint: 'Currently supports: .mp3',
+                vc_remove_file: 'Remove file',
+                vc_select_language: 'Select Language',
+                vc_auto_detect: 'Auto Detect',
+                vc_search: 'Search...',
+                vc_select_gender: 'Select Gender',
+                vc_male: 'Male',
+                vc_female: 'Female',
+                vc_preview_text: 'Preview Text (Optional)',
+                vc_preview_placeholder: 'Enter text here (If empty, default sample text will be used)...',
+                vc_chars: 'chars',
+                vc_remove_noise: 'Remove Noise',
+                vc_clone_btn: 'Clone Voice',
+                vc_library_title: 'Cloned Voice Library',
+                vc_voices: 'voices',
+                vc_refresh: 'Refresh',
+                vc_loading: 'Loading list...',
+                vc_confirm_delete: 'Confirm Delete Voice',
+                vc_confirm_delete_msg: 'Are you sure you want to delete voice',
+                vc_cannot_undo: 'This action cannot be undone.',
+                vc_cancel: 'Cancel',
+                vc_delete: 'Delete',
+                vc_processing: 'Processing...',
+                vc_processing_hint: 'AI is learning your voice. This process may take 1-2 minutes.',
+                vc_notification: 'Notification'
+            }
+        };
+
+        function t(key) {
+            return LANGUAGES[currentLang][key] || LANGUAGES['en'][key] || key;
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            // Update static elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t(key)) el.textContent = t(key);
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t(key)) el.placeholder = t(key);
+            });
+
+            // Update titles
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const key = el.getAttribute('data-i18n-title');
+                if (t(key)) el.title = t(key);
+            });
+        }
+
+        // Listen for language changes from main window via IPC
+        if (window.electronAPI && window.electronAPI.onLanguageChanged) {
+            window.electronAPI.onLanguageChanged((lang) => {
+                setLanguage(lang);
+            });
+        }
+        
+        // Fallback: Storage event
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'app_language' && e.newValue) {
+                setLanguage(e.newValue);
+            }
+        });
+
+        // Init language on load
+        setLanguage(currentLang);
+    </script>
     <script src="js/i18n.js"></script>
     <script src="js/api-handler.js"></script>
     <script src="js/shared-ui.js"></script>

@@ -171,9 +171,11 @@
 
 <body>
     <div class="header">
-        <h1><i class="bi bi-collection-play"></i> My Cloned Voices (Minimax)</h1>
+        <h1>
+            <i class="bi bi-collection-play"></i> <span data-i18n="cv_title">My Cloned Voices (Minimax)</span>
+        </h1>
         <button class="btn" onclick="loadClonedVoices()">
-            <i class="bi bi-arrow-clockwise"></i> Refresh
+            <i class="bi bi-arrow-clockwise"></i> <span data-i18n="cv_refresh">Refresh</span>
         </button>
     </div>
 
@@ -182,15 +184,94 @@
     <div class="voice-list" id="voiceList">
         <div class="loading">
             <div class="spinner"></div>
-            Loading cloned voices...
+            <span data-i18n="cv_loading_text">Loading cloned voices...</span>
         </div>
     </div>
 
     <div class="footer-actions">
-        <button class="btn" onclick="window.close()">Close</button>
+        <button class="btn" onclick="window.close()" data-i18n="cv_close">Close</button>
     </div>
 
     <script>
+        let currentLang = localStorage.getItem('app_language') || 'vi';
+
+        const LANGUAGES = {
+            vi: {
+                cv_title: 'Giọng Nhân Bản Của Tôi (Minimax)',
+                cv_refresh: 'Làm mới',
+                cv_loading_text: 'Đang tải danh sách...',
+                cv_close: 'Đóng',
+                cv_count: 'giọng nhân bản',
+                cv_empty_title: 'Chưa có giọng nhân bản',
+                cv_empty_desc: 'Sử dụng "Voice Clone" trong Pro Tool để tạo giọng mới',
+                cv_unnamed: 'Chưa đặt tên',
+                cv_select: 'Chọn',
+                cv_delete_tooltip: 'Xóa giọng',
+                cv_select_tooltip: 'Chọn giọng này',
+                cv_confirm_delete: 'Xóa giọng',
+                cv_cannot_undo: 'Hành động này không thể hoàn tác!',
+                cv_deleted_success: 'Đã xóa giọng',
+                cv_deleted_local: 'Đã xóa giọng khỏi bộ nhớ tạm',
+                cv_selected_success: 'Đã chọn giọng'
+            },
+            en: {
+                cv_title: 'My Cloned Voices (Minimax)',
+                cv_refresh: 'Refresh',
+                cv_loading_text: 'Loading cloned voices...',
+                cv_close: 'Close',
+                cv_count: 'cloned voices',
+                cv_empty_title: 'No cloned voices',
+                cv_empty_desc: 'Use "Voice Clone" in Pro Tool to create new voices',
+                cv_unnamed: 'Unnamed',
+                cv_select: 'Select',
+                cv_delete_tooltip: 'Delete voice',
+                cv_select_tooltip: 'Use this voice',
+                cv_confirm_delete: 'Delete voice',
+                cv_cannot_undo: 'This cannot be undone!',
+                cv_deleted_success: 'Deleted voice',
+                cv_deleted_local: 'Deleted voice locally',
+                cv_selected_success: 'Selected voice'
+            }
+        };
+
+        function t(key) {
+            return LANGUAGES[currentLang][key] || LANGUAGES['en'][key] || key;
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            // Update static elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t(key)) el.textContent = t(key);
+            });
+
+            // Update titles
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const key = el.getAttribute('data-i18n-title');
+                if (t(key)) el.title = t(key);
+            });
+
+            // Re-render list if populated
+            const localVoices = getLocalClonedVoices();
+            if (localVoices.length > 0) renderVoices(localVoices);
+        }
+
+        // Listen for language changes from main window via IPC
+        if (window.electronAPI && window.electronAPI.onLanguageChanged) {
+            window.electronAPI.onLanguageChanged((lang) => {
+                setLanguage(lang);
+            });
+        }
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'app_language' && e.newValue) setLanguage(e.newValue);
+        });
+
+        // Set initial language
+        setLanguage(currentLang);
+
         // Load cloned voices from localStorage (fallback storage)
         function getLocalClonedVoices() {
             try {
@@ -210,7 +291,7 @@
             container.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    Loading cloned voices...
+                    ${t('cv_loading_text')}
                 </div>
             `;
 
@@ -261,28 +342,28 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="bi bi-mic"></i>
-                        <h4>No cloned voices</h4>
-                        <p style="font-size: 12px; margin-top: 8px;">Use "Voice Clone" in Pro Tool to create new voices</p>
+                        <h4>${t('cv_empty_title')}</h4>
+                        <p style="font-size: 12px; margin-top: 8px;">${t('cv_empty_desc')}</p>
                     </div>
                 `;
                 return;
             }
 
-            countInfo.textContent = `${voices.length} cloned voices`;
+            countInfo.textContent = `${voices.length} ${t('cv_count')}`;
 
             container.innerHTML = voices.map(voice => `
                 <div class="voice-item">
                     <div class="info">
-                        <div class="name">${escapeHtml(voice.name || voice.voice_name || 'Unnamed')}</div>
+                        <div class="name">${escapeHtml(voice.name || voice.voice_name || t('cv_unnamed'))}</div>
                         <div class="id">ID: ${voice.voice_id || voice.id || '-'}</div>
                         ${voice.language ? `<div class="meta">${voice.language}</div>` : ''}
                         ${voice.created_at ? `<div class="meta">${voice.created_at}</div>` : ''}
                     </div>
                     <div class="actions">
-                        <button class="btn btn-sm btn-primary" onclick="selectVoice('${voice.voice_id || voice.id}')" title="Use this voice">
-                            <i class="bi bi-check-lg"></i> Select
+                        <button class="btn btn-sm btn-primary" onclick="selectVoice('${voice.voice_id || voice.id}')" title="${t('cv_select_tooltip')}">
+                            <i class="bi bi-check-lg"></i> ${t('cv_select')}
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteVoice('${voice.voice_id || voice.id}', '${escapeHtml(voice.name || voice.voice_name || 'Voice')}')" title="Delete voice">
+                        <button class="btn btn-sm btn-danger" onclick="deleteVoice('${voice.voice_id || voice.id}', '${escapeHtml(voice.name || voice.voice_name || 'Voice')}')" title="${t('cv_delete_tooltip')}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -301,14 +382,14 @@
                 window.opener.postMessage({ type: 'voiceSelected', voiceId: voiceId }, '*');
             }
 
-            showNotification(`Selected voice: ${voiceId}`, 'success');
+            showNotification(`${t('cv_selected_success')}: ${voiceId}`, 'success');
 
             // Close after short delay
             setTimeout(() => window.close(), 500);
         }
 
         async function deleteVoice(voiceId, voiceName) {
-            if (!confirm(`Delete voice "${voiceName}"? This cannot be undone!`)) {
+            if (!confirm(`${t('cv_confirm_delete')} "${voiceName}"? ${t('cv_cannot_undo')}`)) {
                 return;
             }
 
@@ -328,15 +409,15 @@
                 );
 
                 if (response.success || response.status === 'success') {
-                    showNotification(`Deleted voice "${voiceName}"`, 'success');
+                    showNotification(`${t('cv_deleted_success')} "${voiceName}"`, 'success');
                 } else {
                     // API failed but already deleted from localStorage
-                    showNotification(`Deleted voice "${voiceName}" locally`, 'success');
+                    showNotification(`${t('cv_deleted_local')} "${voiceName}"`, 'success');
                 }
             } catch (error) {
                 console.error('Delete voice error:', error);
                 // API failed but already deleted from localStorage
-                showNotification(`Deleted voice "${voiceName}" locally`, 'success');
+                showNotification(`${t('cv_deleted_local')} "${voiceName}"`, 'success');
             }
 
             // Reload list

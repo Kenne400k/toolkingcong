@@ -1,8 +1,10 @@
 {
-  "version": "1.10.42",
+  "version": "1.10.44",
   "changelog": [
-    "Add Dedicated Voice Cloning Window",
-    "Separate Voice Cloning UI from Pro Tool"
+    "Add Bilingual Support (Vietnamese/English) for all windows",
+    "Synchronize language settings across windows",
+    "Fix default models for ElevenLabs and Minimax",
+    "Remove redundant language selectors"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

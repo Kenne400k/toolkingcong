@@ -228,7 +228,7 @@
     <div class="modal-header">
         <h3>
             <img id="providerLogo" src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4" alt="">
-            <i class="bi bi-mic"></i> <span id="titleText">Chọn Giọng Nói</span>
+            <i class="bi bi-mic"></i> <span id="titleText" data-i18n="title_select_voice">Chọn Giọng Nói</span>
         </h3>
         <button class="modal-close" onclick="window.close()">×</button>
     </div>
@@ -236,28 +236,31 @@
     <!-- Tabs -->
     <div class="voice-tabs">
         <button class="voice-tab active" data-tab="default" onclick="switchTab('default')">
-            <i class="bi bi-cloud-download"></i> Mặc định
+            <i class="bi bi-cloud-download"></i> <span data-i18n="tab_default">Mặc định</span>
         </button>
         <button class="voice-tab" data-tab="library" onclick="switchTab('library')">
-            <i class="bi bi-collection"></i> Thư viện
+            <i class="bi bi-collection"></i> <span data-i18n="tab_library">Thư viện</span>
         </button>
     </div>
 
     <div class="modal-body">
         <div style="margin-bottom: 12px;">
-            <input type="text" class="form-input" id="voiceSearch" placeholder="Tìm kiếm voice..." oninput="filterVoices(this.value)">
+        <div style="margin-bottom: 12px;">
+            <input type="text" class="form-input" id="voiceSearch" placeholder="Tìm kiếm voice..." data-i18n-placeholder="search_placeholder" oninput="filterVoices(this.value)">
+        </div>
         </div>
         <div id="countInfo" class="count-info"></div>
         <div class="voice-list" id="voicesList">
             <div class="loading">
                 <div class="spinner"></div>
-                Loading voices...
+                <span data-i18n="loading_voices">Loading voices...</span>
             </div>
         </div>
     </div>
 
     <div class="modal-footer">
-        <button class="btn" onclick="window.close()">Close</button>
+    <div class="modal-footer">
+        <button class="btn" onclick="window.close()" data-i18n="btn_close">Close</button>
     </div>
 
     <audio id="previewAudio"></audio>
@@ -267,7 +270,80 @@
         let sharedVoices = [];
         let currentProvider = 'elevenlabs';
         let currentTab = 'default';
+        let currentLang = localStorage.getItem('app_language') || 'vi';
         const previewAudio = document.getElementById('previewAudio');
+
+        const LANGUAGES = {
+            vi: {
+                title_select_voice: 'Chọn Giọng Nói',
+                tab_default: 'Mặc định',
+                tab_library: 'Thư viện',
+                search_placeholder: 'Tìm kiếm voice...',
+                loading_voices: 'Đang tải danh sách giọng...',
+                btn_close: 'Đóng',
+                count_voices: 'giọng',
+                count_shared_voices: 'giọng chia sẻ',
+                empty_state: 'Không có voices',
+                empty_state_shared: 'Không có shared voices',
+                error_load: 'Không thể tải voices',
+                error_prefix: 'Lỗi:',
+                unknown: 'Unknown',
+                btn_select: 'Chọn',
+                btn_preview: 'Nghe thử',
+                no_results: 'Không tìm thấy voice'
+            },
+            en: {
+                title_select_voice: 'Select Voice',
+                tab_default: 'Default',
+                tab_library: 'Library',
+                search_placeholder: 'Search voices...',
+                loading_voices: 'Loading voices...',
+                btn_close: 'Close',
+                count_voices: 'voices',
+                count_shared_voices: 'shared voices',
+                empty_state: 'No voices found',
+                empty_state_shared: 'No shared voices found',
+                error_load: 'Cannot load voices',
+                error_prefix: 'Error:',
+                unknown: 'Unknown',
+                btn_select: 'Select',
+                btn_preview: 'Preview',
+                no_results: 'No voices found'
+            }
+        };
+
+        function t(key) {
+            return LANGUAGES[currentLang][key] || LANGUAGES['en'][key] || key;
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            // Update static elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t(key)) el.textContent = t(key);
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t(key)) el.placeholder = t(key);
+            });
+
+            // Re-render lists if they have data (to update dynamic texts like buttons)
+            if (currentTab === 'default' && allVoices.length > 0) renderVoices(allVoices);
+            if (currentTab === 'library' && sharedVoices.length > 0) renderSharedVoices(sharedVoices);
+        }
+
+        // Listen for language changes
+        if (window.electronAPI && window.electronAPI.onLanguageChanged) {
+            window.electronAPI.onLanguageChanged((lang) => setLanguage(lang));
+        }
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'app_language' && e.newValue) setLanguage(e.newValue);
+        });
 
         const PROVIDER_LOGOS = {
             elevenlabs: 'https://avatars.githubusercontent.com/u/94471909?s=280&v=4',
@@ -299,6 +375,10 @@
         }
 
         async function init() {
+            // Set initial language
+            const savedLang = localStorage.getItem('app_language') || 'vi';
+            setLanguage(savedLang);
+
             currentProvider = getQueryParam('provider') || 'elevenlabs';
             document.getElementById('providerLogo').src = PROVIDER_LOGOS[currentProvider] || PROVIDER_LOGOS.elevenlabs;
 
@@ -316,7 +396,7 @@
             document.getElementById('voicesList').innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    Loading voices...
+                    ${t('loading_voices')}
                 </div>
             `;
 
@@ -326,10 +406,10 @@
                     allVoices = res.data[currentProvider]?.voices || [];
                     renderVoices(allVoices);
                 } else {
-                    document.getElementById('voicesList').innerHTML = '<div class="loading">Không thể tải voices</div>';
+                    document.getElementById('voicesList').innerHTML = `<div class="loading">${t('error_load')}</div>`;
                 }
             } catch (error) {
-                document.getElementById('voicesList').innerHTML = `<div class="loading">Lỗi: ${error.message}</div>`;
+                document.getElementById('voicesList').innerHTML = `<div class="loading">${t('error_prefix')} ${error.message}</div>`;
             }
         }
 
@@ -337,7 +417,7 @@
             document.getElementById('voicesList').innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    Loading ElevenLabs shared voices...
+                    ${t('loading_voices')}
                 </div>
             `;
 
@@ -355,18 +435,18 @@
                     document.getElementById('voicesList').innerHTML = `
                         <div class="empty-state">
                             <i class="bi bi-collection"></i>
-                            <p>Không có shared voices</p>
+                            <p>${t('empty_state_shared')}</p>
                         </div>
                     `;
                 }
             } catch (error) {
                 console.error('Load shared voices error:', error);
-                document.getElementById('voicesList').innerHTML = `<div class="loading">Lỗi: ${error.message}</div>`;
+                document.getElementById('voicesList').innerHTML = `<div class="loading">${t('error_prefix')} ${error.message}</div>`;
             }
         }
 
         function renderSharedVoices(voices) {
-            document.getElementById('countInfo').textContent = `${voices.length} shared voices`;
+            document.getElementById('countInfo').textContent = `${voices.length} ${t('count_shared_voices')}`;
             document.getElementById('voicesList').innerHTML = voices.map(voice => {
                 const voiceId = voice.voice_id || voice.id;
                 const voiceName = escapeHtml(voice.name || 'Unknown');
@@ -389,8 +469,8 @@
                         </div>
                     </div>
                     <div class="actions">
-                        ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
-                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">Chọn</button>
+                        ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="${t('btn_preview')}"><i class="bi bi-volume-up"></i></button>` : ''}
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.name)}')">${t('btn_select')}</button>
                     </div>
                 </div>`;
             }).join('');
@@ -403,17 +483,17 @@
         }
 
         function renderVoices(voices) {
-            document.getElementById('countInfo').textContent = `${voices.length} voices`;
+            document.getElementById('countInfo').textContent = `${voices.length} ${t('count_voices')}`;
 
             if (!voices || voices.length === 0) {
-                document.getElementById('voicesList').innerHTML = '<div class="loading">Không có voices</div>';
+                document.getElementById('voicesList').innerHTML = `<div class="loading">${t('empty_state')}</div>`;
                 return;
             }
 
             document.getElementById('voicesList').innerHTML = voices.map(voice => {
                 const voiceId = voice.voice_id || voice.id;
                 // Ưu tiên voice_name trước, sau đó name (tránh trường hợp name = voice_id)
-                const voiceName = escapeHtml(voice.voice_name || voice.name || 'Unknown');
+                const voiceName = escapeHtml(voice.voice_name || voice.name || t('unknown'));
                 const previewUrl = (voice.preview_url || voice.sample_audio || '').replace(/'/g, "\\'");
                 const labels = voice.labels ? Object.values(voice.labels).join(' • ') : '';
 
@@ -425,8 +505,8 @@
                         ${labels ? `<div class="labels">${escapeHtml(labels)}</div>` : ''}
                     </div>
                     <div class="actions">
-                        ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="Nghe thử"><i class="bi bi-volume-up"></i></button>` : ''}
-                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.voice_name || voice.name)}')">Chọn</button>
+                        ${previewUrl ? `<button class="btn btn-sm" onclick="event.stopPropagation(); togglePreview('${previewUrl}')" title="${t('btn_preview')}"><i class="bi bi-volume-up"></i></button>` : ''}
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectVoice('${voiceId}', '${escapeAttr(voice.voice_name || voice.name)}')">${t('btn_select')}</button>
                     </div>
                 </div>`;
             }).join('');
@@ -444,8 +524,8 @@
 
             if (currentTab === 'library') {
                 if (filtered.length === 0) {
-                    document.getElementById('voicesList').innerHTML = '<div class="empty-state"><p>Không tìm thấy voice</p></div>';
-                    document.getElementById('countInfo').textContent = '0 voices';
+                    document.getElementById('voicesList').innerHTML = `<div class="empty-state"><p>${t('no_results')}</p></div>`;
+                    document.getElementById('countInfo').textContent = `0 ${t('count_voices')}`;
                     return;
                 }
                 renderSharedVoices(filtered);
