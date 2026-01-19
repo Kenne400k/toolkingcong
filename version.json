@@ -1,6 +1,7 @@
 {
-  "version": "1.10.48",
+  "version": "1.10.49",
   "changelog": [
+    "Add dashboard micro-interaction animations on launch",
     "Add sophisticated light theme for TTS interface with white background and black text",
     "Add animated gradient border effect for text input area (8s rotation + 16s color change)",
     "Add ultra-smooth 1s fade in/out animation for empty state tips",
