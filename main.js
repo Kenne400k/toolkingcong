@@ -12,9 +12,8 @@ const SESSION_DIR = path.join(USER_DATA_PATH, 'sessions');
 const SESSION_FILE = path.join(SESSION_DIR, 'session.json');
 
 // =================== APP VERSION ===================
-// Use require() to read package.json - works correctly in asar
-const APP_VERSION = require('./package.json').version || '1.0.0';
-console.log('📦 App Version:', APP_VERSION);
+// Hardcode version - update this when releasing new version
+const APP_VERSION = '1.10.50';
 
 // =================== AUTO UPDATE CONFIG ===================
 const UPDATE_SERVER_BASE = 'https://kingcongstudio.com/serverkingcong_tools';
