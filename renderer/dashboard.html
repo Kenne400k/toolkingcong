@@ -273,6 +273,152 @@
             animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
+        /* =================== DASHBOARD MICRO-INTERACTIONS =================== */
+        @keyframes panelInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes headerInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes contentIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes sectionIn {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes buttonPop {
+            0% {
+                opacity: 0;
+                transform: translateY(6px) scale(0.96);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-2px) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        body.dashboard-boot #app-sidebar {
+            animation: panelInLeft 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+            will-change: transform, opacity;
+        }
+        
+        body.dashboard-boot #app-header {
+            animation: headerInDown 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.04s;
+            will-change: transform, opacity;
+        }
+        
+        body.dashboard-ready #main-dashboard {
+            animation: contentIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            will-change: transform, opacity;
+        }
+        
+        body.dashboard-ready #main-dashboard > * {
+            animation: sectionIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: var(--section-delay, 0s);
+            will-change: transform, opacity;
+        }
+        
+        body.dashboard-ready #main-dashboard > :nth-child(1) {
+            --section-delay: 0.06s;
+        }
+        
+        body.dashboard-ready #main-dashboard > :nth-child(2) {
+            --section-delay: 0.12s;
+        }
+        
+        body.dashboard-ready #main-dashboard > :nth-child(3) {
+            --section-delay: 0.18s;
+        }
+        
+        body.dashboard-ready #main-dashboard .stat-card {
+            animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: calc(var(--card-delay, 0) * 80ms);
+            will-change: transform, opacity;
+        }
+        
+        body.dashboard-ready #main-dashboard .stat-card:nth-child(1) {
+            --card-delay: 0;
+        }
+        
+        body.dashboard-ready #main-dashboard .stat-card:nth-child(2) {
+            --card-delay: 1;
+        }
+        
+        body.dashboard-ready #main-dashboard .stat-card:nth-child(3) {
+            --card-delay: 2;
+        }
+        
+        body.dashboard-ready #main-dashboard .stat-card:nth-child(4) {
+            --card-delay: 3;
+        }
+        
+        body.dashboard-ready #create-task-btn {
+            animation: buttonPop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.2s;
+        }
+        
+        body.dashboard-ready #view-all-btn {
+            animation: buttonPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.26s;
+        }
+        
+        #create-task-btn:active,
+        #view-all-btn:active,
+        #langSwitchBtn:active,
+        .theme-toggle:active,
+        .nav-link:active,
+        .stat-card:active {
+            transform: translateY(1px) scale(0.98);
+        }
+        
         /* =================== UTILITIES =================== */
         .text-dim {
             color: var(--text-dim);
@@ -304,7 +450,7 @@
     <link rel="stylesheet" href="css/theme.css">
 </head>
 
-<body class="bg-main">
+<body class="bg-main dashboard-boot">
     <div class="flex h-screen w-full overflow-hidden resize-smooth">
         
         <!-- =================== SIDEBAR =================== -->
