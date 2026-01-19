@@ -2555,11 +2555,409 @@
         .confirm-modal-actions .btn {
             min-width: 96px;
         }
+
+        /* =================== LIGHT MODE PATCHES =================== */
+        html.light .tool-layout {
+            background: var(--bg-main);
+        }
+
+        html.light .tool-sidebar {
+            background: var(--bg-secondary);
+            border-right-color: var(--border);
+        }
+
+        html.light .tool-section {
+            border-bottom-color: var(--border);
+        }
+
+        html.light .section-title {
+            color: var(--text-dim);
+        }
+
+        html.light .provider-select {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .provider-select i {
+            color: var(--text-dim);
+        }
+
+        html.light .provider-menu {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .provider-option:hover {
+            background: var(--hover-bg);
+        }
+
+        html.light .provider-option.active {
+            background: var(--bg-tertiary);
+        }
+
+        html.light .toolbar {
+            background: var(--bg-secondary);
+            border-bottom-color: var(--border);
+        }
+
+        html.light .toolbar-divider {
+            background: var(--border);
+        }
+
+        html.light .toolbar-btn {
+            background: var(--bg-main);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .toolbar-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--border);
+        }
+
+        html.light .toolbar-btn.primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        html.light .toolbar-btn.primary:hover {
+            background: #7c3aed;
+        }
+
+        html.light .toolbar-btn.danger {
+            color: #b91c1c;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        html.light .toolbar-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        html.light .task-table th {
+            background: var(--bg-tertiary);
+            color: var(--text-dim);
+            border-bottom-color: var(--border);
+        }
+
+        html.light .task-table td {
+            border-bottom-color: var(--border);
+        }
+
+        html.light .task-table tr:hover td {
+            background: var(--hover-bg);
+        }
+
+        html.light .task-content {
+            color: var(--text);
+        }
+
+        html.light .task-filename {
+            color: var(--text-dim);
+        }
+
+        html.light .status.pending {
+            background: rgba(217, 119, 6, 0.12);
+            color: #b45309;
+        }
+
+        html.light .status.processing {
+            background: rgba(59, 130, 246, 0.12);
+            color: #2563eb;
+        }
+
+        html.light .status.done {
+            background: rgba(34, 197, 94, 0.14);
+            color: #15803d;
+        }
+
+        html.light .status.failed {
+            background: rgba(239, 68, 68, 0.12);
+            color: #b91c1c;
+        }
+
+        html.light .status-progress-bar {
+            background: var(--bg-tertiary);
+        }
+
+        html.light .status-progress-fill {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        html.light .status-progress-text {
+            color: var(--text-dim);
+        }
+
+        html.light .status-dot {
+            background: #16a34a;
+        }
+
+        html.light .tool-footer {
+            background: var(--bg-secondary);
+            border-top-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .info-text {
+            background: var(--bg-tertiary);
+            color: var(--text-dim);
+        }
+
+        html.light .info-text code {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        html.light .modal {
+            background: rgba(15, 23, 42, 0.35);
+        }
+
+        html.light .modal.keep-dark .modal-box {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .modal-body {
+            color: var(--text);
+        }
+
+        html.light #voicesModalBody > div,
+        html.light #projectsModalBody > div,
+        html.light #clonedVoicesBody > div,
+        html.light #backupBody > div {
+            color: var(--text-dim) !important;
+        }
+
+        html.light #selectionActions {
+            background: var(--bg-secondary) !important;
+            border-bottom-color: var(--border) !important;
+            color: var(--text);
+        }
+
+        html.light #advancedSettingsPanel {
+            background: var(--bg-tertiary) !important;
+            border-color: var(--border) !important;
+        }
+
+        html.light #advancedSettingsPanel span {
+            color: var(--text-dim) !important;
+        }
+
+        html.light #advancedSettingsPanel div[style*="border: 1px"] {
+            background: var(--bg-secondary);
+            border-color: var(--border) !important;
+        }
+
+        html.light #cloneStatus {
+            background: var(--bg-tertiary) !important;
+            color: var(--text);
+        }
+
+        html.light #cloneStatus .spinner {
+            border-color: var(--border) !important;
+            border-top-color: var(--primary) !important;
+        }
+
+        html.light .bk-modal-overlay {
+            background: rgba(15, 23, 42, 0.35);
+        }
+
+        html.light .bk-modal-content {
+            background: var(--bg-main);
+            border-color: var(--border);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+        }
+
+        html.light .bk-header {
+            border-bottom-color: var(--border);
+        }
+
+        html.light .bk-close {
+            color: var(--text-dim);
+        }
+
+        html.light .bk-close:hover {
+            color: var(--text);
+        }
+
+        html.light .bk-toolbar {
+            background: var(--bg-secondary);
+            border-bottom-color: var(--border);
+        }
+
+        html.light .bk-list-body {
+            background: var(--bg-main);
+        }
+
+        html.light .bk-header-row {
+            background: var(--bg-tertiary);
+            border-bottom-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .bk-row {
+            border-bottom-color: var(--border);
+        }
+
+        html.light .bk-row:hover {
+            background: var(--hover-bg);
+        }
+
+        html.light .bk-btn-action {
+            background: var(--bg-main);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .bk-btn-action:hover:not(:disabled) {
+            background: var(--hover-bg);
+            border-color: var(--border-dark);
+        }
+
+        html.light .bk-badge-processing {
+            background: var(--bg-tertiary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        html.light .bk-badge-error {
+            background: rgba(239, 68, 68, 0.08);
+            color: #b91c1c;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        html.light .bk-download-btn {
+            border-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .bk-download-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--border-dark);
+            color: var(--text);
+        }
+
+        html.light .confirm-modal-overlay {
+            background: rgba(15, 23, 42, 0.35);
+        }
+
+        /* =================== SUPER MICRO-INTERACTIONS =================== */
+        @keyframes toolSlideInLeft {
+            from { opacity: 0; transform: translateX(-18px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toolSlideInRight {
+            from { opacity: 0; transform: translateX(18px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toolDropIn {
+            from { opacity: 0; transform: translateY(-14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes toolFadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes toolScaleIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes toolSheen {
+            0% { transform: translateX(-120%) skewX(-12deg); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateX(120%) skewX(-12deg); opacity: 0; }
+        }
+
+        @keyframes toolGlowPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(168, 85, 247, 0); }
+            50% { box-shadow: 0 0 24px rgba(168, 85, 247, 0.35); }
+        }
+
+        body.tool-boot .main-sidebar {
+            animation: toolSlideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        body.tool-boot .top-bar {
+            animation: toolDropIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.03s;
+        }
+
+        body.tool-boot .tool-sidebar {
+            animation: toolSlideInLeft 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.07s;
+        }
+
+        body.tool-boot .tool-content {
+            animation: toolFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.1s;
+        }
+
+        body.tool-boot .toolbar {
+            animation: toolDropIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.14s;
+        }
+
+        body.tool-boot .task-area {
+            animation: toolScaleIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.18s;
+        }
+
+        body.tool-boot .tool-footer {
+            animation: toolFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-delay: 0.2s;
+        }
+
+        body.tool-boot .tool-section {
+            animation: toolFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .tool-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary,
+        .toolbar-btn.primary {
+            position: relative;
+            overflow: hidden;
+            animation: toolGlowPulse 3s ease-in-out infinite;
+        }
+
+        .btn-primary::after,
+        .toolbar-btn.primary::after {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -120%;
+            width: 60%;
+            height: 140%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            opacity: 0;
+        }
+
+        .btn-primary:hover::after,
+        .toolbar-btn.primary:hover::after {
+            animation: toolSheen 0.8s ease;
+        }
+
+        .modal-box,
+        .bk-modal-content,
+        .confirm-modal-content {
+            animation: toolScaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
     </style>
     <link rel="stylesheet" href="css/theme.css">
 </head>
 
-<body>
+<body class="tool-boot">
     <div class="flex h-screen w-full overflow-hidden">
 
         <!-- ========== MAIN SIDEBAR ========== -->
