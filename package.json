@@ -39,6 +39,7 @@
     "files": [
       "main.js",
       "preload.js",
+      "version.json",
       "renderer/**/*",
       "image/**/*",
       "!sessions",
