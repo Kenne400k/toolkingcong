@@ -36,6 +36,7 @@
     <script src="js/theme.js"></script>
 
     <link rel="stylesheet" href="css/tts.css">
+    <link rel="stylesheet" href="css/tts-light-theme.css">
 
     <style>
         * {
@@ -181,6 +182,106 @@
             overflow: auto;
             padding: 16px;
         }
+
+        /* ========== GRADIENT BORDER FOR DARK THEME ========== */
+        .textarea-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 16px;
+            padding: 1.5px;
+            background: #0a0a0a;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .textarea-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -150%;
+            background: conic-gradient(
+                from 0deg,
+                #1a1a2e 0deg,
+                oklch(54.6% .245 262.881) 45deg,
+                oklch(62.3% .214 259.815) 90deg,
+                oklch(70.7% .165 254.624) 135deg,
+                oklch(29.1% .149 302.717) 180deg,
+                oklch(48.8% .243 264.376) 225deg,
+                oklch(54.6% .245 262.881) 270deg,
+                oklch(42.4% .199 265.638) 315deg,
+                #1a1a2e 360deg
+            );
+            animation: spin 8s linear infinite, colorChange 16s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes colorChange {
+            0% {
+                filter: hue-rotate(0deg) saturate(1);
+            }
+            50% {
+                filter: hue-rotate(80deg) saturate(1.2);
+            }
+            100% {
+                filter: hue-rotate(0deg) saturate(1);
+            }
+        }
+
+        .textarea-inner {
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        textarea.tts-textarea {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: #e5e5e5;
+            font-size: 16px;
+            line-height: 1.7;
+            resize: none;
+            outline: none;
+            font-weight: 400;
+            font-family: inherit;
+            z-index: 2;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Hide empty state when focused or has content */
+        textarea.tts-textarea:focus ~ .empty-state,
+        textarea.tts-textarea:not(:placeholder-shown) ~ .empty-state {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .empty-state {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            pointer-events: none;
+            z-index: 1;
+            transition: 
+                opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 1s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
     <link rel="stylesheet" href="css/theme.css">
 </head>
@@ -308,8 +409,7 @@
 
                         <div class="textarea-wrapper">
                             <div class="textarea-inner">
-                                <textarea id="txtInput" class="tts-textarea" data-i18n-placeholder="tts_enter_text"
-                                    placeholder=""></textarea>
+                                <textarea id="txtInput" class="tts-textarea"></textarea>
 
                                 <div id="emptyState" class="empty-state">
                                     <div class="es-title" data-i18n="tts_enter_text">Nhập văn bản của bạn tại đây.</div>
@@ -1266,6 +1366,42 @@
     <script src="js/shared-ui.js"></script>
     <script src="js/detailed-history.js"></script>
     <script src="js/tts.js"></script>
+
+    <script>
+        // Handle empty state visibility with ultra-smooth fade
+        const txtInput = document.getElementById('txtInput');
+        const emptyState = document.getElementById('emptyState');
+
+        function updateEmptyState() {
+            if (txtInput.value.trim() === '' && document.activeElement !== txtInput) {
+                emptyState.style.opacity = '1';
+                emptyState.style.visibility = 'visible';
+            } else {
+                emptyState.style.opacity = '0';
+                emptyState.style.visibility = 'hidden';
+            }
+        }
+
+        // Hide when focus with smooth fade
+        txtInput.addEventListener('focus', () => {
+            emptyState.style.opacity = '0';
+            emptyState.style.visibility = 'hidden';
+        });
+
+        // Show when blur and empty
+        txtInput.addEventListener('blur', updateEmptyState);
+
+        // Hide when typing
+        txtInput.addEventListener('input', () => {
+            if (txtInput.value.trim() !== '') {
+                emptyState.style.opacity = '0';
+                emptyState.style.visibility = 'hidden';
+            }
+        });
+
+        // Initial check
+        updateEmptyState();
+    </script>
 </body>
 
 </html>

@@ -1,109 +1,4 @@
 /* ==========================================
-   🎨 TEXTAREA GRADIENT BORDER & EMPTY STATE
-   ========================================== */
-
-/* Textarea Wrapper - GRADIENT BORDER EFFECT for DARK MODE */
-.textarea-wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    border-radius: 16px;
-    padding: 1.5px;
-    background: #0a0a0a;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.textarea-wrapper::before {
-    content: '';
-    position: absolute;
-    inset: -150%;
-    background: conic-gradient(
-        from 0deg,
-        #1a1a2e 0deg,
-        oklch(54.6% .245 262.881) 45deg,
-        oklch(62.3% .214 259.815) 90deg,
-        oklch(70.7% .165 254.624) 135deg,
-        oklch(29.1% .149 302.717) 180deg,
-        oklch(48.8% .243 264.376) 225deg,
-        oklch(54.6% .245 262.881) 270deg,
-        oklch(42.4% .199 265.638) 315deg,
-        #1a1a2e 360deg
-    );
-    animation: spinGradient 8s linear infinite, colorChangeGradient 16s ease-in-out infinite;
-    z-index: 0;
-}
-
-@keyframes spinGradient {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes colorChangeGradient {
-    0% {
-        filter: hue-rotate(0deg) saturate(1);
-    }
-    50% {
-        filter: hue-rotate(80deg) saturate(1.2);
-    }
-    100% {
-        filter: hue-rotate(0deg) saturate(1);
-    }
-}
-
-.textarea-inner {
-    width: 100%;
-    height: 100%;
-    background: #0a0a0a;
-    border-radius: 16px;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-
-textarea.tts-textarea {
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    border: none;
-    color: #e5e5e5;
-    font-size: 16px;
-    line-height: 1.7;
-    resize: none;
-    outline: none;
-    font-weight: 400;
-    font-family: inherit;
-    z-index: 2;
-    position: relative;
-    padding: 20px;
-}
-
-/* Empty State with Ultra-Smooth Fade Animation */
-.empty-state {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    pointer-events: none;
-    z-index: 1;
-    transition: 
-        opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
-        visibility 1s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Hide empty state when focused or has content */
-textarea.tts-textarea:focus ~ .empty-state,
-textarea.tts-textarea:not(:placeholder-shown) ~ .empty-state {
-    opacity: 0;
-    visibility: hidden;
-}
-
-/* ==========================================
    🎨 BULK CONFIRM POPUP - FINAL FIX
    ========================================== */
 
@@ -717,136 +612,6 @@ textarea.tts-textarea:not(:placeholder-shown) ~ .empty-state {
 
 .bulk-file-list-items::-webkit-scrollbar-thumb:hover,
 .bulk-modal-body::-webkit-scrollbar-thumb:hover {
-    background: #444;
-}
-
-/* ==========================================
-   📁 FOLDER CONFIRM POPUP
-   ========================================== */
-#folderConfirmPopup {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(12px);
-    z-index: 999999;
-    align-items: center;
-    justify-content: center;
-}
-
-.folder-confirm-box {
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 450px;
-    width: 90%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-    text-align: center;
-}
-
-.folder-confirm-icon {
-    width: 60px;
-    height: 60px;
-    margin: 0 auto 20px;
-    background: #222;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #444;
-}
-
-.folder-confirm-icon i {
-    font-size: 28px;
-    color: #fff;
-}
-
-#folderConfirmPopup h3 {
-    margin: 0 0 12px 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #fff;
-}
-
-#folderConfirmPopup p {
-    color: #999;
-    font-size: 14px;
-    margin-bottom: 28px;
-    line-height: 1.6;
-}
-
-#folderFileList {
-    max-height: 180px;
-    overflow-y: auto;
-    margin-bottom: 24px;
-    text-align: left;
-    background: #0a0a0a;
-    border: 1px solid #222;
-    border-radius: 8px;
-    padding: 12px;
-}
-
-.folder-confirm-actions {
-    display: flex;
-    gap: 12px;
-}
-
-#folderCancelBtn,
-#folderUploadBtn {
-    flex: 1;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 14px;
-    transition: 0.2s;
-}
-
-#folderCancelBtn {
-    border: 1px solid #444;
-    background: transparent;
-    color: #ccc;
-}
-
-#folderUploadBtn {
-    border: none;
-    background: #fff;
-    color: #000;
-}
-
-#folderCancelBtn:hover {
-    background: #222;
-    border-color: #666;
-    color: #fff;
-}
-
-#folderUploadBtn:hover {
-    background: #e5e5e5;
-}
-
-#folderUploadBtn:active,
-#folderCancelBtn:active {
-    transform: scale(0.98);
-}
-
-#folderFileList::-webkit-scrollbar {
-    width: 6px;
-}
-
-#folderFileList::-webkit-scrollbar-track {
-    background: #0a0a0a;
-}
-
-#folderFileList::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 3px;
-}
-
-#folderFileList::-webkit-scrollbar-thumb:hover {
     background: #444;
 }
 /* ========================================
@@ -3796,40 +3561,6 @@ textarea.tts-textarea {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* ========== GENERAL INPUT STYLING ========== */
-input[type="text"],
-input[type="search"],
-input[type="number"],
-input[type="email"],
-textarea {
-    background: #111 !important;
-    border: 1px solid #333 !important;
-    border-radius: 10px !important;
-    color: #fff !important;
-    font-size: 14px !important;
-    padding: 12px 14px !important;
-    outline: none !important;
-    transition: all 0.2s ease !important;
-    box-sizing: border-box !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-}
-
-input[type="text"]:focus,
-input[type="search"]:focus,
-input[type="number"]:focus,
-input[type="email"]:focus,
-textarea:focus {
-    border-color: #667eea !important;
-    background: #0a0a0a !important;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: #666 !important;
-}
-
 .voice-selector-btn {
     width: 100%;
     background: var(--el-bg);
@@ -4509,15 +4240,11 @@ input:checked + .toggle-slider:before {
     padding: 16px 24px;
     background: #000;
     border-bottom: 1px solid #1a1a1a;
-    display: flex;
-    gap: 12px;
-    align-items: center;
 }
 
 .vm-search-wrapper {
     position: relative;
     max-width: 600px;
-    flex: 1;
 }
 
 .vm-search-wrapper i {
@@ -4527,38 +4254,23 @@ input:checked + .toggle-slider:before {
     transform: translateY(-50%);
     color: #666;
     font-size: 14px;
-    z-index: 2;
-    pointer-events: none;
 }
 
-.vm-search-input,
-input.vm-search-input,
-#voiceSearch {
-    width: 100% !important;
-    background: #111 !important;
-    border: 1px solid #333 !important;
-    padding: 12px 14px 12px 42px !important;
-    border-radius: 10px !important;
-    color: #fff !important;
-    font-size: 14px !important;
-    outline: none !important;
-    transition: all 0.2s ease !important;
-    box-sizing: border-box !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
+.vm-search-input {
+    width: 100%;
+    background: #0a0a0a;
+    border: 1px solid #2a2a2a;
+    padding: 10px 14px 10px 40px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: 0.15s;
 }
 
-.vm-search-input:focus,
-input.vm-search-input:focus,
-#voiceSearch:focus {
-    border-color: #667eea !important;
-    background: #0a0a0a !important;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15) !important;
-}
-
-.vm-search-input::placeholder,
-#voiceSearch::placeholder {
-    color: #666 !important;
+.vm-search-input:focus {
+    border-color: #444;
+    background: #0f0f0f;
 }
 
 /* Filters Bar */

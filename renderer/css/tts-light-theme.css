@@ -1,0 +1,1170 @@
+/* ==========================================
+   🎨 TTS LIGHT THEME - SOPHISTICATED BLACK & WHITE
+   Premium Design with White Background & Black Text
+   ========================================== */
+
+/* =================== ROOT VARIABLES =================== */
+html.light {
+    --primary: #1a1a1a;
+    --accent: #2d2d2d;
+    --bg-main: #ffffff;
+    --bg-secondary: #f8f8f8;
+    --bg-tertiary: #f0f0f0;
+    --border: #e5e5e5;
+    --border-medium: #d1d5db;
+    --border-dark: #9ca3af;
+    --text: #1a1a1a;
+    --text-secondary: #4b5563;
+    --text-dim: #6b7280;
+    --text-muted: #9ca3af;
+    --input-bg: #ffffff;
+    --hover-bg: #f9fafb;
+    --scrollbar: #d1d5db;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* =================== BODY & SCROLLBAR =================== */
+html.light body {
+    background: var(--bg-main);
+    color: var(--text);
+}
+
+html.light ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+html.light ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar);
+    border-radius: 10px;
+    border: 2px solid var(--bg-main);
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-dark);
+}
+
+/* =================== SIDEBAR =================== */
+html.light #app-sidebar {
+    background: var(--bg-main);
+    border-right-color: var(--border);
+}
+
+html.light .avatar-wrapper {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.1) 0%, rgba(26, 26, 26, 0.05) 100%);
+}
+
+html.light .avatar-inner {
+    background: var(--bg-secondary);
+}
+
+html.light .avatar-inner span {
+    color: var(--text);
+}
+
+html.light .nav-link {
+    color: var(--text-dim);
+}
+
+html.light .nav-link:hover {
+    background: var(--hover-bg);
+    color: var(--text);
+}
+
+html.light .nav-link.active {
+    background: var(--bg-tertiary);
+    color: var(--primary);
+}
+
+html.light .nav-link.active::before {
+    background: var(--primary);
+}
+
+html.light .nav-link i,
+html.light .nav-link .material-symbols-outlined {
+    color: inherit;
+}
+
+/* =================== HEADER =================== */
+html.light #app-header {
+    background: var(--bg-main);
+    border-bottom-color: var(--border);
+}
+
+html.light #app-header h2 {
+    color: var(--text);
+}
+
+html.light #app-header .bg-secondary {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light #app-header .text-white {
+    color: var(--text) !important;
+}
+
+html.light #app-header .text-dim {
+    color: var(--text-dim) !important;
+}
+
+html.light #app-header .material-symbols-outlined {
+    color: var(--primary) !important;
+}
+
+html.light #langSwitchBtn {
+    background: var(--bg-secondary) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.light #langSwitchBtn:hover {
+    background: var(--bg-tertiary) !important;
+    border-color: var(--border-medium) !important;
+}
+
+/* =================== INPUT AREA =================== */
+html.light .input-area {
+    background: var(--bg-main);
+    border-color: var(--border);
+}
+
+html.light .textarea-wrapper {
+    background: var(--bg-main);
+    border-color: var(--border);
+}
+
+html.light .textarea-inner {
+    background: var(--bg-main);
+}
+
+html.light .tts-textarea {
+    background: transparent;
+    color: var(--text);
+}
+
+html.light .tts-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+html.light .tts-textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+}
+
+/* Empty State */
+html.light .empty-state {
+    color: var(--text-secondary);
+}
+
+html.light .es-title {
+    color: var(--text);
+}
+
+html.light .es-subtitle {
+    color: var(--text-dim);
+}
+
+html.light .es-tip {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+html.light .es-code {
+    background: var(--bg-tertiary);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+/* =================== INPUT FOOTER =================== */
+html.light .input-footer {
+    background: var(--bg-secondary);
+    border-top-color: var(--border);
+}
+
+html.light .upload-btn {
+    background: var(--bg-main);
+    border-color: var(--border-medium);
+    color: var(--text);
+}
+
+html.light .upload-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-dark);
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+html.light #btnClearText {
+    background: transparent !important;
+    border-color: var(--border-medium) !important;
+    color: var(--text-dim) !important;
+}
+
+html.light #btnClearText:hover {
+    background: var(--hover-bg) !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+/* Upload Dropdown */
+html.light #uploadDropdown {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+html.light .upload-option {
+    color: var(--text);
+    border-bottom-color: var(--border);
+}
+
+html.light .upload-option:hover {
+    background: var(--hover-bg);
+    color: var(--primary);
+}
+
+/* Stats Display */
+html.light .stats-display {
+    color: var(--text);
+}
+
+html.light .stats-display i {
+    color: var(--text-dim);
+}
+
+html.light .stats-display span {
+    color: var(--text);
+}
+
+html.light #charCount {
+    color: var(--text) !important;
+}
+
+html.light #estimatedCost {
+    color: #d97706 !important;
+}
+
+html.light .credits-display {
+    color: var(--text) !important;
+}
+
+html.light .credits-display i {
+    color: var(--text-dim) !important;
+}
+
+/* Tooltip */
+html.light #creditsTooltip {
+    background: var(--bg-main);
+    border-color: var(--border-dark);
+    color: var(--text);
+    box-shadow: var(--shadow-xl);
+}
+
+/* =================== SIDEBAR PANEL =================== */
+html.light .sidebar-panel {
+    background: var(--bg-secondary);
+    border-left-color: var(--border);
+}
+
+/* Top Tabs */
+html.light .top-tabs {
+    background: var(--bg-main);
+    border-bottom-color: var(--border);
+}
+
+html.light .tab-btn {
+    background: transparent;
+    color: var(--text-dim);
+    border-color: transparent;
+}
+
+html.light .tab-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text);
+}
+
+html.light .tab-btn.active {
+    background: var(--bg-tertiary);
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+/* Provider Dropdown */
+html.light .provider-dropdown-btn {
+    background: var(--bg-main);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .provider-dropdown-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light .provider-dropdown-menu {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+html.light .provider-option {
+    color: var(--text);
+    border-bottom-color: var(--border);
+}
+
+html.light .provider-option:hover {
+    background: var(--hover-bg);
+}
+
+html.light .provider-option.active {
+    background: var(--bg-tertiary);
+}
+
+html.light .provider-name {
+    color: var(--text);
+}
+
+html.light .provider-desc {
+    color: var(--text-dim);
+}
+
+html.light .check-icon {
+    color: #10b981 !important;
+}
+
+/* =================== SETTINGS =================== */
+html.light .sidebar-content {
+    background: var(--bg-secondary);
+}
+
+html.light .setting-group label {
+    color: var(--text-secondary);
+}
+
+html.light #voiceSelectorBtn {
+    background: var(--bg-main) !important;
+    border-color: var(--border) !important;
+}
+
+html.light #voiceSelectorBtn:hover {
+    background: var(--hover-bg) !important;
+    border-color: var(--border-medium) !important;
+}
+
+html.light #selectedVoiceName {
+    color: var(--text) !important;
+}
+
+html.light #voiceSelectorBtn i {
+    color: var(--text-dim) !important;
+}
+
+/* Custom Select */
+html.light .custom-select {
+    background: var(--bg-main);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .custom-select:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light .custom-select i {
+    color: var(--text-dim);
+}
+
+/* Language Selector */
+html.light .lang-selector-dropdown {
+    background: var(--bg-main);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .lang-selector-dropdown:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light .lang-dropdown-menu {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+html.light .lang-option {
+    color: var(--text);
+    border-bottom-color: var(--border);
+}
+
+html.light .lang-option:hover {
+    background: var(--hover-bg);
+}
+
+html.light .lang-option.active {
+    background: var(--bg-tertiary);
+    color: var(--primary);
+}
+
+/* Sliders */
+html.light .slider-container {
+    background: transparent;
+}
+
+html.light .slider-header span {
+    color: var(--text-secondary);
+}
+
+html.light .slider-header span:last-child {
+    color: var(--text);
+    font-weight: 600;
+}
+
+html.light input[type="range"] {
+    background: linear-gradient(to right, #1a1a1a 0%, #1a1a1a 50%, #ffffff 50%, #ffffff 100%);
+    background-size: 200% 100%;
+    background-position: right;
+}
+
+html.light input[type="range"]::-webkit-slider-track {
+    background: transparent;
+    border: 1px solid var(--border);
+}
+
+html.light input[type="range"]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, #2a2a2a 0%, #2a2a2a var(--value, 50%), #f0f0f0 var(--value, 50%), #f0f0f0 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    height: 6px;
+}
+
+html.light input[type="range"]::-webkit-slider-thumb {
+    background: #ffffff;
+    border: 2px solid #1a1a1a;
+    box-shadow: var(--shadow-md);
+}
+
+html.light input[type="range"]:hover::-webkit-slider-thumb {
+    background: #f5f5f5;
+    box-shadow: var(--shadow-lg);
+}
+
+html.light input[type="range"]::-moz-range-track {
+    background: linear-gradient(to right, #2a2a2a 0%, #2a2a2a var(--value, 50%), #f0f0f0 var(--value, 50%), #f0f0f0 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    height: 6px;
+}
+
+html.light input[type="range"]::-moz-range-thumb {
+    background: #ffffff;
+    border: 2px solid #1a1a1a;
+}
+
+
+/* Toggle Switch */
+html.light .toggle-row {
+    color: var(--text);
+    border-top-color: var(--border);
+}
+
+html.light .toggle-switch input:checked + .toggle-slider {
+    background: var(--primary);
+}
+
+html.light .toggle-switch .toggle-slider {
+    background: var(--border-dark);
+}
+
+html.light .toggle-switch .toggle-slider::before {
+    background: var(--bg-main);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Badge Cost */
+html.light .badge-cost {
+    background: rgba(217, 119, 6, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+/* Reset Button */
+html.light .reset-btn {
+    background: var(--bg-main) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.light .reset-btn:hover {
+    background: var(--hover-bg) !important;
+    border-color: var(--border-medium) !important;
+}
+
+/* Generate Button */
+html.light .btn-generate {
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+html.light .btn-generate:hover {
+    background: var(--accent);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+}
+
+html.light .btn-generate:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+html.light .btn-generate:disabled {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    box-shadow: none;
+}
+
+/* =================== VOICE MODAL =================== */
+html.light .voice-modal {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+html.light .voice-modal-content {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .vm-header {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border);
+}
+
+html.light .vm-tab {
+    color: var(--text-dim);
+    border-bottom-color: transparent;
+}
+
+html.light .vm-tab:hover {
+    color: var(--text);
+    background: var(--hover-bg);
+}
+
+html.light .vm-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: var(--bg-main);
+}
+
+html.light .vm-close {
+    color: var(--text-dim);
+}
+
+html.light .vm-close:hover {
+    color: var(--text);
+    background: var(--hover-bg);
+}
+
+/* Voice Search */
+html.light .vm-search-wrapper input {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .vm-search-wrapper input::placeholder {
+    color: var(--text-muted);
+}
+
+html.light .vm-search-wrapper input:focus {
+    border-color: var(--primary);
+    background: var(--bg-main);
+}
+
+html.light .vm-search-wrapper i {
+    color: var(--text-dim);
+}
+
+/* Voice Cards */
+html.light .voice-card {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .voice-card:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+    box-shadow: var(--shadow-md);
+}
+
+html.light .voice-card.selected {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+html.light .voice-name {
+    color: var(--text);
+}
+
+html.light .voice-labels {
+    color: var(--text-dim);
+}
+
+html.light .voice-badge {
+    background: rgba(26, 26, 26, 0.1);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+/* Voice Modal Body and Grid */
+html.light .vm-body {
+    background: var(--bg-main);
+}
+
+html.light .vm-grid {
+    background: var(--bg-main);
+}
+
+html.light .voice-card-description,
+html.light .vc-description {
+    color: var(--text-secondary) !important;
+}
+
+html.light .vc-preview,
+html.light .vc-sample {
+    background: var(--bg-secondary) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+html.light .vc-play-btn {
+    background: var(--primary) !important;
+    color: var(--bg-main) !important;
+}
+
+html.light .vc-labels span,
+html.light .voice-language,
+html.light .voice-gender,
+html.light .voice-age {
+    background: rgba(26, 26, 26, 0.08) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+
+/* =================== HISTORY =================== */
+html.light .history-card {
+    background: var(--bg-main);
+    border-color: var(--border);
+}
+
+html.light .history-card:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+    box-shadow: var(--shadow-sm);
+}
+
+html.light .hc-text {
+    color: var(--text);
+}
+
+html.light .hc-time {
+    color: var(--text-dim);
+}
+
+html.light .hc-meta {
+    color: var(--text-dim);
+}
+
+html.light .hc-download-btn {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text-dim);
+}
+
+html.light .hc-download-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-medium);
+    color: var(--text);
+}
+
+html.light .hc-delete-btn {
+    color: var(--text-dim);
+}
+
+html.light .hc-delete-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* =================== MODEL DETAILS SIDEBAR =================== */
+html.light .model-details-sidebar {
+    background: var(--bg-main);
+    border-left-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .md-header {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border);
+}
+
+html.light .md-title {
+    color: var(--text);
+}
+
+html.light .md-close {
+    color: var(--text-dim);
+}
+
+html.light .md-close:hover {
+    color: var(--text);
+    background: var(--hover-bg);
+}
+
+html.light .md-content {
+    color: var(--text);
+}
+
+html.light .model-card {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .model-card:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light .model-card.active {
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+    border-width: 2px;
+}
+
+html.light .model-name {
+    color: var(--text);
+}
+
+html.light .model-desc {
+    color: var(--text-dim);
+}
+
+/* =================== LOADING STATES =================== */
+html.light #pageLoader {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+}
+
+html.light #pageLoader .spinner-border {
+    color: var(--primary) !important;
+}
+
+html.light #pageLoader div {
+    color: var(--text) !important;
+}
+
+html.light .loading-overlay {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+html.light .loading-more {
+    color: var(--text-dim);
+}
+
+html.light .no-more-data {
+    color: var(--text-dim);
+}
+
+/* =================== MODALS & POPUPS =================== */
+html.light .modern-popup-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+html.light .modern-popup-container {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .modern-popup-title {
+    color: var(--text);
+}
+
+html.light .modern-popup-message {
+    color: var(--text-secondary);
+}
+
+html.light .modern-btn {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .modern-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light .modern-btn-primary {
+    background: var(--primary);
+    color: var(--bg-main);
+    border-color: var(--primary);
+}
+
+html.light .modern-btn-primary:hover {
+    background: var(--accent);
+}
+
+html.light .modern-btn-danger {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+html.light .modern-btn-danger:hover {
+    background: #dc2626;
+}
+
+/* =================== REMAKE MODAL =================== */
+html.light #remakeTaskModal {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+html.light .remake-modal-box {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .remake-header {
+    border-bottom-color: var(--border);
+}
+
+html.light .remake-header h3 {
+    color: var(--text);
+}
+
+html.light .remake-close-btn {
+    color: var(--text-dim);
+}
+
+html.light .remake-close-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text);
+}
+
+html.light .remake-warning {
+    color: var(--text-secondary);
+}
+
+html.light .remake-preview {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .remake-settings {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .remake-settings-header {
+    color: var(--text);
+}
+
+html.light .remake-settings-content {
+    color: var(--text-secondary);
+}
+
+html.light .remake-cost {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .remake-cost span:first-child {
+    color: var(--text-secondary);
+}
+
+html.light #remakeCostDisplay {
+    color: var(--text);
+}
+
+html.light .remake-btn-cancel {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .remake-btn-cancel:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light .remake-btn-confirm {
+    background: var(--primary);
+    color: var(--bg-main);
+}
+
+html.light .remake-btn-confirm:hover {
+    background: var(--accent);
+    box-shadow: var(--shadow-lg);
+}
+
+/* =================== DOWNLOAD DROPDOWN for HISTORY =================== */
+html.light .download-dropdown {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-lg);
+}
+
+html.light .dd-header {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border);
+    color: var(--text-dim);
+}
+
+html.light .dd-item {
+    color: var(--text);
+    border-bottom-color: var(--border);
+}
+
+html.light .dd-item:hover {
+    background: var(--hover-bg);
+}
+
+html.light .dd-item.disabled {
+    color: var(--text-muted);
+}
+
+/* =================== ADDITIONAL ELEMENTS =================== */
+html.light #minimax-badge,
+html.light #minimax-model-badge {
+    background: var(--primary);
+    color: var(--bg-main);
+    border-color: var(--primary);
+}
+
+html.light .voice-cloned-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* File Name Display */
+html.light #fileNameDisplay {
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+/* =================== ANIMATIONS =================== */
+@keyframes fadeInLight {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+html.light .history-card {
+    animation: fadeInLight 0.3s ease-out;
+}
+
+/* =================== RESPONSIVE REFINEMENTS =================== */
+@media (max-width: 768px) {
+    html.light .sidebar-panel {
+        border-left-color: transparent;
+        box-shadow: var(--shadow-xl);
+    }
+}
+
+/* =================== FOCUS STATES =================== */
+html.light button:focus,
+html.light input:focus,
+html.light select:focus,
+html.light textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+html.light button:focus:not(:focus-visible),
+html.light input:focus:not(:focus-visible),
+html.light select:focus:not(:focus-visible),
+html.light textarea:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* =================== SELECTION =================== */
+html.light ::selection {
+    background: rgba(26, 26, 26, 0.15);
+    color: var(--text);
+}
+
+/* =================== PRINT STYLES =================== */
+@media print {
+    html.light {
+        background: white;
+        color: black;
+    }
+}
+
+/* =================== TEXT INPUT AREA - WHITE BACKGROUND BLACK TEXT =================== */
+/* =================== WITH ANIMATED GRADIENT BORDER =================== */
+
+/* Main Input Area Container */
+html.light .input-area {
+    background: #ffffff !important;
+    border: 1px solid #e5e5e5 !important;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: 0.2s;
+}
+
+html.light .input-area.drag-over {
+    border-color: #1a1a1a;
+    background: rgba(26, 26, 26, 0.02) !important;
+}
+
+/* Textarea Wrapper - GRADIENT BORDER EFFECT */
+html.light .textarea-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+    border-radius: 16px !important;
+    padding: 1.5px !important; /* Viền dày hơn */
+    background: #ffffff !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* ANIMATED GRADIENT BORDER - Adapted for Light Theme */
+html.light .textarea-wrapper::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: -150% !important;
+    background: conic-gradient(
+        from 0deg,
+        #e5e5e5 0deg,
+        oklch(44.6% .285 262.881) 45deg,
+        oklch(52.3% .254 259.815) 90deg,
+        oklch(60.7% .205 254.624) 135deg,
+        oklch(39.1% .189 302.717) 180deg,
+        oklch(48.8% .283 264.376) 225deg,
+        oklch(44.6% .285 262.881) 270deg,
+        oklch(42.4% .239 265.638) 315deg,
+        #e5e5e5 360deg
+    ) !important;
+    animation: spinLight 8s linear infinite, colorChangeLight 16s ease-in-out infinite !important;
+    z-index: 0 !important;
+}
+
+@keyframes spinLight {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes colorChangeLight {
+    0% {
+        filter: hue-rotate(0deg) saturate(1);
+    }
+    50% {
+        filter: hue-rotate(80deg) saturate(1.2);
+    }
+    100% {
+        filter: hue-rotate(0deg) saturate(1);
+    }
+}
+
+/* Textarea Inner - WHITE BACKGROUND */
+html.light .textarea-inner {
+    width: 100%;
+    height: 100%;
+    background: #ffffff !important;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1; /* Đẩy nội dung lên trên gradient */
+}
+
+/* Textarea Element - WHITE BACKGROUND, BLACK TEXT */
+html.light #txtInput,
+html.light .tts-textarea,
+html.light textarea.tts-textarea {
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    border: none !important;
+    color: #000000 !important;
+    font-size: 16px;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    font-weight: 400;
+    font-family: inherit;
+    z-index: 2;
+    position: relative;
+    padding: 20px;
+    caret-color: #000000 !important;
+}
+
+html.light #txtInput::placeholder,
+html.light .tts-textarea::placeholder,
+html.light textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 0.6;
+}
+
+html.light #txtInput:focus,
+html.light .tts-textarea:focus,
+html.light textarea:focus {
+    background: transparent !important;
+    color: #000000 !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Empty State */
+html.light .empty-state {
+    background: transparent !important;
+    color: #6b7280 !important;
+}
+
+html.light .es-title {
+    color: #1a1a1a !important;
+}
+
+html.light .es-subtitle {
+    color: #6b7280 !important;
+}
+
+html.light .es-tip {
+    background: #f9fafb !important;
+    color: #4b5563 !important;
+    border: 1px solid #e5e5e5 !important;
+}
+
+html.light .es-code {
+    background: #f0f0f0 !important;
+    color: #1a1a1a !important;
+    border: 1px solid #d1d5db !important;
+}
+
