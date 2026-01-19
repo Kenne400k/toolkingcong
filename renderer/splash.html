@@ -175,11 +175,64 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .btn-skip {
+        /* Error State */
+        .error-state {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+        }
+
+        .error-icon {
+            font-size: 32px;
+            color: #ef4444;
+            margin-bottom: 12px;
+        }
+
+        .error-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ef4444;
+            margin-bottom: 8px;
+        }
+
+        .error-text {
+            font-size: 13px;
+            color: #ccc;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .error-contact {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+
+        .btn-contact {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-exit {
             padding: 10px 24px;
             background: transparent;
-            color: #666;
-            border: 1px solid #333;
+            color: #888;
+            border: 1px solid #444;
             border-radius: 8px;
             font-size: 13px;
             cursor: pointer;
@@ -187,52 +240,15 @@
             transition: all 0.3s;
         }
 
-        .btn-skip:hover {
-            border-color: #555;
-            color: #888;
+        .btn-exit:hover {
+            border-color: #666;
+            color: #aaa;
         }
 
-        /* Error State */
-        .error-state {
-            display: none;
-            margin-top: 20px;
-            padding: 16px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 10px;
-        }
-
-        .error-icon {
-            font-size: 24px;
-            color: #ef4444;
-            margin-bottom: 8px;
-        }
-
-        .error-text {
-            font-size: 13px;
-            color: #ef4444;
-            margin-bottom: 12px;
-        }
-
-        .btn-retry {
-            padding: 8px 20px;
-            background: #ef4444;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .btn-continue {
-            padding: 8px 20px;
-            background: transparent;
-            color: #888;
-            border: 1px solid #333;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-left: 8px;
+        .countdown-text {
+            font-size: 11px;
+            color: #666;
+            margin-top: 12px;
         }
 
         /* Changelog */
@@ -311,10 +327,28 @@
             </div>
         </div>
 
-        <!-- Error State (auto-continue after error) -->
+        <!-- Error State - Update Failed -->
         <div class="error-state" id="errorState" style="display:none;">
-            <div class="error-icon"><i class="bi bi-exclamation-circle"></i></div>
-            <div class="error-text" id="errorText">Could not check for updates</div>
+            <div class="error-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div class="error-title">Không thể cập nhật</div>
+            <div class="error-text" id="errorText">
+                Đã thử tải 3 lần nhưng không thành công.<br>
+                Vui lòng kiểm tra kết nối mạng hoặc liên hệ hỗ trợ.
+            </div>
+            <div class="error-contact">
+                Trang hỗ trợ đã được mở trong trình duyệt của bạn.
+            </div>
+            <div>
+                <button class="btn-contact" onclick="openContact()">
+                    <i class="bi bi-headset"></i> Mở trang hỗ trợ
+                </button>
+                <button class="btn-exit" onclick="exitApp()">
+                    <i class="bi bi-x-lg"></i> Thoát
+                </button>
+            </div>
+            <div class="countdown-text" id="countdownText">
+                Ứng dụng sẽ tự đóng sau <span id="countdown">30</span> giây
+            </div>
         </div>
 
         <!-- Version Info -->
@@ -329,6 +363,8 @@
         // Get version from main process
         let currentVersion = '1.0.0';
         let updateInfo = null;
+        let contactUrl = 'https://kingcongstudio.com/lien-he';
+        let countdownInterval = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
@@ -337,6 +373,13 @@
                 if (window.electronAPI && window.electronAPI.getVersion) {
                     currentVersion = await window.electronAPI.getVersion();
                     document.getElementById('currentVersion').textContent = currentVersion;
+                }
+
+                // Listen for update failed event
+                if (window.electronAPI && window.electronAPI.onUpdateFailed) {
+                    window.electronAPI.onUpdateFailed((data) => {
+                        showUpdateFailed(data);
+                    });
                 }
 
                 // Start update check
@@ -348,7 +391,7 @@
         });
 
         async function checkForUpdates() {
-            setStatus('checking', 'Checking for updates...', 'Connecting to server');
+            setStatus('checking', 'Đang kiểm tra cập nhật...', 'Kết nối đến server');
 
             try {
                 if (window.electronAPI && window.electronAPI.checkForUpdates) {
@@ -357,7 +400,7 @@
                     if (result.updateAvailable) {
                         updateInfo = result;
                         // Auto update - không cần xác nhận
-                        setStatus('downloading', 'Update available!', `Downloading v${result.version}...`);
+                        setStatus('downloading', 'Có bản cập nhật mới!', `Đang tải v${result.version}...`);
 
                         // Hiển thị changelog
                         if (result.changelog && result.changelog.length > 0) {
@@ -367,23 +410,23 @@
                                 `</div>`;
                         }
 
-                        // Tự động mở trang download sau 2 giây
+                        // Tự động bắt đầu tải sau 2 giây
                         setTimeout(async () => {
                             await startUpdate();
                         }, 2000);
                     } else {
-                        setStatus('success', 'You\'re up to date!', 'Launching application...');
+                        setStatus('success', 'Đã cập nhật!', 'Đang khởi động...');
                         setTimeout(() => continueToApp(), 1500);
                     }
                 } else {
                     // No API available, continue to app
-                    setStatus('success', 'Ready', 'Launching application...');
+                    setStatus('success', 'Sẵn sàng', 'Đang khởi động...');
                     setTimeout(() => continueToApp(), 1000);
                 }
             } catch (error) {
                 console.error('Update check error:', error);
                 // Nếu lỗi kiểm tra update, vẫn tiếp tục vào app
-                setStatus('success', 'Ready', 'Launching application...');
+                setStatus('success', 'Sẵn sàng', 'Đang khởi động...');
                 setTimeout(() => continueToApp(), 1500);
             }
         }
@@ -429,9 +472,66 @@
         }
 
         function showError(message) {
-            setStatus('error', 'Error', message);
+            setStatus('error', 'Lỗi', message);
+        }
+
+        function showUpdateFailed(data) {
+            // Hide other elements
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('updateAvailable').style.display = 'none';
+
+            // Update status
+            setStatus('error', 'Cập nhật thất bại', 'Không thể tải bản cập nhật');
+
+            // Show error state
             document.getElementById('errorState').style.display = 'block';
-            document.getElementById('errorText').textContent = message;
+
+            if (data.message) {
+                document.getElementById('errorText').innerHTML = data.message;
+            }
+
+            if (data.contactUrl) {
+                contactUrl = data.contactUrl;
+            }
+
+            // Start countdown to auto-close app
+            startCountdown(30);
+        }
+
+        function startCountdown(seconds) {
+            let remaining = seconds;
+            const countdownEl = document.getElementById('countdown');
+
+            countdownInterval = setInterval(() => {
+                remaining--;
+                countdownEl.textContent = remaining;
+
+                if (remaining <= 0) {
+                    clearInterval(countdownInterval);
+                    exitApp();
+                }
+            }, 1000);
+        }
+
+        function openContact() {
+            // Open contact URL in default browser
+            if (window.electronAPI && window.electronAPI.openExternal) {
+                window.electronAPI.openExternal(contactUrl);
+            } else {
+                window.open(contactUrl, '_blank');
+            }
+        }
+
+        function exitApp() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            // Quit the app
+            if (window.electronAPI && window.electronAPI.quitApp) {
+                window.electronAPI.quitApp();
+            } else {
+                window.close();
+            }
         }
 
         async function startUpdate() {
@@ -440,10 +540,10 @@
                 return;
             }
 
-            setStatus('downloading', 'Updating...', 'Downloading latest version');
+            setStatus('downloading', 'Đang cập nhật...', 'Tải phiên bản mới nhất');
             document.getElementById('progressContainer').style.display = 'block';
-            document.getElementById('progressFill').style.width = '10%';
-            document.getElementById('progressText').textContent = 'Starting...';
+            document.getElementById('progressFill').style.width = '5%';
+            document.getElementById('progressText').textContent = 'Bắt đầu...';
 
             try {
                 if (window.electronAPI && window.electronAPI.downloadUpdate) {
@@ -451,25 +551,35 @@
 
                     if (result.success) {
                         // Update thành công - app sẽ tự restart
-                        setStatus('success', 'Update complete!', 'Restarting...');
+                        setStatus('success', 'Cập nhật hoàn tất!', 'Đang khởi động lại...');
                         document.getElementById('progressFill').style.width = '100%';
-                        document.getElementById('progressText').textContent = 'Restarting...';
-                        // App sẽ tự restart từ main.js
+                        document.getElementById('progressText').textContent = 'Đang khởi động lại...';
+                        // App sẽ tự quit và exe mới sẽ chạy từ main.js
+                    } else if (result.openedContact) {
+                        // Update thất bại sau 3 lần thử - đã mở trang liên hệ
+                        // UI đã được update qua event 'update-failed'
+                        console.error('Update failed after retries:', result.error);
                     } else {
-                        // Update thất bại, tiếp tục vào app
-                        console.warn('Update failed:', result.error);
-                        setStatus('success', 'Ready', 'Launching application...');
-                        setTimeout(() => continueToApp(), 1000);
+                        // Update thất bại vì lý do khác
+                        showUpdateFailed({
+                            message: 'Lỗi không xác định khi cập nhật.<br>Vui lòng thử lại sau.',
+                            contactUrl: contactUrl
+                        });
                     }
                 } else {
-                    continueToApp();
+                    // Không có API, không thể update
+                    showUpdateFailed({
+                        message: 'Không thể kết nối đến hệ thống cập nhật.',
+                        contactUrl: contactUrl
+                    });
                 }
 
             } catch (error) {
                 console.error('Download error:', error);
-                // Nếu lỗi, vẫn tiếp tục vào app
-                setStatus('success', 'Ready', 'Launching application...');
-                setTimeout(() => continueToApp(), 1500);
+                showUpdateFailed({
+                    message: `Lỗi tải cập nhật: ${error.message}`,
+                    contactUrl: contactUrl
+                });
             }
         }
 

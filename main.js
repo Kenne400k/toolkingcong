@@ -27,9 +27,13 @@ function getLocalVersion() {
 }
 
 const APP_VERSION = getLocalVersion();
-const GITHUB_OWNER = 'Kenne400k';
-const GITHUB_REPO = 'toolkingcong';
-const UPDATE_CHECK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/version.json`;
+
+// =================== AUTO UPDATE CONFIG ===================
+const UPDATE_SERVER_BASE = 'https://kingcongstudio.com/serverkingcong_tools';
+const UPDATE_CHECK_URL = `${UPDATE_SERVER_BASE}/version.json`;
+const UPDATE_EXE_URL = (version) => `${UPDATE_SERVER_BASE}/exeupdate/${version}.exe`;
+const CONTACT_URL = 'https://kingcongstudio.com/lien-he'; // Trang liên hệ khi update fail
+const MAX_RETRY_ATTEMPTS = 3;
 
 // ⚠️ IMPORTANT: Load from environment variables
 // For development, create a .env file (see .env.example)
@@ -154,57 +158,232 @@ function compareVersions(v1, v2) {
 }
 
 async function downloadUpdate(updateInfo) {
+  const fetch = require('node-fetch');
   const { exec } = require('child_process');
-  const util = require('util');
-  const execPromise = util.promisify(exec);
+  const os = require('os');
 
-  try {
-    console.log('🔄 Auto-updating via git pull...');
+  const version = updateInfo.version;
+  const downloadUrl = UPDATE_EXE_URL(version);
+  const tempDir = os.tmpdir();
+  const tempExePath = path.join(tempDir, `KingCong_Update_${version}.exe`);
+  const currentExePath = app.getPath('exe');
+  const updaterBatPath = path.join(tempDir, 'kingcong_updater.bat');
 
-    // Notify splash about progress
-    if (splashWindow && !splashWindow.isDestroyed()) {
-      splashWindow.webContents.send('update-progress', { percent: 30, status: 'Pulling updates...' });
-    }
+  console.log(`🔄 Downloading update v${version} from: ${downloadUrl}`);
 
-    // Try git pull first
+  // Retry logic
+  for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
     try {
-      const { stdout } = await execPromise('git pull origin main', {
-        cwd: __dirname
-      });
-      console.log('✅ Git pull output:', stdout);
-    } catch (pullError) {
-      // If pull fails (conflict/unmerged), force reset to remote
-      console.log('⚠️ Git pull failed, forcing reset to remote...');
+      console.log(`📥 Download attempt ${attempt}/${MAX_RETRY_ATTEMPTS}...`);
 
       if (splashWindow && !splashWindow.isDestroyed()) {
-        splashWindow.webContents.send('update-progress', { percent: 50, status: 'Resolving conflicts...' });
+        splashWindow.webContents.send('update-progress', {
+          percent: 5,
+          status: `Đang tải... (Lần ${attempt}/${MAX_RETRY_ATTEMPTS})`
+        });
       }
 
-      await execPromise('git fetch origin', { cwd: __dirname });
-      await execPromise('git reset --hard origin/main', { cwd: __dirname });
-      console.log('✅ Force reset to origin/main successful');
+      // Download file với progress tracking
+      const response = await fetch(downloadUrl);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const contentLength = parseInt(response.headers.get('content-length'), 10);
+      let downloadedBytes = 0;
+      const chunks = [];
+
+      // Stream download với progress
+      for await (const chunk of response.body) {
+        chunks.push(chunk);
+        downloadedBytes += chunk.length;
+
+        if (contentLength && splashWindow && !splashWindow.isDestroyed()) {
+          const percent = Math.round((downloadedBytes / contentLength) * 90) + 5; // 5-95%
+          const downloadedMB = (downloadedBytes / 1024 / 1024).toFixed(1);
+          const totalMB = (contentLength / 1024 / 1024).toFixed(1);
+
+          splashWindow.webContents.send('update-progress', {
+            percent,
+            status: `Đang tải... ${downloadedMB}/${totalMB} MB`
+          });
+        }
+      }
+
+      // Combine chunks and save to file
+      const buffer = Buffer.concat(chunks);
+
+      // Verify file size (if provided in bytes)
+      if (updateInfo.size && typeof updateInfo.size === 'number' && buffer.length < updateInfo.size * 0.9) {
+        throw new Error('File tải về không đầy đủ');
+      }
+
+      // Verify checksum if provided
+      if (updateInfo.checksum) {
+        const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+        const expectedHash = updateInfo.checksum.replace('sha256:', '');
+
+        if (hash !== expectedHash) {
+          throw new Error('Checksum không khớp - file có thể bị lỗi');
+        }
+        console.log('✅ Checksum verified');
+      }
+
+      // Save file
+      fs.writeFileSync(tempExePath, buffer);
+      console.log(`✅ Downloaded to: ${tempExePath}`);
+
+      if (splashWindow && !splashWindow.isDestroyed()) {
+        splashWindow.webContents.send('update-progress', {
+          percent: 98,
+          status: 'Đang cài đặt bản cập nhật...'
+        });
+      }
+
+      // Create updater batch script
+      // This script will:
+      // 1. Wait for current app to close
+      // 2. Replace exe with new one
+      // 3. Start new exe
+      // 4. Clean up
+
+      // Escape paths for batch file (use double backslashes or quotes)
+      const exeName = path.basename(currentExePath);
+      const currentExePathEscaped = currentExePath.replace(/\\/g, '\\\\');
+      const tempExePathEscaped = tempExePath.replace(/\\/g, '\\\\');
+
+      const batchScript = `@echo off
+chcp 65001 >nul
+title KingCong Auto Updater
+echo ========================================
+echo    KingCong Auto Updater
+echo ========================================
+echo.
+echo Dang cap nhat, vui long doi...
+echo.
+
+set "CURRENT_EXE=${currentExePathEscaped}"
+set "NEW_EXE=${tempExePathEscaped}"
+set "EXE_NAME=${exeName}"
+
+:: Wait for old process to exit (max 30 seconds)
+set /a count=0
+:waitloop
+tasklist /FI "IMAGENAME eq %EXE_NAME%" 2>NUL | find /I /N "%EXE_NAME%" >NUL
+if "%ERRORLEVEL%"=="0" (
+    set /a count+=1
+    if %count% geq 30 (
+        echo Timeout doi app dong. Dang tiep tuc...
+        goto :continue
+    )
+    echo Dang doi app dong... [%count%/30]
+    timeout /t 1 /nobreak >nul
+    goto :waitloop
+)
+
+:continue
+echo.
+echo Dang thay the file...
+
+:: Backup old exe
+if exist "%CURRENT_EXE%.bak" del /f /q "%CURRENT_EXE%.bak" >nul 2>&1
+move /y "%CURRENT_EXE%" "%CURRENT_EXE%.bak" >nul 2>&1
+
+:: Copy new exe
+copy /y "%NEW_EXE%" "%CURRENT_EXE%" >nul 2>&1
+
+if %ERRORLEVEL% neq 0 (
+    echo LOI: Khong the copy file!
+    echo Dang khoi phuc...
+    move /y "%CURRENT_EXE%.bak" "%CURRENT_EXE%" >nul 2>&1
+    echo Vui long thu lai sau.
+    timeout /t 5
+    exit /b 1
+)
+
+echo.
+echo ========================================
+echo    Cap nhat thanh cong!
+echo ========================================
+echo.
+echo Dang khoi dong lai...
+timeout /t 2 /nobreak >nul
+
+:: Start new app
+start "" "%CURRENT_EXE%"
+
+:: Clean up
+timeout /t 3 /nobreak >nul
+del /f /q "%NEW_EXE%" >nul 2>&1
+del /f /q "%CURRENT_EXE%.bak" >nul 2>&1
+
+:: Self-delete this batch file
+(goto) 2>nul & del "%~f0"
+`;
+
+      fs.writeFileSync(updaterBatPath, batchScript, 'utf8');
+      console.log(`✅ Updater script created: ${updaterBatPath}`);
+
+      // Run updater batch (hidden window)
+      console.log('🚀 Launching updater...');
+      exec(`start /min "" "${updaterBatPath}"`, { windowsHide: true });
+
+      if (splashWindow && !splashWindow.isDestroyed()) {
+        splashWindow.webContents.send('update-progress', {
+          percent: 100,
+          status: 'Đang khởi động lại...'
+        });
+      }
+
+      // Wait a bit then quit current app
+      setTimeout(() => {
+        console.log('👋 Closing app for update...');
+        app.quit();
+      }, 2000);
+
+      return { success: true, message: 'Update downloaded, installing...' };
+
+    } catch (error) {
+      console.error(`❌ Download attempt ${attempt} failed:`, error.message);
+
+      if (attempt < MAX_RETRY_ATTEMPTS) {
+        // Wait before retry (exponential backoff)
+        const waitTime = attempt * 2000;
+        console.log(`⏳ Waiting ${waitTime/1000}s before retry...`);
+
+        if (splashWindow && !splashWindow.isDestroyed()) {
+          splashWindow.webContents.send('update-progress', {
+            percent: 0,
+            status: `Lỗi tải. Thử lại sau ${waitTime/1000}s...`
+          });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      } else {
+        // All retries failed - open contact page
+        console.error('❌ All download attempts failed. Opening contact page...');
+
+        if (splashWindow && !splashWindow.isDestroyed()) {
+          splashWindow.webContents.send('update-failed', {
+            message: 'Không thể tải bản cập nhật. Vui lòng liên hệ hỗ trợ.',
+            contactUrl: CONTACT_URL
+          });
+        }
+
+        // Open browser to contact page
+        shell.openExternal(CONTACT_URL);
+
+        return {
+          success: false,
+          error: 'Download failed after all retries',
+          openedContact: true
+        };
+      }
     }
-
-    if (splashWindow && !splashWindow.isDestroyed()) {
-      splashWindow.webContents.send('update-progress', { percent: 100, status: 'Update complete!' });
-    }
-
-    // Update successful - need to restart app
-    console.log('🔄 Update complete! Restarting app...');
-
-    setTimeout(() => {
-      app.relaunch();
-      app.exit(0);
-    }, 1500);
-
-    return { success: true, message: 'Updated successfully' };
-
-  } catch (error) {
-    console.error('❌ Auto-update error:', error);
-
-    // Fallback: try to continue anyway
-    return { success: false, error: error.message };
   }
+
+  return { success: false, error: 'Unknown error' };
 }
 
 function finishSplashAndShowMain() {
@@ -1171,6 +1350,18 @@ ipcMain.handle('download-update', async (event, updateInfo) => {
 
 ipcMain.handle('finish-splash', async () => {
   finishSplashAndShowMain();
+  return { success: true };
+});
+
+// Quit app from splash when update fails
+ipcMain.handle('quit-app', async () => {
+  app.quit();
+  return { success: true };
+});
+
+// Open external URL
+ipcMain.handle('open-external', async (event, url) => {
+  shell.openExternal(url);
   return { success: true };
 });
 

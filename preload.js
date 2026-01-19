@@ -76,6 +76,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   downloadUpdate: (updateInfo) => ipcRenderer.invoke('download-update', updateInfo),
   finishSplash: () => ipcRenderer.invoke('finish-splash'),
+  quitApp: () => ipcRenderer.invoke('quit-app'),
+  openExternal: (url) => ipcRenderer.invoke('open-external', url),
   onUpdateProgress: (callback) => ipcRenderer.on('update-progress', (event, progress) => callback(progress)),
-  onUpdateComplete: (callback) => ipcRenderer.on('update-complete', (event, success) => callback(success))
+  onUpdateComplete: (callback) => ipcRenderer.on('update-complete', (event, success) => callback(success)),
+  onUpdateFailed: (callback) => ipcRenderer.on('update-failed', (event, data) => callback(data))
 });
