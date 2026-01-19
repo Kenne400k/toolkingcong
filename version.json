@@ -1,9 +1,8 @@
 {
-  "version": "1.10.49",
+  "version": "1.10.50",
   "changelog": [
-    "Fix dropdown z-index issue - move menu to body element when opening",
-    "Fix dropdown auto-close when selecting provider (ElevenLabs/Minimax)",
-    "Add comprehensive light theme support for tool-voice-cloning.html"
+    "Fix hardcoded version header to use dynamic APP_VERSION",
+    "Hide AI33 and AI84 server tags from voice cloning cards"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0"

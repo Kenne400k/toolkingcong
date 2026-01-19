@@ -481,7 +481,7 @@ ipcMain.handle('api-request', async (event, urlOrObject, data) => {
     // 🔥 Thêm header để backend biết đây là request từ Electron Tool
     // Backend có thể check header này để áp dụng rate limit 20/min thay vì 10/min
     headers['X-Client'] = 'kingcong-electron-tool';
-    headers['X-Tool-Version'] = '1.0.0';
+    headers['X-Tool-Version'] = APP_VERSION;
 
     console.log(`📡 API Request: ${API_ENDPOINT}`);
 

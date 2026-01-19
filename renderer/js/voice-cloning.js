@@ -367,7 +367,7 @@ function renderGrid(list) {
         let extraTags = v.tags || v.tag_list;
         if (extraTags && Array.isArray(extraTags)) {
             tagsHtml += extraTags
-                .filter(t => t !== 'AI84')
+                .filter(t => t !== 'AI84' && t !== 'AI33')
                 .map(t => `<span class="vc-tag">${t}</span>`)
                 .join('');
         }
