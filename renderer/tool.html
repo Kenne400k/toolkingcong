@@ -830,6 +830,7 @@
         /* Provider Dropdown Menu */
         .provider-dropdown {
             position: relative;
+            z-index: 1000;
         }
 
         .provider-menu {
@@ -842,8 +843,9 @@
             border: 1px solid #222;
             border-radius: 8px;
             overflow: hidden;
-            z-index: 100;
+            z-index: 9999;
             display: none;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
         }
 
         .provider-dropdown.open .provider-menu {
@@ -2808,7 +2810,7 @@
         }
 
         html.light .bk-btn-action {
-            background: var(--bg-main);
+            background: var(--bg-tertiary);
             border-color: var(--border);
             color: var(--text);
         }
@@ -2831,14 +2833,54 @@
         }
 
         html.light .bk-download-btn {
+            background: var(--bg-secondary);
             border-color: var(--border);
-            color: var(--text-dim);
+            color: var(--text);
         }
 
         html.light .bk-download-btn:hover {
             background: var(--hover-bg);
             border-color: var(--border-dark);
             color: var(--text);
+        }
+
+        html.light .bk-delete-btn {
+            color: var(--text-dim);
+        }
+
+        html.light .bk-delete-btn:hover {
+            color: #b91c1c;
+        }
+
+        html.light .bk-provider-icon {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+        }
+
+        html.light .bk-play-btn {
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .bk-progress-track {
+            background: var(--bg-tertiary);
+        }
+
+        html.light .bk-progress-bar {
+            background: var(--primary);
+        }
+
+        html.light input[type="range"] {
+            background: var(--bg-tertiary);
+        }
+
+        html.light input[type="range"]::-webkit-slider-thumb {
+            background: var(--primary);
+        }
+
+        html.light input[type="range"]::-moz-range-thumb {
+            background: var(--primary);
+            border: none;
         }
 
         html.light .confirm-modal-overlay {

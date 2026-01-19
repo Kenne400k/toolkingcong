@@ -4724,9 +4724,12 @@ function checkIsV3() {
 }
 
 function updateSlider(type) {
+    const isLight = document.documentElement.classList.contains('light');
+    let sliderId = null;
     switch (type) {
         case 'speed':
             document.getElementById('speedValue').textContent = parseFloat(document.getElementById('voiceSpeed').value).toFixed(2);
+            sliderId = 'voiceSpeed';
             break;
         case 'stability':
             const stabVal = parseInt(document.getElementById('voiceStability').value);
@@ -4745,24 +4748,40 @@ function updateSlider(type) {
             } else {
                 stabDisplay.textContent = stabVal + '%';
             }
-            stabDisplay.style.color = '#fff';
+            stabDisplay.style.color = isLight ? '#1f2937' : '#fff';
+            sliderId = 'voiceStability';
             break;
         case 'similarity':
             document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value + '%';
+            sliderId = 'voiceSimilarity';
             break;
         case 'style':
             document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value + '%';
+            sliderId = 'voiceStyle';
             break;
         // Minimax sliders
         case 'mmSpeed':
             document.getElementById('mmSpeedValue').textContent = parseFloat(document.getElementById('mmVoiceSpeed').value).toFixed(2);
+            sliderId = 'mmVoiceSpeed';
             break;
         case 'mmPitch':
             document.getElementById('mmPitchValue').textContent = document.getElementById('mmVoicePitch').value;
+            sliderId = 'mmVoicePitch';
             break;
         case 'mmVol':
             document.getElementById('mmVolValue').textContent = parseFloat(document.getElementById('mmVoiceVol').value).toFixed(2);
+            sliderId = 'mmVoiceVol';
             break;
+    }
+
+    const slider = sliderId ? document.getElementById(sliderId) : null;
+    if (slider) {
+        const min = parseFloat(slider.min || 0);
+        const max = parseFloat(slider.max || 100);
+        const val = parseFloat(slider.value || min);
+        const percent = max === min ? 0 : ((val - min) / (max - min)) * 100;
+        const trackColor = isLight ? 'var(--bg-tertiary)' : '#1a1a1a';
+        slider.style.background = `linear-gradient(90deg, var(--primary) ${percent}%, ${trackColor} ${percent}%)`;
     }
 }
 
