@@ -14,19 +14,239 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        :root {
+        /* Dark Mode (default) */
+        :root,
+        html.dark {
             --primary: #a855f7;
             --accent: #667eea;
             --bg-main: #0a0a0a;
             --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
             --border: #2a2a2a;
             --text: #e5e5e5;
             --text-dim: #888;
+            --text-muted: #555;
+            --input-bg: #000;
+            --hover-bg: #111;
+            --scrollbar: #333;
+        }
+
+        /* Light Mode */
+        html.light {
+            --primary: #9333ea;
+            --accent: #4f46e5;
+            --bg-main: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e5e5e5;
+            --border: #d1d5db;
+            --text: #1f2937;
+            --text-dim: #6b7280;
+            --text-muted: #9ca3af;
+            --input-bg: #ffffff;
+            --hover-bg: #f3f4f6;
+            --scrollbar: #d1d5db;
+        }
+
+        /* Light mode component overrides */
+        html.light .top-bar {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .top-bar-title {
+            color: var(--text);
+        }
+
+        html.light .clone-container {
+            background: var(--bg-main);
+        }
+
+        html.light .form-panel,
+        html.light .library-area {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .section-header {
+            border-color: var(--border);
+        }
+
+        html.light .section-title {
+            color: var(--text);
+        }
+
+        html.light .info-banner {
+            background: rgba(147, 51, 234, 0.08);
+            border-color: rgba(147, 51, 234, 0.2);
+            color: var(--text-secondary);
+        }
+
+        html.light .info-banner strong {
+            color: var(--text);
+        }
+
+        html.light .form-group label {
+            color: var(--text);
+        }
+
+        html.light .form-input,
+        html.light .form-textarea,
+        html.light .dropdown-selected,
+        html.light .dropdown-search input {
+            background: var(--input-bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .form-input:focus,
+        html.light .form-textarea:focus {
+            border-color: var(--primary);
+        }
+
+        html.light .upload-box {
+            border-color: var(--border);
+        }
+
+        html.light .upload-box:hover {
+            border-color: var(--primary);
+            background: rgba(147, 51, 234, 0.05);
+        }
+
+        html.light .upload-text {
+            color: var(--text-dim);
+        }
+
+        html.light .upload-hint {
+            color: var(--text-muted);
+        }
+
+        html.light .file-preview-card {
+            background: var(--bg-tertiary);
+            border-color: var(--border);
+        }
+
+        html.light .file-name {
+            color: var(--text);
+        }
+
+        html.light .file-size {
+            color: var(--text-dim);
+        }
+
+        html.light .dropdown-options {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .dropdown-item {
+            color: var(--text);
+        }
+
+        html.light .dropdown-item:hover {
+            background: var(--hover-bg);
+        }
+
+        html.light .voice-card {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .voice-card:hover {
+            border-color: var(--border);
+        }
+
+        html.light .vc-title {
+            color: var(--text);
+        }
+
+        html.light .vc-tag {
+            background: rgba(147, 51, 234, 0.1);
+            border-color: rgba(147, 51, 234, 0.2);
+            color: var(--text-dim);
+        }
+
+        html.light .btn-icon-action {
+            background: var(--bg-tertiary);
+            border-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .btn-icon-action:hover {
+            background: var(--hover-bg);
+            color: var(--text);
+        }
+
+        html.light .btn-refresh {
+            background: var(--bg-tertiary);
+            border-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .btn-refresh:hover {
+            background: var(--hover-bg);
+            color: var(--text);
+        }
+
+        html.light .empty-state {
+            color: var(--text-dim);
+        }
+
+        html.light .empty-state .title {
+            color: var(--text);
+        }
+
+        html.light .modal-content {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .modal-header {
+            border-color: var(--border);
+        }
+
+        html.light .modal-header h3 {
+            color: var(--text);
+        }
+
+        html.light .modal-body {
+            color: var(--text);
+        }
+
+        html.light .btn-cancel {
+            border-color: var(--border);
+            color: var(--text-dim);
+        }
+
+        html.light .btn-cancel:hover {
+            background: var(--hover-bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .loading-text {
+            color: var(--text);
+        }
+
+        html.light .loading-hint {
+            color: var(--text-dim);
+        }
+
+        html.light .toast-notification {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        html.light .toast-content {
+            color: var(--text);
+        }
+
+        html.light ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar);
         }
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 4px; }
 
         body {
             background: var(--bg-main);

@@ -9,6 +9,7 @@ class Dashboard {
             pending: 0,
             successRate: 0
         };
+        this.hasAnimated = false;
         this.api = window.apiHandler; // Use centralized API handler
         this.init();
     }
@@ -429,7 +430,14 @@ async updateUserInfo() {
             // 🔥 FIX: Luôn hiện dashboard khi tắt loading
             dashboard.classList.remove('hidden');
             dashboard.classList.add('flex');
+            this.activateDashboardAnimations();
         }
+    }
+
+    activateDashboardAnimations() {
+        if (this.hasAnimated) return;
+        document.body.classList.add('dashboard-ready');
+        this.hasAnimated = true;
     }
 
     showError(message) {

@@ -5767,3 +5767,190 @@ input.vm-search-input:focus,
         font-size: 10px;
     }
 }
+
+/* ==========================================
+   ✨ MICRO-INTERACTIONS & SUPER ANIMATIONS
+   ========================================== */
+@keyframes ttsSlideInLeft {
+    from { opacity: 0; transform: translateX(-18px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes ttsSlideInRight {
+    from { opacity: 0; transform: translateX(18px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes ttsDropIn {
+    from { opacity: 0; transform: translateY(-14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ttsFadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ttsScaleIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes ttsModalPop {
+    0% { opacity: 0; transform: translateY(18px) scale(0.96); }
+    60% { opacity: 1; transform: translateY(-4px) scale(1.01); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ttsGlowPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(168, 85, 247, 0); }
+    50% { box-shadow: 0 0 24px rgba(168, 85, 247, 0.35); }
+}
+
+@keyframes ttsSheen {
+    0% { transform: translateX(-120%) skewX(-12deg); opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { transform: translateX(120%) skewX(-12deg); opacity: 0; }
+}
+
+@keyframes ttsSelectPop {
+    0% { transform: scale(0.96); }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+body.tts-boot #app-sidebar {
+    animation: ttsSlideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    will-change: transform, opacity;
+}
+
+body.tts-boot #app-header {
+    animation: ttsDropIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 0.03s;
+}
+
+body.tts-boot .tts-container {
+    animation: ttsFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 0.06s;
+}
+
+body.tts-boot .input-area {
+    animation: ttsScaleIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 0.1s;
+}
+
+body.tts-boot .sidebar-panel {
+    animation: ttsSlideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: 0.12s;
+}
+
+.input-area:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(168, 85, 247, 0.35);
+}
+
+.textarea-wrapper:focus-within::before {
+    filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.35));
+}
+
+.tab-btn:hover,
+.upload-btn:hover,
+.reset-btn:hover,
+.provider-dropdown-btn:hover,
+.custom-select:hover,
+.lang-selector-dropdown:hover,
+.filter-btn-wrapper .dropdown-btn:hover,
+.bulk-btn-process:hover,
+.bulk-confirm-btn:hover,
+.bulk-btn-clear:hover,
+.bulk-btn-remove:hover,
+.bulk-modal-close:hover,
+.dh-btn-action:hover:not(:disabled),
+.hc-download-btn:hover,
+.hc-action-btn:hover,
+.dh-remake-btn:hover,
+.dh-download-btn:hover,
+.dh-delete-btn:hover,
+.btn-cancel:hover,
+.btn-confirm-delete:hover,
+#folderCancelBtn:hover,
+#folderUploadBtn:hover {
+    transform: translateY(-2px);
+}
+
+.tab-btn:active,
+.upload-btn:active,
+.reset-btn:active,
+.provider-dropdown-btn:active,
+.custom-select:active,
+.lang-selector-dropdown:active,
+.filter-btn-wrapper .dropdown-btn:active,
+.bulk-btn-process:active,
+.bulk-confirm-btn:active,
+.bulk-btn-clear:active,
+.bulk-btn-remove:active,
+.bulk-modal-close:active,
+.dh-btn-action:active,
+.hc-download-btn:active,
+.hc-action-btn:active,
+.dh-remake-btn:active,
+.dh-download-btn:active,
+.dh-delete-btn:active,
+.btn-cancel:active,
+.btn-confirm-delete:active,
+#folderCancelBtn:active,
+#folderUploadBtn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.voice-card:hover,
+.history-card:hover,
+.dh-row:hover {
+    transform: translateY(-2px);
+}
+
+.voice-card.selected {
+    animation: ttsSelectPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-generate:not(:disabled),
+.bulk-btn-process:not(:disabled),
+.bulk-confirm-btn-confirm:not(:disabled) {
+    position: relative;
+    overflow: hidden;
+    animation: ttsGlowPulse 3s ease-in-out infinite;
+}
+
+.btn-generate::after,
+.bulk-btn-process::after,
+.bulk-confirm-btn-confirm::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -120%;
+    width: 60%;
+    height: 140%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    opacity: 0;
+}
+
+.btn-generate:hover::after,
+.bulk-btn-process:hover::after,
+.bulk-confirm-btn-confirm:hover::after {
+    animation: ttsSheen 0.8s ease;
+}
+
+.voice-modal-content,
+.bulk-modal-content,
+.delete-modal-box,
+.folder-confirm-box,
+.dh-modal-content,
+.modern-popup-container,
+.srt-modal-box {
+    animation: ttsModalPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    will-change: transform, opacity;
+}
+
+.bulk-confirm-overlay.show .bulk-confirm-box {
+    animation: ttsModalPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

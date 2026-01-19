@@ -219,12 +219,111 @@
             to { transform: rotate(360deg); }
         }
 
+        /* =================== LIGHT THEME =================== */
+        html.light body {
+            background: var(--bg-main);
+            color: var(--text);
+        }
+
+        html.light .modal-header {
+            border-bottom-color: var(--border);
+        }
+
+        html.light .modal-header h3 {
+            color: var(--text);
+        }
+
+        html.light .modal-close {
+            color: var(--text-dim);
+        }
+
+        html.light .modal-close:hover {
+            color: var(--text);
+        }
+
+        html.light .voice-tabs {
+            border-bottom-color: var(--border);
+        }
+
+        html.light .voice-tab {
+            color: var(--text-dim);
+        }
+
+        html.light .voice-tab:hover {
+            color: var(--text);
+        }
+
+        html.light .voice-tab.active {
+            color: var(--text);
+            border-bottom-color: var(--primary);
+        }
+
+        html.light .form-input {
+            background: var(--input-bg);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        html.light .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        html.light .btn {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        html.light .btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--border);
+        }
+
+        html.light .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        html.light .btn-primary:hover {
+            background: #7c3aed;
+        }
+
+        html.light .voice-item {
+            border-bottom-color: var(--border);
+        }
+
+        html.light .voice-item:hover {
+            background: var(--hover-bg);
+        }
+
+        html.light .voice-item .name {
+            color: var(--text);
+        }
+
+        html.light .voice-item .id,
+        html.light .voice-item .labels,
+        html.light .count-info,
+        html.light .loading,
+        html.light .empty-state {
+            color: var(--text-dim);
+        }
+
+        html.light .spinner {
+            border-color: var(--border);
+            border-top-color: var(--primary);
+        }
+
         #previewAudio { display: none; }
     </style>
     <link rel="stylesheet" href="css/theme.css">
 </head>
 
-<body class="force-dark">
+<body>
     <div class="modal-header">
         <h3>
             <img id="providerLogo" src="https://avatars.githubusercontent.com/u/94471909?s=280&v=4" alt="">

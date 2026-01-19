@@ -3840,8 +3840,15 @@ function selectProvider(provider) {
     proTool.provider = provider;
     document.getElementById('providerSelect').value = provider;
 
-    // Update dropdown UI
+    // Update dropdown UI and cleanup menu properly
     const dropdown = document.getElementById('providerDropdown');
+    const menu = document.querySelector('.provider-menu');
+    if (menu) {
+        menu.classList.remove('show');
+        if (dropdown) {
+            dropdown.appendChild(menu);
+        }
+    }
     dropdown.classList.remove('open');
 
     // Update selected display - dùng đúng URL logo như TTS
