@@ -1688,3 +1688,492 @@ html.light .dh-loading-more-spinner {
     border-top-color: var(--primary);
 }
 
+/* =================== INLINE LIGHT OVERRIDES =================== */
+html.light #uploadDropdown {
+    background: var(--bg-main) !important;
+    border-color: var(--border) !important;
+    box-shadow: var(--shadow-lg);
+}
+
+html.light #uploadDropdown .upload-option {
+    color: var(--text) !important;
+    border-bottom-color: var(--border) !important;
+}
+
+html.light #uploadDropdown .upload-option:hover {
+    background: var(--hover-bg) !important;
+    color: var(--text) !important;
+}
+
+html.light #creditsTooltip {
+    background: var(--bg-main) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.light #creditsTooltip div {
+    color: var(--text-dim) !important;
+}
+
+html.light #creditsTooltip span {
+    color: var(--text) !important;
+}
+
+html.light #charDisplay {
+    color: var(--text) !important;
+}
+
+html.light #charDisplay i,
+html.light #charDisplay span[data-i18n="vc_chars"] {
+    color: var(--text-dim) !important;
+}
+
+html.light #estimatedCostDisplay,
+html.light #estimatedCost {
+    color: #b45309 !important;
+}
+
+html.light .stats-display > span:not(.credits-display) {
+    color: var(--border-dark) !important;
+}
+
+html.light #historyActions .tab-btn {
+    background: var(--bg-main) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+html.light #historyActions .tab-btn:hover {
+    background: var(--hover-bg) !important;
+    border-color: var(--border-medium) !important;
+}
+
+html.light #inputLoader {
+    background: rgba(255, 255, 255, 0.85) !important;
+}
+
+html.light #inputLoader div {
+    color: var(--text) !important;
+}
+
+html.light #globalDropOverlay {
+    background: rgba(255, 255, 255, 0.92) !important;
+    color: var(--text) !important;
+}
+
+html.light #globalDropOverlay h2 {
+    color: var(--text) !important;
+}
+
+html.light #globalDropOverlay p {
+    color: var(--text-dim) !important;
+}
+
+html.light #globalDropOverlay i {
+    color: var(--primary) !important;
+}
+
+/* =================== PROVIDER & STATUS =================== */
+html.light .provider-option.provider-disabled {
+    background: var(--bg-tertiary) !important;
+    border-left-color: transparent !important;
+    opacity: 0.6 !important;
+}
+
+html.light .provider-option.provider-disabled .provider-name {
+    color: var(--text-muted) !important;
+}
+
+html.light .provider-option.provider-disabled .provider-desc {
+    color: var(--text-muted) !important;
+}
+
+html.light .maintenance-banner {
+    background: rgba(217, 119, 6, 0.08);
+    border-color: rgba(217, 119, 6, 0.25);
+}
+
+html.light .maintenance-banner-title {
+    color: #b45309;
+}
+
+html.light .maintenance-banner-content {
+    color: var(--text-secondary);
+}
+
+html.light .maintenance-banner-note {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text-dim);
+}
+
+html.light .maintenance-banner-error {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* =================== BULK UPLOAD MODAL =================== */
+html.light #bulkUploadModal {
+    background: rgba(15, 23, 42, 0.35);
+}
+
+html.light .bulk-modal-content {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .bulk-modal-header {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border);
+}
+
+html.light .bulk-modal-header h3 {
+    color: var(--text);
+}
+
+html.light .bulk-modal-close {
+    border-color: var(--border);
+    color: var(--text-dim);
+}
+
+html.light .bulk-modal-close:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+    color: var(--text);
+}
+
+html.light .bulk-notice {
+    background: rgba(217, 119, 6, 0.08);
+    border-bottom-color: rgba(217, 119, 6, 0.2);
+}
+
+html.light .bulk-notice span {
+    color: var(--text-secondary);
+}
+
+html.light .bulk-notice strong {
+    color: #b45309;
+}
+
+html.light .bulk-drop-zone {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .bulk-drop-zone:hover {
+    border-color: var(--primary);
+    background: rgba(26, 26, 26, 0.02);
+}
+
+html.light .bulk-drop-zone.dragover {
+    border-color: var(--primary);
+    background: rgba(26, 26, 26, 0.05);
+}
+
+html.light .bulk-drop-zone p {
+    color: var(--text-dim);
+}
+
+html.light .bulk-file-list-header h5 {
+    color: var(--text);
+}
+
+html.light .bulk-btn-clear {
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .bulk-btn-clear:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+}
+
+html.light .bulk-file-item {
+    border-bottom-color: var(--border);
+}
+
+html.light .bulk-file-item:hover {
+    background: var(--hover-bg);
+}
+
+html.light .bulk-file-name {
+    color: var(--text);
+}
+
+html.light .bulk-file-badge,
+html.light .bulk-file-chars {
+    color: var(--text-dim);
+}
+
+html.light .bulk-btn-remove {
+    border-color: var(--border);
+    color: var(--text-dim);
+}
+
+html.light .bulk-btn-remove:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+}
+
+html.light .bulk-summary {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .bulk-summary-label {
+    color: var(--text-dim);
+}
+
+html.light .bulk-summary-value {
+    color: var(--text);
+}
+
+html.light .bulk-summary-value.small {
+    color: var(--text-dim);
+}
+
+html.light .bulk-summary-total .bulk-summary-label {
+    color: var(--text);
+}
+
+html.light .bulk-summary-total .bulk-summary-value {
+    color: #b45309;
+}
+
+html.light .bulk-summary-balance .bulk-summary-value {
+    color: #15803d;
+}
+
+html.light .bulk-summary-divider,
+html.light .bulk-summary-total {
+    border-top-color: var(--border);
+}
+
+html.light .bulk-settings-info {
+    color: var(--text-dim);
+}
+
+html.light .bulk-settings-info {
+    border-top-color: var(--border);
+}
+
+html.light .bulk-settings-info span {
+    color: #15803d;
+}
+
+html.light .bulk-btn-process {
+    background: var(--primary);
+    color: var(--bg-main);
+    box-shadow: var(--shadow-md);
+}
+
+html.light .bulk-btn-process:hover:not(:disabled) {
+    box-shadow: var(--shadow-lg);
+}
+
+html.light .bulk-file-list-items::-webkit-scrollbar-track,
+html.light .bulk-modal-body::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+html.light .bulk-file-list-items::-webkit-scrollbar-thumb,
+html.light .bulk-modal-body::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+}
+
+html.light .bulk-file-list-items::-webkit-scrollbar-thumb:hover,
+html.light .bulk-modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--border-dark);
+}
+
+/* =================== BULK CONFIRM POPUP =================== */
+html.light .bulk-confirm-overlay {
+    background: rgba(15, 23, 42, 0.35);
+}
+
+html.light .bulk-confirm-box {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .bulk-confirm-icon {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .bulk-confirm-icon i {
+    color: var(--primary);
+}
+
+html.light .bulk-confirm-title {
+    color: var(--text);
+}
+
+html.light .bulk-confirm-message {
+    color: var(--text-secondary);
+}
+
+html.light .bulk-confirm-stats {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .bulk-confirm-stat-row {
+    border-bottom-color: var(--border);
+}
+
+html.light .bulk-confirm-stat-label {
+    color: var(--text-dim);
+}
+
+html.light .bulk-confirm-stat-value {
+    color: var(--text);
+}
+
+html.light .bulk-confirm-stat-value.highlight {
+    color: #b45309;
+}
+
+html.light .bulk-confirm-stat-value.balance {
+    color: #15803d;
+}
+
+html.light .bulk-confirm-stat-value.danger {
+    color: #b91c1c;
+}
+
+html.light .bulk-confirm-warning {
+    background: rgba(217, 119, 6, 0.08);
+    border-color: rgba(217, 119, 6, 0.25);
+}
+
+html.light .bulk-confirm-warning-text {
+    color: var(--text-secondary);
+}
+
+html.light .bulk-confirm-btn-cancel {
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .bulk-confirm-btn-cancel:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light .bulk-confirm-btn-confirm {
+    background: var(--primary);
+    color: var(--bg-main);
+}
+
+html.light .bulk-confirm-btn-confirm:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* =================== FOLDER CONFIRM POPUP =================== */
+html.light #folderConfirmPopup {
+    background: rgba(15, 23, 42, 0.35);
+}
+
+html.light .folder-confirm-box {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .folder-confirm-icon {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+}
+
+html.light .folder-confirm-icon i {
+    color: var(--text);
+}
+
+html.light #folderConfirmPopup h3 {
+    color: var(--text);
+}
+
+html.light #folderConfirmPopup p {
+    color: var(--text-dim);
+}
+
+html.light #folderFileList {
+    background: var(--bg-secondary);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light #folderCancelBtn {
+    border-color: var(--border);
+    color: var(--text);
+    background: var(--bg-main);
+}
+
+html.light #folderCancelBtn:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
+html.light #folderUploadBtn {
+    background: var(--primary);
+    color: var(--bg-main);
+}
+
+html.light #folderUploadBtn:hover {
+    background: var(--accent);
+}
+
+html.light #folderFileList::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+html.light #folderFileList::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+}
+
+html.light #folderFileList::-webkit-scrollbar-thumb:hover {
+    background: var(--border-dark);
+}
+
+/* =================== DELETE MODAL =================== */
+html.light .custom-modal-overlay {
+    background: rgba(15, 23, 42, 0.35);
+}
+
+html.light .delete-modal-box {
+    background: var(--bg-main);
+    border-color: var(--border);
+    box-shadow: var(--shadow-xl);
+}
+
+html.light .dm-header h3 {
+    color: var(--text);
+}
+
+html.light .dm-warning,
+html.light .dm-note {
+    color: var(--text-secondary);
+}
+
+html.light .dm-preview {
+    background: var(--bg-secondary);
+    border-left-color: var(--border-medium);
+    color: var(--text);
+}
+
+html.light .btn-cancel {
+    border-color: var(--border);
+    color: var(--text);
+}
+
+html.light .btn-cancel:hover {
+    background: var(--hover-bg);
+    border-color: var(--border-medium);
+}
+
