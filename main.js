@@ -12,29 +12,8 @@ const SESSION_DIR = path.join(USER_DATA_PATH, 'sessions');
 const SESSION_FILE = path.join(SESSION_DIR, 'session.json');
 
 // =================== APP VERSION ===================
-// Read version from package.json (always included in build)
-function getLocalVersion() {
-  try {
-    // Try package.json first (always exists in asar)
-    const pkgFile = path.join(__dirname, 'package.json');
-    if (fs.existsSync(pkgFile)) {
-      const pkg = JSON.parse(fs.readFileSync(pkgFile, 'utf8'));
-      if (pkg.version) return pkg.version;
-    }
-
-    // Fallback to version.json
-    const versionFile = path.join(__dirname, 'version.json');
-    if (fs.existsSync(versionFile)) {
-      const data = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
-      return data.version || '1.0.0';
-    }
-  } catch (e) {
-    console.error('Error reading version:', e.message);
-  }
-  return '1.0.0';
-}
-
-const APP_VERSION = getLocalVersion();
+// Use Electron's built-in app.getVersion() - reads from package.json automatically
+const APP_VERSION = app.getVersion();
 
 // =================== AUTO UPDATE CONFIG ===================
 const UPDATE_SERVER_BASE = 'https://kingcongstudio.com/serverkingcong_tools';
