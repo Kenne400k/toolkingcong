@@ -5,5 +5,7 @@
     "Hide AI33 and AI84 server tags from voice cloning cards"
   ],
   "forceUpdate": false,
-  "minVersion": "1.0.0"
+  "minVersion": "1.0.0",
+  "releaseUrl": "https://github.com/Kenne400k/toolkingcong/releases/download/v1.10.50/KingCong-v1.10.50.zip",
+  "fileSize": "105.95 MB"
 }
