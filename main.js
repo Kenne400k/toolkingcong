@@ -13,7 +13,7 @@ const SESSION_FILE = path.join(SESSION_DIR, 'session.json');
 
 // =================== APP VERSION ===================
 // Hardcode version - update this when releasing new version
-const APP_VERSION = '1.10.50';
+const APP_VERSION = '1.10.51';
 
 // =================== AUTO UPDATE CONFIG ===================
 const UPDATE_SERVER_BASE = 'https://kingcongstudio.com/serverkingcong_tools';
