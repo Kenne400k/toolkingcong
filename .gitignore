@@ -52,3 +52,5 @@ yarn-error.log*
 # Personal configuration
 .agent/personal/
 .agent/config/local.json
+CLAUDE.md
+server_version.json
