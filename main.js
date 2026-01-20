@@ -231,13 +231,17 @@ async function downloadUpdate(updateInfo) {
       // Create updater batch script
       // This script will:
       // 1. Wait for current app to close
-      // 2. Replace exe with new one
-      // 3. Start new exe
+      // 2. Run uninstaller (silent)
+      // 3. Run new installer (silent)
       // 4. Clean up
 
-      // Escape paths for batch file (use double backslashes or quotes)
+      // Get install directory and uninstaller path
+      const installDir = path.dirname(currentExePath);
+      const uninstallerPath = path.join(installDir, 'Uninstall KingCong TTS Tool.exe');
+
+      // Escape paths for batch file
       const exeName = path.basename(currentExePath);
-      const currentExePathEscaped = currentExePath.replace(/\\/g, '\\\\');
+      const uninstallerPathEscaped = uninstallerPath.replace(/\\/g, '\\\\');
       const tempExePathEscaped = tempExePath.replace(/\\/g, '\\\\');
 
       const batchScript = `@echo off
@@ -250,11 +254,12 @@ echo.
 echo Dang cap nhat, vui long doi...
 echo.
 
-set "CURRENT_EXE=${currentExePathEscaped}"
-set "NEW_EXE=${tempExePathEscaped}"
+set "UNINSTALLER=${uninstallerPathEscaped}"
+set "NEW_INSTALLER=${tempExePathEscaped}"
 set "EXE_NAME=${exeName}"
 
 :: Wait for old process to exit (max 30 seconds)
+echo Dang doi app dong...
 set /a count=0
 :waitloop
 tasklist /FI "IMAGENAME eq %EXE_NAME%" 2>NUL | find /I /N "%EXE_NAME%" >NUL
@@ -262,28 +267,35 @@ if "%ERRORLEVEL%"=="0" (
     set /a count+=1
     if %count% geq 30 (
         echo Timeout doi app dong. Dang tiep tuc...
-        goto :continue
+        goto :uninstall
     )
-    echo Dang doi app dong... [%count%/30]
+    echo Dang doi... [%count%/30]
     timeout /t 1 /nobreak >nul
     goto :waitloop
 )
 
-:continue
+:uninstall
 echo.
-echo Dang thay the file...
+echo Dang go cai dat phien ban cu...
 
-:: Backup old exe
-if exist "%CURRENT_EXE%.bak" del /f /q "%CURRENT_EXE%.bak" >nul 2>&1
-move /y "%CURRENT_EXE%" "%CURRENT_EXE%.bak" >nul 2>&1
+:: Run uninstaller silently
+if exist "%UNINSTALLER%" (
+    "%UNINSTALLER%" /S
+    :: Wait for uninstaller to finish
+    timeout /t 5 /nobreak >nul
+) else (
+    echo Khong tim thay uninstaller, bo qua...
+)
 
-:: Copy new exe
-copy /y "%NEW_EXE%" "%CURRENT_EXE%" >nul 2>&1
+:install
+echo.
+echo Dang cai dat phien ban moi...
+
+:: Run new installer silently
+"%NEW_INSTALLER%" /S
 
 if %ERRORLEVEL% neq 0 (
-    echo LOI: Khong the copy file!
-    echo Dang khoi phuc...
-    move /y "%CURRENT_EXE%.bak" "%CURRENT_EXE%" >nul 2>&1
+    echo LOI: Khong the cai dat!
     echo Vui long thu lai sau.
     timeout /t 5
     exit /b 1
@@ -294,16 +306,10 @@ echo ========================================
 echo    Cap nhat thanh cong!
 echo ========================================
 echo.
-echo Dang khoi dong lai...
-timeout /t 2 /nobreak >nul
-
-:: Start new app
-start "" "%CURRENT_EXE%"
 
 :: Clean up
 timeout /t 3 /nobreak >nul
-del /f /q "%NEW_EXE%" >nul 2>&1
-del /f /q "%CURRENT_EXE%.bak" >nul 2>&1
+del /f /q "%NEW_INSTALLER%" >nul 2>&1
 
 :: Self-delete this batch file
 (goto) 2>nul & del "%~f0"
