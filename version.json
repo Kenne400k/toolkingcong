@@ -1,5 +1,5 @@
 {
-  "version": "1.10.51",
+  "version": "1.10.52",
   "changelog": [
     "Fix hardcoded version header to use dynamic APP_VERSION",
     "Hide AI33 and AI84 server tags from voice cloning cards"
