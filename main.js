@@ -241,6 +241,7 @@ async function downloadUpdate(updateInfo) {
 
       // Escape paths for batch file
       const exeName = path.basename(currentExePath);
+      const installDirEscaped = installDir.replace(/\\/g, '\\\\');
       const uninstallerPathEscaped = uninstallerPath.replace(/\\/g, '\\\\');
       const tempExePathEscaped = tempExePath.replace(/\\/g, '\\\\');
 
@@ -256,6 +257,7 @@ echo.
 
 set "UNINSTALLER=${uninstallerPathEscaped}"
 set "NEW_INSTALLER=${tempExePathEscaped}"
+set "INSTALL_DIR=${installDirEscaped}"
 set "EXE_NAME=${exeName}"
 
 :: Wait for old process to exit (max 30 seconds)
@@ -290,9 +292,10 @@ if exist "%UNINSTALLER%" (
 :install
 echo.
 echo Dang cai dat phien ban moi...
+echo Duong dan: %INSTALL_DIR%
 
-:: Run new installer silently
-"%NEW_INSTALLER%" /S
+:: Run new installer silently with same install directory
+"%NEW_INSTALLER%" /S /D=%INSTALL_DIR%
 
 if %ERRORLEVEL% neq 0 (
     echo LOI: Khong the cai dat!
