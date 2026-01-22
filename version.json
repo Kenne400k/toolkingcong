@@ -1,8 +1,8 @@
 {
-  "version": "1.10.52",
+  "version": "1.11.1",
   "changelog": [
-    "Fix hardcoded version header to use dynamic APP_VERSION",
-    "Hide AI33 and AI84 server tags from voice cloning cards"
+    "Fix bulk upload button disabled when user has enough credits",
+    "Fix credits parsing issue with different locale formats (dot vs comma separator)"
   ],
   "forceUpdate": false,
   "minVersion": "1.0.0",

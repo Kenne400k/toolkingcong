@@ -71,6 +71,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getClonedVoices: () => ipcRenderer.invoke('get-cloned-voices'),
   deleteClonedVoice: (voiceId) => ipcRenderer.invoke('delete-cloned-voice', voiceId),
 
+  // 🔥 Maintenance Check
+  checkMaintenance: () => ipcRenderer.invoke('check-maintenance'),
+
   // 🔥 Auto Update
   getVersion: () => ipcRenderer.invoke('get-version'),
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),

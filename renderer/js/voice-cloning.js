@@ -9,9 +9,9 @@ let previewUrl = null;
 
 // Default preview texts for each language
 const defaultPreviewTexts = {
-    "Auto": "Xin chao, hay nhap van ban bat ky va toi se tu dong nhan dien ngon ngu cua ban.",
+    "Auto": "Xin chào, hãy nhập văn bản bất kỳ và tôi sẽ tự động nhận diện ngôn ngữ của bạn.",
     "English": "Hello, I'm delighted to assist you with our voice services. Choose a voice that resonates with you, and let's begin our creative audio journey together",
-    "Vietnamese": "Xin chao, toi rat vui duoc ho tro ban voi cac dich vu giong noi cua chung toi. Hay chon mot giong noi phu hop voi ban va cung bat dau hanh trinh am thanh sang tao cua chung ta",
+    "Vietnamese": "Xin chào, tôi rất vui được hỗ trợ bạn với các dịch vụ giọng nói của chúng tôi. Hãy chọn một giọng nói phù hợp với bạn và cùng bắt đầu hành trình âm thanh sáng tạo của chúng ta",
     "Chinese": "Nin hao, hen gaoxing neng wei nin tigong peiyin fuwu. Xuanze nin ganxingqu de yinse, rang women yiqi kaishi shengyin chuangzuo de qihuan zhi lu ba.",
     "Japanese": "Kono tabi wa, onsei seisei sabisu wo go riyo itadaki arigatou gozaimasu. O konomi no koe wo o erabi itadaki, onsei sousaku no tabi wo tanoshimimashou.",
     "Korean": "Annyeonghaseyo, eumseong seobiseureul jegonghae deuril su isseo gibbeubnida. Maeume deusineun moksori-reul seontaekhasimyeon hamkke meotjin eumseong jejageul sijakhaeborodo hakgesseupnida.",

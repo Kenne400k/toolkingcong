@@ -2486,9 +2486,51 @@ $(document).ready(function () {
     // 3. LOGIC BẢO TRÌ & BACKUP (MAINTENANCE)
     // ================================================================
 
-    // Lấy biến từ PHP truyền xuống
-    let isElevenLabsDown = (typeof elevenlabsDown !== 'undefined' && elevenlabsDown);
-    let isMinimaxDown = (typeof minimaxDown !== 'undefined' && minimaxDown);
+    // 🔧 Fetch maintenance status từ API (cho Electron app)
+    (async function checkMaintenanceForTTS() {
+        if (window.electronAPI && window.electronAPI.checkMaintenance) {
+            try {
+                const maintenanceResult = await window.electronAPI.checkMaintenance();
+                if (maintenanceResult.status === 'success' && maintenanceResult.maintenance) {
+                    window.elevenlabsDown = maintenanceResult.maintenance.elevenlabs;
+                    window.minimaxDown = maintenanceResult.maintenance.minimax;
+                    console.log('🔧 TTS Maintenance status from API:', maintenanceResult.maintenance);
+
+                    // Apply maintenance UI nếu có
+                    if (window.elevenlabsDown && !window.minimaxDown) {
+                        console.log('⚠️ ElevenLabs bảo trì -> Chuyển sang Minimax');
+                        currentProvider = 'minimax';
+                        setTimeout(() => {
+                            selectProvider('minimax');
+                            disableProviderOption('elevenlabs');
+                            showToast('⚠️ ElevenLabs đang bảo trì. Đã chuyển sang Minimax.');
+                        }, 500);
+                    } else if (window.minimaxDown && !window.elevenlabsDown) {
+                        console.log('⚠️ Minimax bảo trì -> Giữ ElevenLabs');
+                        currentProvider = 'elevenlabs';
+                        setTimeout(() => {
+                            selectProvider('elevenlabs');
+                            disableProviderOption('minimax');
+                            showToast('⚠️ Minimax đang bảo trì.');
+                        }, 500);
+                    } else if (window.elevenlabsDown && window.minimaxDown) {
+                        console.log('⚠️ Cả 2 đều bảo trì');
+                        setTimeout(() => {
+                            disableProviderOption('elevenlabs');
+                            disableProviderOption('minimax');
+                            showToast('⚠️ ElevenLabs và Minimax đều đang bảo trì.');
+                        }, 500);
+                    }
+                }
+            } catch (e) {
+                console.error('❌ Failed to check maintenance:', e);
+            }
+        }
+    })();
+
+    // Lấy biến từ PHP truyền xuống hoặc từ API
+    let isElevenLabsDown = (typeof elevenlabsDown !== 'undefined' && elevenlabsDown) || (typeof window.elevenlabsDown !== 'undefined' && window.elevenlabsDown);
+    let isMinimaxDown = (typeof minimaxDown !== 'undefined' && minimaxDown) || (typeof window.minimaxDown !== 'undefined' && window.minimaxDown);
     let isBackupEligible = (typeof backupEligible !== 'undefined' && backupEligible);
     let isGenaiBackupDown = (typeof genaiBackupDown !== 'undefined' && genaiBackupDown);
 
@@ -2787,7 +2829,7 @@ function setupEventListeners() {
             }
 
             // Hiển thị chữ với màu sắc tương ứng
-            $('#stabilityVal').html(`<span style="color: ${color}; font-weight: bold;">${text}</span>`);
+            $('#stabilityVal').html(`<span>${text}</span>`);
         } else {
             // Model thường hiển thị %
             $('#stabilityVal').text(this.value + '%');
@@ -3417,7 +3459,7 @@ function updateElevenLabsUI(modelId) {
         // Cập nhật lại text %
         let currentVal = $('#stability').val();
         const stabilityLabel = window.jsLang?.tts_stability || 'Độ ổn định';
-        $('#slider-stability .slider-header').html(`<span data-i18n="tts_stability">${stabilityLabel}</span> <span id="stabilityVal" style="color: #ffffff;">${currentVal}%</span>`);
+        $('#slider-stability .slider-header').html(`<span data-i18n="tts_stability">${stabilityLabel}</span> <span id="stabilityVal">${currentVal}%</span>`);
 
         // Ẩn nhãn 3 nấc
         $('#stability-labels').hide();
@@ -5056,7 +5098,7 @@ function calculateCost() {
     // Hiển thị ra màn hình
     $('#estimatedCost').text(total_cost.toLocaleString());
 
-    let currentCredits = parseInt($('#userCredits').text().replace(/,/g, '') || '0');
+    let currentCredits = parseInt($('#userCredits').text().replace(/[^0-9]/g, '') || '0');
     if (currentCredits < total_cost && charCount > 0) {
         $('#estimatedCost').css('color', '#ef4444');
     } else {
@@ -5486,7 +5528,7 @@ function proceedWithTTS() {
         success: function (res) {
             if (res.status === 'success') {
                 // 1. Cập nhật số dư
-                let currentBalance = parseInt($('#userCredits').text().replace(/,/g, ''));
+                let currentBalance = parseInt($('#userCredits').text().replace(/[^0-9]/g, ''));
                 let newBalance = res.new_balance || (currentBalance - res.credit_cost);
                 $('#userCredits').text(newBalance.toLocaleString());
 
@@ -5530,7 +5572,7 @@ function proceedWithTTS() {
                 console.warn('⏰ Request timeout, creating pending card...');
 
                 // Trừ tiền tạm thời trên giao diện
-                let currentBalance = parseInt($('#userCredits').text().replace(/,/g, ''));
+                let currentBalance = parseInt($('#userCredits').text().replace(/[^0-9]/g, ''));
                 let newBalance = currentBalance - estimatedCost;
                 $('#userCredits').text(newBalance.toLocaleString());
 
@@ -6888,7 +6930,7 @@ function updateRemakeCost() {
     $('#remakeCostDisplay').text(total_cost.toLocaleString() + ' credits');
 
     // Check balance
-    let currentCredits = parseInt($('#userCredits').text().replace(/,/g, '') || '0');
+    let currentCredits = parseInt($('#userCredits').text().replace(/[^0-9]/g, '') || '0');
     if (currentCredits < total_cost) {
         $('#remakeCostDisplay').css('color', '#ef4444');
         $('#btnConfirmRemake').prop('disabled', true);
@@ -8218,20 +8260,25 @@ function calculateBulkCost() {
         // 🔥 SỬA: Đổi từ #estimatedCost sang #bulkEstimatedCost
         $('#bulkEstimatedCost').text(total_cost.toLocaleString() + ' credits');
 
-        let currentCredits = parseInt($('#userCredits').text().replace(/,/g, '') || '0');
+        let rawCreditsText = $('#userCredits').text();
+        let currentCredits = parseInt(rawCreditsText.replace(/[^0-9]/g, '') || '0');
 
-        console.log('  - Current credits:', currentCredits);
-        console.log('  - Need:', total_cost);
+        console.log('🔍 [BULK DEBUG] =====================');
+        console.log('  - Raw credits text:', rawCreditsText);
+        console.log('  - Parsed credits:', currentCredits);
+        console.log('  - Total cost:', total_cost);
+        console.log('  - Comparison:', currentCredits, '<', total_cost, '=', currentCredits < total_cost);
 
         if (currentCredits < total_cost) {
             $('#btnBulkProcess').prop('disabled', true).css('opacity', '0.5');
             $('#bulkEstimatedCost').css('color', '#ef4444'); // 🔥 SỬA
-            console.log('  → Not enough credits');
+            console.log('  ❌ BLOCKED: Not enough credits');
         } else {
             $('#btnBulkProcess').prop('disabled', false).css('opacity', '1');
             $('#bulkEstimatedCost').css('color', '#fbbf24'); // 🔥 SỬA
-            console.log('  → Enough credits');
+            console.log('  ✅ OK: Enough credits');
         }
+        console.log('=====================================');
     }
 
     // 8. HIỂN THỊ SUMMARY
@@ -8408,7 +8455,7 @@ async function confirmBulkProcess() {
                     }
                 }
 
-                let currentBalance = parseInt($('#userCredits').text().replace(/,/g, ''));
+                let currentBalance = parseInt($('#userCredits').text().replace(/[^0-9]/g, ''));
                 let newBalance = res.new_balance !== undefined ? res.new_balance : (currentBalance - (res.credit_cost || 0));
                 $('#userCredits').text(newBalance.toLocaleString());
 
@@ -8818,14 +8865,15 @@ function disableProviderOption(provider) {
     if ($option.length) {
         $option.addClass('provider-disabled');
 
-        if (!$option.find('.maintenance-badge').length) {
-            $option.find('.provider-desc').html(`
-                <span class="maintenance-badge">🔴 Đang bảo trì</span>
-            `);
+        // Thêm icon bảo trì bên cạnh tên provider
+        if (!$option.find('.maintenance-icon').length) {
+            const lang = typeof i18n !== 'undefined' ? i18n.currentLang : 'vi';
+            const tooltip = lang === 'en' ? 'Under Maintenance' : 'Đang bảo trì';
+            $option.append(`<i class="bi bi-tools maintenance-icon" title="${tooltip}" style="margin-left: auto; color: #f59e0b; font-size: 14px;"></i>`);
         }
 
         $option.css('pointer-events', 'none');
-        $option.css('opacity', '0.5');
+        $option.css('opacity', '0.6');
 
         console.log('❌ Disabled provider:', provider);
     }

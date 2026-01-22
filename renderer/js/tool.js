@@ -166,7 +166,7 @@ const LANGUAGES = {
         voiceIdPlaceholder: 'Voice ID...',
         stopped: 'Đã dừng',
         completedSummary: 'Hoàn tất - {done} thành công, {failed} thất bại',
-        processingSummary: 'Đang xử lý... ({done}/{total} hoàn thành, {active} đang xử lý)',
+        processingSummary: 'Đang xử lý...',
         processingShort: 'đang xử lý',
 
         // Backup
@@ -224,6 +224,13 @@ class ProToolManager {
         this.libraryVoicesLoading = false;
         this.currentVoiceTab = 'default';
 
+        // Maintenance state
+        this.maintenance = {
+            tts: false,
+            elevenlabs: false,
+            minimax: false
+        };
+
         this.init();
     }
 
@@ -250,8 +257,229 @@ class ProToolManager {
         this.setupVoiceLibraryListener();
         this.loadResourcesOnInit(); // Load models & voices từ server
         this.updateVoiceSettingsUI(); // Initialize provider-specific settings
+        this.checkMaintenanceStatus(); // Check maintenance status on init
         this.updateProgress();
         console.log('✅ ProToolManager initialized');
+    }
+
+    // 🔧 Check maintenance status from server
+    async checkMaintenanceStatus() {
+        try {
+            if (window.electronAPI && window.electronAPI.checkMaintenance) {
+                const result = await window.electronAPI.checkMaintenance();
+
+                if (result.status === 'success' && result.maintenance) {
+                    this.maintenance = result.maintenance;
+                    console.log('🔧 Maintenance status:', this.maintenance);
+
+                    // Update UI based on maintenance status
+                    this.updateMaintenanceUI();
+                }
+            }
+        } catch (error) {
+            console.error('❌ Check maintenance error:', error);
+        }
+    }
+
+    // 🔧 Update UI based on maintenance status
+    updateMaintenanceUI() {
+        const { tts, elevenlabs, minimax } = this.maintenance;
+        console.log('🔧 Updating maintenance UI:', { tts, elevenlabs, minimax });
+
+        // 1. If TTS maintenance is on (ID 7) - show maintenance overlay for entire Pro Tool
+        if (tts) {
+            this.showMaintenanceOverlay('tts');
+            return; // Don't need to check further
+        }
+
+        // 2. Update provider options based on maintenance
+        this.updateProviderMaintenanceUI(elevenlabs, minimax);
+
+        // 3. Update footer status if both are in maintenance
+        this.updateFooterMaintenanceStatus(elevenlabs, minimax);
+    }
+
+    // 🔧 Show maintenance overlay for TTS tab
+    showMaintenanceOverlay(type) {
+        const toolContent = document.querySelector('.tool-content');
+        if (!toolContent) return;
+
+        // Check if overlay already exists
+        let overlay = document.getElementById('maintenanceOverlay');
+        if (overlay) return;
+
+        const lang = typeof i18n !== 'undefined' ? i18n.currentLang : 'vi';
+        const texts = {
+            vi: {
+                title: 'Đang bảo trì',
+                message: 'Tính năng Pro Tool đang được bảo trì. Vui lòng quay lại sau.',
+                status: 'Đang xử lý'
+            },
+            en: {
+                title: 'Under Maintenance',
+                message: 'Pro Tool feature is under maintenance. Please come back later.',
+                status: 'In Progress'
+            }
+        };
+        const t = texts[lang] || texts.vi;
+
+        overlay = document.createElement('div');
+        overlay.id = 'maintenanceOverlay';
+        overlay.innerHTML = `
+            <div class="maintenance-box">
+                <div class="maintenance-icon"><i class="bi bi-tools"></i></div>
+                <h2>${t.title}</h2>
+                <p>${t.message}</p>
+                <div class="maintenance-status">
+                    <span class="status-dot"></span>
+                    <span>${t.status}</span>
+                </div>
+            </div>
+        `;
+        overlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 12px;
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            #maintenanceOverlay .maintenance-box {
+                text-align: center;
+                padding: 40px;
+            }
+            #maintenanceOverlay .maintenance-icon {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 20px;
+                background: #222;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 36px;
+                color: #f59e0b;
+            }
+            #maintenanceOverlay h2 {
+                font-size: 24px;
+                color: #fff;
+                margin-bottom: 12px;
+            }
+            #maintenanceOverlay p {
+                color: #888;
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+            #maintenanceOverlay .maintenance-status {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                background: rgba(245, 158, 11, 0.1);
+                border: 1px solid rgba(245, 158, 11, 0.3);
+                border-radius: 20px;
+                color: #f59e0b;
+                font-size: 13px;
+            }
+            #maintenanceOverlay .status-dot {
+                width: 8px;
+                height: 8px;
+                background: #f59e0b;
+                border-radius: 50%;
+                animation: pulse 2s ease-in-out infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        toolContent.style.position = 'relative';
+        toolContent.appendChild(overlay);
+    }
+
+    // 🔧 Update provider dropdown based on maintenance
+    updateProviderMaintenanceUI(elevenlabsMaintenance, minimaxMaintenance) {
+        const elevenlabsOption = document.querySelector('.provider-option[data-provider="elevenlabs"]');
+        const minimaxOption = document.querySelector('.provider-option[data-provider="minimax"]');
+
+        // Update Elevenlabs option
+        if (elevenlabsOption) {
+            const existingIcon = elevenlabsOption.querySelector('.maintenance-icon');
+            if (elevenlabsMaintenance) {
+                elevenlabsOption.classList.add('maintenance-disabled');
+                if (!existingIcon) {
+                    const icon = document.createElement('i');
+                    icon.className = 'bi bi-tools maintenance-icon';
+                    icon.title = typeof i18n !== 'undefined' && i18n.currentLang === 'en' ? 'Under Maintenance' : 'Đang bảo trì';
+                    elevenlabsOption.appendChild(icon);
+                }
+            } else {
+                elevenlabsOption.classList.remove('maintenance-disabled');
+                if (existingIcon) existingIcon.remove();
+            }
+        }
+
+        // Update Minimax option
+        if (minimaxOption) {
+            const existingIcon = minimaxOption.querySelector('.maintenance-icon');
+            if (minimaxMaintenance) {
+                minimaxOption.classList.add('maintenance-disabled');
+                if (!existingIcon) {
+                    const icon = document.createElement('i');
+                    icon.className = 'bi bi-tools maintenance-icon';
+                    icon.title = typeof i18n !== 'undefined' && i18n.currentLang === 'en' ? 'Under Maintenance' : 'Đang bảo trì';
+                    minimaxOption.appendChild(icon);
+                }
+            } else {
+                minimaxOption.classList.remove('maintenance-disabled');
+                if (existingIcon) existingIcon.remove();
+            }
+        }
+
+        // If current provider is in maintenance, switch to the other one
+        if (this.provider === 'elevenlabs' && elevenlabsMaintenance && !minimaxMaintenance) {
+            this.setProvider('minimax');
+        } else if (this.provider === 'minimax' && minimaxMaintenance && !elevenlabsMaintenance) {
+            this.setProvider('elevenlabs');
+        }
+    }
+
+    // 🔧 Update footer status when both providers are in maintenance
+    updateFooterMaintenanceStatus(elevenlabsMaintenance, minimaxMaintenance) {
+        const statusText = document.getElementById('statusText');
+        const statusDot = document.querySelector('.tool-footer .status-dot');
+
+        if (elevenlabsMaintenance && minimaxMaintenance) {
+            const lang = typeof i18n !== 'undefined' ? i18n.currentLang : 'vi';
+            if (statusText) {
+                statusText.textContent = lang === 'vi' ? 'Đang bảo trì' : 'Maintenance';
+                statusText.removeAttribute('data-i18n');
+            }
+            if (statusDot) {
+                statusDot.style.background = '#f59e0b'; // Orange for maintenance
+            }
+        }
+    }
+
+    // 🔧 Set provider method (for switching when maintenance)
+    setProvider(provider) {
+        this.provider = provider;
+        document.getElementById('providerSelect').value = provider;
+
+        // Update UI
+        if (typeof selectProvider === 'function') {
+            selectProvider(provider);
+        }
     }
 
     // Listen for voice library updates from new window
@@ -1538,22 +1766,76 @@ class ProToolManager {
         const chars2 = document.getElementById('silentChars2')?.value || '.:?!';
         const time2 = document.getElementById('silentTime2')?.value || '0.5';
 
-        // Build regex from characters
-        const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex1 = new RegExp(`[${escapeRegex(chars1)}]`, 'g');
-        const regex2 = new RegExp(`[${escapeRegex(chars2)}]`, 'g');
+        // Determine replacement format based on provider
+        const breakTag1 = provider === 'elevenlabs' ? `<break time="${time1}s"/>` : `<#${time1}#>`;
+        const breakTag2 = provider === 'elevenlabs' ? `<break time="${time2}s"/>` : `<#${time2}#>`;
 
-        if (provider === 'elevenlabs') {
-            // ElevenLabs format: <break time="0.3s"/>
-            text = text.replace(regex1, `<break time="${time1}s"/>`);
-            text = text.replace(regex2, `<break time="${time2}s"/>`);
-        } else {
-            // Minimax format: <#0.3#>
-            text = text.replace(regex1, `<#${time1}#>`);
-            text = text.replace(regex2, `<#${time2}#>`);
+        // Helper to escape regex special chars
+        const escapeRegex = (char) => char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // Helper: check if position is inside a tag
+        const isInsideTag = (str, pos) => {
+            let inTag = false;
+            for (let i = 0; i < pos; i++) {
+                if (str[i] === '<') inTag = true;
+                if (str[i] === '>') inTag = false;
+            }
+            return inTag;
+        };
+
+        // Helper: check if char at position is between digits (for decimal numbers)
+        const isBetweenDigits = (str, pos) => {
+            const prevChar = pos > 0 ? str[pos - 1] : '';
+            const nextChar = pos < str.length - 1 ? str[pos + 1] : '';
+            return /\d/.test(prevChar) && /\d/.test(nextChar);
+        };
+
+        // Process text character by character
+        let result = '';
+        let i = 0;
+        while (i < text.length) {
+            const char = text[i];
+
+            // Skip if inside a tag
+            if (isInsideTag(text, i)) {
+                result += char;
+                i++;
+                continue;
+            }
+
+            // Check chars1 (,;) - replace with breakTag1
+            if (chars1.includes(char)) {
+                if (!isBetweenDigits(text, i)) {
+                    result += breakTag1;
+                } else {
+                    result += char;
+                }
+                i++;
+                continue;
+            }
+
+            // Check chars2 (.:?!) - replace with breakTag2
+            if (chars2.includes(char)) {
+                // For dot, also check if between digits
+                if (char === '.') {
+                    if (!isBetweenDigits(text, i)) {
+                        result += breakTag2;
+                    } else {
+                        result += char;
+                    }
+                } else {
+                    result += breakTag2;
+                }
+                i++;
+                continue;
+            }
+
+            // Normal character
+            result += char;
+            i++;
         }
 
-        return text;
+        return result;
     }
 
     removeSpecialCharacters(text) {
@@ -2099,7 +2381,7 @@ class ProToolManager {
         const completedSummary = this.t('completedSummary')
             .replace('{done}', done)
             .replace('{failed}', failed);
-        document.getElementById('statusText').textContent = completedSummary;
+        document.getElementById('statusText').textContent = this.t('ready');
 
         if (done + failed > 0) {
             openInfoModal(completedSummary);
@@ -3041,25 +3323,29 @@ class ProToolManager {
                 const speedSlider = document.getElementById('voiceSpeed');
                 if (speedSlider) {
                     speedSlider.value = this.voiceSpeed;
-                    document.getElementById('speedValue').textContent = this.voiceSpeed;
                 }
 
                 const stabilitySlider = document.getElementById('voiceStability');
                 if (stabilitySlider) {
                     stabilitySlider.value = this.voiceStability;
-                    document.getElementById('stabilityValue').textContent = this.voiceStability;
                 }
 
                 const similaritySlider = document.getElementById('voiceSimilarity');
                 if (similaritySlider) {
                     similaritySlider.value = this.voiceSimilarity;
-                    document.getElementById('similarityValue').textContent = this.voiceSimilarity;
                 }
 
                 const styleSlider = document.getElementById('voiceStyle');
                 if (styleSlider) {
                     styleSlider.value = this.voiceStyle;
-                    document.getElementById('styleValue').textContent = this.voiceStyle;
+                }
+
+                // Update slider displays with proper formatting
+                if (typeof updateSlider === 'function') {
+                    updateSlider('speed');
+                    updateSlider('stability');
+                    updateSlider('similarity');
+                    updateSlider('style');
                 }
 
                 const speakerBoostCb = document.getElementById('speakerBoost');
@@ -3441,7 +3727,24 @@ function closeConfirmModal() {
 document.addEventListener('DOMContentLoaded', () => {
     proTool = new ProToolManager();
     initConfirmModal();
+
+    // Initialize slider track fills for light theme
+    initSliderFills();
 });
+
+// Initialize all slider track fills on page load
+function initSliderFills() {
+    const sliders = [
+        'voiceSpeed', 'voiceStability', 'voiceSimilarity', 'voiceStyle',
+        'mmVoiceSpeed', 'mmVoicePitch', 'mmVoiceVol'
+    ];
+    sliders.forEach(id => {
+        const slider = document.getElementById(id);
+        if (slider) {
+            updateSliderFillTrack(slider);
+        }
+    });
+}
 
 document.addEventListener('app:language-changed', (event) => {
     const lang = event.detail?.lang;
@@ -3522,6 +3825,9 @@ function resetVoiceSettings() {
     document.getElementById('silentTime1').value = 0.3;
     document.getElementById('silentChars2').value = '.:?!';
     document.getElementById('silentTime2').value = 0.5;
+
+    // Update slider fills after reset
+    initSliderFills();
 
     proTool.saveSettings();
     proTool.showNotification('Đã reset về mặc định', 'success');
@@ -3837,6 +4143,26 @@ function openOutputFolder() {
 }
 
 function selectProvider(provider) {
+    // Check if provider is in maintenance
+    if (proTool.maintenance) {
+        if (provider === 'elevenlabs' && proTool.maintenance.elevenlabs) {
+            const lang = typeof i18n !== 'undefined' ? i18n.currentLang : 'vi';
+            proTool.showNotification(
+                lang === 'vi' ? 'ElevenLabs đang bảo trì' : 'ElevenLabs is under maintenance',
+                'warning'
+            );
+            return;
+        }
+        if (provider === 'minimax' && proTool.maintenance.minimax) {
+            const lang = typeof i18n !== 'undefined' ? i18n.currentLang : 'vi';
+            proTool.showNotification(
+                lang === 'vi' ? 'Minimax đang bảo trì' : 'Minimax is under maintenance',
+                'warning'
+            );
+            return;
+        }
+    }
+
     proTool.provider = provider;
     document.getElementById('providerSelect').value = provider;
 
@@ -4730,13 +5056,26 @@ function checkIsV3() {
     return modelId.toLowerCase().includes('v3');
 }
 
+// Helper function to update slider track fill gradient
+function updateSliderFillTrack(slider) {
+    if (!slider) return;
+    const min = parseFloat(slider.min) || 0;
+    const max = parseFloat(slider.max) || 100;
+    const val = parseFloat(slider.value) || 0;
+    const percentage = ((val - min) / (max - min)) * 100;
+    slider.style.setProperty('--value', percentage + '%');
+}
+
 function updateSlider(type) {
+    let slider;
     switch (type) {
         case 'speed':
-            document.getElementById('speedValue').textContent = parseFloat(document.getElementById('voiceSpeed').value).toFixed(2);
+            slider = document.getElementById('voiceSpeed');
+            document.getElementById('speedValue').textContent = parseFloat(slider.value).toFixed(2);
             break;
         case 'stability':
-            const stabVal = parseInt(document.getElementById('voiceStability').value);
+            slider = document.getElementById('voiceStability');
+            const stabVal = parseInt(slider.value);
             const stabDisplay = document.getElementById('stabilityValue');
             // Check V3 directly from model select
             const currentIsV3 = isV3Model || checkIsV3();
@@ -4752,25 +5091,31 @@ function updateSlider(type) {
             } else {
                 stabDisplay.textContent = stabVal + '%';
             }
-            stabDisplay.style.color = '#fff';
             break;
         case 'similarity':
-            document.getElementById('similarityValue').textContent = document.getElementById('voiceSimilarity').value + '%';
+            slider = document.getElementById('voiceSimilarity');
+            document.getElementById('similarityValue').textContent = slider.value + '%';
             break;
         case 'style':
-            document.getElementById('styleValue').textContent = document.getElementById('voiceStyle').value + '%';
+            slider = document.getElementById('voiceStyle');
+            document.getElementById('styleValue').textContent = slider.value + '%';
             break;
         // Minimax sliders
         case 'mmSpeed':
-            document.getElementById('mmSpeedValue').textContent = parseFloat(document.getElementById('mmVoiceSpeed').value).toFixed(2);
+            slider = document.getElementById('mmVoiceSpeed');
+            document.getElementById('mmSpeedValue').textContent = parseFloat(slider.value).toFixed(2);
             break;
         case 'mmPitch':
-            document.getElementById('mmPitchValue').textContent = document.getElementById('mmVoicePitch').value;
+            slider = document.getElementById('mmVoicePitch');
+            document.getElementById('mmPitchValue').textContent = slider.value;
             break;
         case 'mmVol':
-            document.getElementById('mmVolValue').textContent = parseFloat(document.getElementById('mmVoiceVol').value).toFixed(2);
+            slider = document.getElementById('mmVoiceVol');
+            document.getElementById('mmVolValue').textContent = parseFloat(slider.value).toFixed(2);
             break;
     }
+    // Update slider track fill for light theme gradient
+    updateSliderFillTrack(slider);
 }
 
 // Apply V3 model settings (only Stability with 3 tiers)
@@ -4834,6 +5179,7 @@ function resetVoiceSettings() {
         updateSlider('style');
     }
 
+    proTool?.saveSettings?.();
     proTool?.showNotification?.('Reset voice settings', 'success');
 }
 

@@ -13,7 +13,7 @@ const SESSION_FILE = path.join(SESSION_DIR, 'session.json');
 
 // =================== APP VERSION ===================
 // Hardcode version - update this when releasing new version
-const APP_VERSION = '1.10.52';
+const APP_VERSION = '1.11.1';
 
 // =================== AUTO UPDATE CONFIG ===================
 const UPDATE_SERVER_BASE = 'https://kingcongstudio.com/serverkingcong_tools';
@@ -731,6 +731,43 @@ ipcMain.handle('get-resources', async () => {
       status: 'error',
       message: error.message
     };
+  }
+});
+
+// 🔥 CHECK MAINTENANCE STATUS
+ipcMain.handle('check-maintenance', async () => {
+  const fetch = require('node-fetch');
+
+  try {
+    const response = await fetch('https://kingcongstudio.com/api/maintenance-webhook.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list' })
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'success' && data.services) {
+      // Lọc ra các service cần check cho tool (ID 7, 8, 9)
+      const toolServices = data.services.filter(s => [7, 8, 9].includes(Number(s.id)));
+
+      console.log('🔧 Maintenance services:', toolServices);
+
+      return {
+        status: 'success',
+        maintenance: {
+          tts: Number(toolServices.find(s => Number(s.id) === 7)?.is_active) === 1,       // Tab TTS
+          elevenlabs: Number(toolServices.find(s => Number(s.id) === 8)?.is_active) === 1, // Elevenlabs
+          minimax: Number(toolServices.find(s => Number(s.id) === 9)?.is_active) === 1     // Minimax
+        }
+      };
+    }
+
+    return { status: 'error', message: 'Could not get maintenance status' };
+
+  } catch (error) {
+    console.error('❌ Check Maintenance Error:', error);
+    return { status: 'error', message: error.message };
   }
 });
 

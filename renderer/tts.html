@@ -282,6 +282,23 @@
             opacity: 1;
             visibility: visible;
         }
+
+        /* Maintenance disabled state */
+        .provider-option.provider-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .provider-option.provider-disabled .provider-name {
+            color: #f59e0b;
+        }
+
+        .provider-option .maintenance-icon {
+            margin-left: auto;
+            color: #f59e0b;
+            font-size: 14px;
+        }
     </style>
     <link rel="stylesheet" href="css/theme.css">
 </head>

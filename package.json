@@ -1,6 +1,6 @@
 {
   "name": "kingcong-tts-tool",
-  "version": "1.10.52",
+  "version": "1.11.1",
   "description": "Text-to-Speech Desktop Tool for KingCong Studio",
   "main": "main.js",
   "scripts": {
@@ -10,7 +10,8 @@
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux",
-    "build:secure": "node scripts/build-secure.js"
+    "build:secure": "node scripts/build-secure.js",
+    "release": "node scripts/build-and-release.js"
   },
   "keywords": [
     "electron",
@@ -21,11 +22,13 @@
   "author": "@Kenne400k",
   "license": "MIT",
   "devDependencies": {
+    "archiver": "^7.0.1",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.0",
     "javascript-obfuscator": "^5.1.0"
   },
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "dotenv": "^16.3.1",
     "form-data": "^4.0.0",
     "node-fetch": "^2.7.0"
