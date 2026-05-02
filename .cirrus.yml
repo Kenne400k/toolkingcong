@@ -1,0 +1,16 @@
+build_mac_task:
+  macos_instance:
+    image: ghcr.io/cirruslabs/macos-sequoia-xcode:latest
+
+  install_node_script:
+    - brew install node@20
+    - brew link node@20 --force --overwrite
+
+  install_deps_script:
+    - npm ci
+
+  build_script:
+    - CSC_IDENTITY_AUTO_DISCOVERY=false npm run build:mac
+
+  artifacts:
+    path: dist/*.dmg
