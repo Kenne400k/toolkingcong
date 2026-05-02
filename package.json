@@ -48,6 +48,17 @@
       "!sessions",
       "!*.md"
     ],
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "icon": "image/icon.png",
+      "category": "public.app-category.utilities"
+    },
+    "dmg": {
+      "title": "KingCong TTS Tool",
+      "window": { "width": 540, "height": 380 }
+    },
     "win": {
       "target": "nsis",
       "icon": "image/icon.ico",
